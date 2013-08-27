@@ -38,6 +38,39 @@ ElementNode.prototype = {
   }
 };
 
+function CompileError(message) {
+  this.message = message;
+}
+
+function NodeCompiler(topLevelClassMap) {
+  this.topLevelClassMap = topLevelClassMap;
+}
+
+NodeCompiler.prototype = {
+  compile: function(rootElementNode) {
+    var elementArgs = rootElementNode.args;
+    if (elementArgs.length == 0) {
+      throw new CompileError("No node function name given for root element");
+    }
+    var functionName = elementArgs[0];
+    if (functionName.match(/^_/)) {
+      functionName = functionName.substring(1);
+    }
+    var nodeFunctionClass = this.topLevelClassMap[functionName];
+    if (!nodeFunctionClass) {
+      throw new CompileError("Unknown top-level function for root element: " + functionName);
+    }
+    var rootObject = Object.create(nodeFunctionClass.prototype);
+    nodeFunctionClass.apply(rootObject, elementArgs.slice(1));
+    var childNodes = rootElementNode.children;
+    for (var i=0; i<childNodes.length; i++) {
+      var childNode = childNodes[i];
+      this.compileChild(rootObject, childNode);
+    }
+    return rootObject;
+  }
+};
+
 function NodeParseException(message) {
   this.message = message;
 }
