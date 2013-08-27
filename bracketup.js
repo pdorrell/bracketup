@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 function inspect(object) {
   return JSON.stringify(object);
 }
@@ -95,9 +97,14 @@ var testLine2 = "ABCabcDEFghi";
 
 var bracketupScanner = new BracketupScanner(testLine);
 
-bracketupScanner.scan(new TestTokenReceiver());
+//bracketupScanner.scan(new TestTokenReceiver());
 
 
+var testFileName = "sample.bracketup";
+
+var fileContents = fs.readFileSync(testFileName, {encoding: "utf-8"});
+
+console.log("fileContents = " + inspect(fileContents));
 
 
 
