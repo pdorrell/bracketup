@@ -26,8 +26,6 @@ TestTokenReceiver.prototype = {
   }
 };
 
-var lexerRegex = /(?:(\[)([A-Za-z0-9_\-,]*)([\s]*))|(\])|(\\(.))|([^[\]\\]+)/g;
-
 var testLine = "[correspondence  [_title \\[Queens\\] Puzzle] " + 
   "[_text,rhoscript [_title rhoScript] [A [_word,1 8] [2 range]]";
 
