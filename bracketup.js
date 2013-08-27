@@ -25,8 +25,9 @@ EndOfLineNode.prototype = {
   }
 }
 
-function ElementNode(args) {
+function ElementNode(args, whitespace) {
   this.args = args;
+  this.whitespace = whitespace;
   this.children = [];
 }
 
@@ -56,6 +57,14 @@ function NodeCompiler(topLevelClassMap) {
 }
 
 NodeCompiler.prototype = {
+  createObjectFromFunctionClass: function(functionClass, constructorArgs, initialWhitespace) {
+    var object = Object.create(functionClass.prototype);
+    functionClass.apply(object, constructorArgs);
+    if (object.prependWhitespace) {
+      object.prependWhitespace(initialWhitespace);
+    }
+    return object;
+  }, 
   compile: function(rootElementNode) {
     var elementArgs = rootElementNode.args;
     if (elementArgs.length == 0) {
@@ -69,8 +78,8 @@ NodeCompiler.prototype = {
     if (!nodeFunctionClass) {
       throw new CompileError("Unknown top-level function for root element: " + functionName);
     }
-    var rootObject = Object.create(nodeFunctionClass.prototype);
-    nodeFunctionClass.apply(rootObject, elementArgs.slice(1));
+    var rootObject = this.createObjectFromFunctionClass(nodeFunctionClass, elementArgs.slice(1), 
+                                                        rootElementNode.whitespace);
     var childNodes = rootElementNode.children;
     for (var i=0; i<childNodes.length; i++) {
       var childNode = childNodes[i];
@@ -113,7 +122,8 @@ NodeCompiler.prototype = {
       throw new CompileError("No function class found for " + inspect(functionName) + 
                              " in either parent class map or top-level class map");
     }
-    var childObject = Object.create(childFunctionClass.prototype);
+    var childObject = this.createObjectFromFunctionClass(childFunctionClass, elementArgs, 
+                                                         childNode.whitespace);
     childFunctionClass.apply(childObject, elementArgs);
     if(childObject.addToParent) {
       childObject.addToParent(parentObject);
@@ -136,7 +146,7 @@ function NodeParser() {
 
 NodeParser.prototype = {
   startItem: function(itemArguments, whitespace) {
-    var elementNode = new ElementNode(itemArguments);
+    var elementNode = new ElementNode(itemArguments, whitespace);
     if (this.currentElementNode == null) {
       this.rootElements.push(elementNode);
     }    
@@ -285,5 +295,6 @@ BracketupScanner.prototype = {
 
 exports.BracketupScanner = BracketupScanner;
 exports.NodeParser = NodeParser;
+exports.NodeCompiler = NodeCompiler;
 exports.TestTokenReceiver = TestTokenReceiver;
 
