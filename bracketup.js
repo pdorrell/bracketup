@@ -1,8 +1,4 @@
-var fs = require('fs');
-
-function inspect(object) {
-  return JSON.stringify(object);
-}
+function inspect(object) {return JSON.stringify(object);}
 
 function TextNode(string) {
   this.string = string;
@@ -200,27 +196,8 @@ BracketupScanner.prototype = {
     }
   }
 };
-  
-var bracketupScanner = new BracketupScanner();
 
-//bracketupScanner.scanLine(new TestTokenReceiver(), testLine);
-
-var testFileName = "sample.bracketup";
-
-var fileContents = fs.readFileSync(testFileName, {encoding: "utf-8"});
-
-//var fileLines = fileContents.split("\n");
-
-//console.log("fileLines = " + inspect(fileLines));
-
-var nodeParser = new NodeParser();
-bracketupScanner.scanSource(nodeParser, fileContents);
-
-var rootElements = nodeParser.rootElements;
-console.log("Read in " + rootElements.length + " root elements from " + testFileName);
-console.log("");
-
-for (var i=0; i<rootElements.length; i++) {
-  console.log("ROOT ELEMENT:\n  " + rootElements[i] + "\n");
-}
+exports.BracketupScanner = BracketupScanner;
+exports.NodeParser = NodeParser;
+exports.TestTokenReceiver = TestTokenReceiver;
 
