@@ -25,14 +25,16 @@ TestTokenReceiver.prototype = {
   }, 
   text: function(string) {
     console.log(this.indent + "TEXT " + inspect(string));
+  }, 
+  endOfLine: function() {
+    console.log(this.indent + "EOLN");
   }
 };
 
 var testLine = "[correspondence  [_title \\[Queens\\] Puzzle] " + 
   "[_text,rhoscript [_title rhoScript] [A [_word,1 8] [2 range]]";
 
-function BracketupScanner(string) {
-  this.string = string;
+function BracketupScanner() {
 }
 
 BracketupScanner.prototype = {
@@ -45,12 +47,12 @@ BracketupScanner.prototype = {
     }
   }, 
   
-  scan: function(tokenReceiver) {
+  scanLine: function(tokenReceiver, line) {
     var scanningRegex = new RegExp(this.regex.source, "g");
-    console.log("Scanning " + inspect(this.string) + "\n  with " + scanningRegex + " ..."); 
+    // console.log("Scanning " + inspect(line) + "\n  with " + scanningRegex + " ..."); 
     var matchedSubstrings = [];
     this.textPortions = [];
-    while ((match = scanningRegex.exec(this.string)) !== null) {
+    while ((match = scanningRegex.exec(line)) !== null) {
       // console.log("  match = " + inspect(match));
       matchedSubstrings.push(match[0]);
       // console.log("==> " + inspect(match[0]));
@@ -76,35 +78,35 @@ BracketupScanner.prototype = {
       }
     }
     this.sendAnyTexts(tokenReceiver);
+    tokenReceiver.endOfLine();
 
     var reconstitutedMatches = matchedSubstrings.join("");
-    if (reconstitutedMatches != this.string) {
+    if (reconstitutedMatches != line) {
       throw new Error("Reconstituted " + inspect(reconstitutedMatches) + 
-                    "\n                  != " + inspect(this.string));
+                    "\n                  != " + inspect(line));
     }
-    console.log("matched substrings = " + inspect(matchedSubstrings.join("")));
+    // console.log("matched substrings = " + inspect(matchedSubstrings.join("")));
+  }, 
+  
+  scanSource: function(tokenReceiver, source) {
+    var lines = source.split("\n");
+    for (var i=0; i<lines.length; i++) {
+      this.scanLine(tokenReceiver, lines[i]);
+    }
   }
 };
   
+var bracketupScanner = new BracketupScanner();
 
-function scan(string, regex, tokenReceiver) {
-  var match;
-  var scanningRegex = new RegExp(regex.source, "g");
-}
-
-var testRegex = /([A-Z]+)|([^A-Z]+)/g;
-var testLine2 = "ABCabcDEFghi";
-
-var bracketupScanner = new BracketupScanner(testLine);
-
-//bracketupScanner.scan(new TestTokenReceiver());
-
+//bracketupScanner.scanLine(new TestTokenReceiver(), testLine);
 
 var testFileName = "sample.bracketup";
 
 var fileContents = fs.readFileSync(testFileName, {encoding: "utf-8"});
 
-console.log("fileContents = " + inspect(fileContents));
+//var fileLines = fileContents.split("\n");
 
+//console.log("fileLines = " + inspect(fileLines));
 
+bracketupScanner.scanSource(new TestTokenReceiver(), fileContents);
 
