@@ -7,6 +7,9 @@ function TextNode(string) {
 TextNode.prototype = {
   toString: function() {
     return "[TextNode " + inspect(this.string) + "]";
+  }, 
+  addToResult: function(compiler, result) {
+    compiler.compileTextChild(result, this.string);
   }
 };
 
@@ -16,6 +19,9 @@ function EndOfLineNode() {
 EndOfLineNode.prototype = {
   toString: function() {
     return "[EndOfLineNode]";
+  }, 
+  addToResult: function(compiler, result) {
+    compiler.compileEndOfLineChild(result);
   }
 }
 
@@ -35,6 +41,9 @@ ElementNode.prototype = {
       childStrings.push(this.children[i].toString());
     }
     return "[ElementNode(" + this.args.join(", ") + ") " + childStrings.join(", ") + "]";
+  }, 
+  addToResult: function(compiler, result) {
+    compiler.compileElementChild(result, this);
   }
 };
 
@@ -68,6 +77,50 @@ NodeCompiler.prototype = {
       this.compileChild(rootObject, childNode);
     }
     return rootObject;
+  }, 
+  compileChild: function(rootObject, childNode) {
+    childNode.addToResult(this, rootObject);
+  }, 
+  compileTextChild: function(rootObject, string) {
+    rootObject.addTextChild(string);
+  }, 
+  compileEndOfLineChild: function(rootObject) {
+    rootObject.addEndOfLineChild();
+  }, 
+  compileElementChild: function(parentObject, childNode) {
+    var elementArgs = childNode.args.slice(0);
+    if(elementArgs.length>0 && elementArgs[0].match(/^_/)) {
+      elementArgs[0] = elementArgs[0].substring(1);
+    }
+    else {
+      if(parentObject.defaultChildFunction) {
+        elementArgs = [parentObject.defaultChildFunction] + elementArgs;
+      }
+    }
+    if (elementArgs.length == 0) {
+      throw new CompileError("No function argument given and no default child function for parent element");
+    }
+    var functionName = elementArgs[0];
+    elementArgs = elementArgs.slice(1);
+    var childFunctionClass = null;
+    if (parentObject.classMap) {
+      childFunctionClass = parentObject.classMap[functionName];
+    }
+    if (!childFunctionClass) {
+      childFunctionClass = this.topLevelClassMap[functionName];
+    }
+    if (!childFunctionClass) {
+      throw new CompileError("No function class found for " + inspect(functionName) + 
+                             " in either parent class map or top-level class map");
+    }
+    var childObject = Object.create(childFunctionClass.prototype);
+    childFunctionClass.apply(childObject, elementArgs);
+    if(childObject.addToParent) {
+      childObject.addToParent(parentObject);
+    }
+    else {
+      parentObject.addChild(childObject);
+    }
   }
 };
 
