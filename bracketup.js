@@ -2,15 +2,27 @@ function inspect(object) {
   return JSON.stringify(object);
 }
 
-var testTokenReceiver = {
+function TestTokenReceiver() {
+  this.indent = "";
+}
+
+TestTokenReceiver.prototype = {
+  indentIncrement: "  ", 
+  
   startItem: function(itemArguments, whitespace) {
-    console.log("Start item " + inspect(itemArguments) + ", whitespace = " + inspect(whitespace));
+    console.log(this.indent + "START " + inspect(itemArguments) + 
+                "  (whitespace = " + inspect(whitespace) + ")");
+    this.indent = this.indent + this.indentIncrement;
   }, 
   endItem: function() {
-    console.log("End item");
+    if (this.indent.length < this.indentIncrement.length) {
+      throw new Error("Unexpected end of item");
+    }
+    this.indent = this.indent.substring(this.indentIncrement.length);
+    console.log(this.indent + "END");
   }, 
   text: function(string) {
-    console.log("Text: " + inspect(string));
+    console.log(this.indent + "TEXT " + inspect(string));
   }
 };
 
@@ -34,11 +46,10 @@ BracketupScanner.prototype = {
   }, 
   
   scan: function(tokenReceiver) {
-    this.textPortions = [];
     var scanningRegex = new RegExp(this.regex.source, "g");
     console.log("Scanning " + inspect(this.string) + "\n  with " + scanningRegex + " ..."); 
     var matchedSubstrings = [];
-    var textPortions = [];
+    this.textPortions = [];
     while ((match = scanningRegex.exec(this.string)) !== null) {
       // console.log("  match = " + inspect(match));
       matchedSubstrings.push(match[0]);
@@ -54,10 +65,10 @@ BracketupScanner.prototype = {
         tokenReceiver.endItem();
       }
       else if (match[5]) {
-        textPortions.push(match[6]);
+        this.textPortions.push(match[6]);
       }
       else if (match[7]) {
-        textPortions.push(match[7]);
+        this.textPortions.push(match[7]);
       }
       else {
         console.log("match = " + inspect(match));
@@ -86,7 +97,7 @@ var testLine2 = "ABCabcDEFghi";
 
 var bracketupScanner = new BracketupScanner(testLine);
 
-bracketupScanner.scan(testTokenReceiver);
+bracketupScanner.scan(new TestTokenReceiver());
 
 
 
