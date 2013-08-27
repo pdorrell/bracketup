@@ -4,6 +4,97 @@ function inspect(object) {
   return JSON.stringify(object);
 }
 
+function TextNode(string) {
+  this.string = string;
+}
+
+TextNode.prototype = {
+  toString: function() {
+    return "[TextNode " + inspect(this.string) + "]";
+  }
+};
+
+function EndOfLineNode() {
+}
+
+EndOfLineNode.prototype = {
+  toString: function() {
+    return "[EndOfLineNode]";
+  }
+}
+
+function ElementNode(args) {
+  this.args = args;
+  this.children = [];
+}
+
+ElementNode.prototype = {
+  addChild: function(child) {
+    child.parent = this;
+    this.children.push(child);
+  }, 
+  toString: function() {
+    var childStrings = [];
+    for (var i=0; i<this.children.length; i++) {
+      childStrings.push(this.children[i].toString());
+    }
+    return "[ElementNode(" + this.args.join(", ") + ") " + childStrings.join(", ") + "]";
+  }
+};
+
+function NodeParseException(message) {
+  this.message = message;
+}
+
+function NodeParser() {
+  this.nodesStack = [];
+  this.currentElementNode = null;
+  this.rootElementNode = null;
+}
+
+NodeParser.prototype = {
+  startItem: function(itemArguments, whitespace) {
+    var elementNode = new ElementNode(itemArguments);
+    if (this.currentElementNode != null) {
+      this.currentElementNode.addChild(elementNode);
+    }
+    else {
+      this.rootElement = elementNode;
+    }
+    this.currentElementNode = elementNode;
+    this.nodesStack.push(elementNode);
+  }, 
+  endItem: function() {
+    if (this.currentElementNode != null) {
+      this.currentElementNode = this.nodesStack.pop();
+    }
+    else {
+      throw new NodeParseException("Unexpected end of element node");
+    }
+  }, 
+  text: function(string) {
+    if (this.currentElementNode != null) {
+      this.currentElementNode.addChild(new TextNode(string));
+    }
+    else {
+      if (string.match("^\s*$")) {
+        console.log("Ignoring whitespace outside of root element: " + inspect(string));
+      }
+      else {
+        throw new NodeParseException("Unexpected text outside of root element: " + inspect(string));
+      }
+    }
+  }, 
+  endOfLine: function() {
+    if (this.currentElementNode != null) {
+      this.currentElementNode.addChild(new EndOfLineNode());
+    }
+    else {
+        console.log("Ignoring end-of-line outside of root element");
+    }
+  }
+};
+
 function TestTokenReceiver() {
   this.indent = "";
 }
@@ -117,5 +208,9 @@ var fileContents = fs.readFileSync(testFileName, {encoding: "utf-8"});
 
 //console.log("fileLines = " + inspect(fileLines));
 
-bracketupScanner.scanSource(new TestTokenReceiver(), fileContents);
+var nodeParser = new NodeParser();
+bracketupScanner.scanSource(nodeParser, fileContents);
+
+console.log("root element = " + nodeParser.rootElement);
+
 
