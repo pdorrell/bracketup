@@ -49,24 +49,29 @@ function NodeParseException(message) {
 function NodeParser() {
   this.nodesStack = [];
   this.currentElementNode = null;
-  this.rootElementNode = null;
+  this.rootElements = [];
 }
 
 NodeParser.prototype = {
   startItem: function(itemArguments, whitespace) {
     var elementNode = new ElementNode(itemArguments);
-    if (this.currentElementNode != null) {
-      this.currentElementNode.addChild(elementNode);
-    }
+    if (this.currentElementNode == null) {
+      this.rootElements.push(elementNode);
+    }    
     else {
-      this.rootElement = elementNode;
+      this.currentElementNode.addChild(elementNode);
+      this.nodesStack.push(this.currentElementNode);
     }
     this.currentElementNode = elementNode;
-    this.nodesStack.push(elementNode);
   }, 
   endItem: function() {
     if (this.currentElementNode != null) {
-      this.currentElementNode = this.nodesStack.pop();
+      if (this.nodesStack.length > 0) {
+        this.currentElementNode = this.nodesStack.pop();
+      }
+      else {
+        this.currentElementNode = null;
+      }
     }
     else {
       throw new NodeParseException("Unexpected end of element node");
@@ -78,7 +83,7 @@ NodeParser.prototype = {
     }
     else {
       if (string.match("^\s*$")) {
-        console.log("Ignoring whitespace outside of root element: " + inspect(string));
+        //console.log("Ignoring whitespace outside of root element: " + inspect(string));
       }
       else {
         throw new NodeParseException("Unexpected text outside of root element: " + inspect(string));
@@ -90,7 +95,7 @@ NodeParser.prototype = {
       this.currentElementNode.addChild(new EndOfLineNode());
     }
     else {
-        console.log("Ignoring end-of-line outside of root element");
+        //console.log("Ignoring end-of-line outside of root element");
     }
   }
 };
@@ -211,6 +216,11 @@ var fileContents = fs.readFileSync(testFileName, {encoding: "utf-8"});
 var nodeParser = new NodeParser();
 bracketupScanner.scanSource(nodeParser, fileContents);
 
-console.log("root element = " + nodeParser.rootElement);
+var rootElements = nodeParser.rootElements;
+console.log("Read in " + rootElements.length + " root elements from " + testFileName);
+console.log("");
 
+for (var i=0; i<rootElements.length; i++) {
+  console.log("ROOT ELEMENT:\n  " + rootElements[i] + "\n");
+}
 
