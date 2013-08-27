@@ -61,10 +61,15 @@ BracketupScanner.prototype = {
         var itemArguments = match[2].split(",");
         var whitespace = match[3];
         tokenReceiver.startItem(itemArguments, whitespace);
+        this.depth++;
       }
       else if (match[4]) {
         this.sendAnyTexts(tokenReceiver);
+        if(this.depth <= 0) {
+          throw new Error("Unexpected ']'");
+        }
         tokenReceiver.endItem();
+        this.depth--;
       }
       else if (match[5]) {
         this.textPortions.push(match[6]);
@@ -89,9 +94,13 @@ BracketupScanner.prototype = {
   }, 
   
   scanSource: function(tokenReceiver, source) {
+    this.depth = 0;
     var lines = source.split("\n");
     for (var i=0; i<lines.length; i++) {
       this.scanLine(tokenReceiver, lines[i]);
+    }
+    if (this.depth != 0) {
+      throw new Error(this.depth + " unbalanced '['s at end of file");
     }
   }
 };
