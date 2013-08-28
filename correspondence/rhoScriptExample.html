@@ -2,36 +2,46 @@
 <html lang="en" >
 <head><meta charset="utf-8">
 <title>Correspondence</title>
-  <link rel="stylesheet" type="text/css" href="page.css" />
+  <link rel="stylesheet" type="text/css" href="../page.css" />
   <link rel="stylesheet" type="text/css" href="correspondence.css" />
   <link rel="stylesheet" type="text/css" href="correspondence-rhoscript.css" />
   <link rel="stylesheet" type="text/css" href="correspondence-programming-output.css" />
-  <script language="javascript" type="text/javascript" src="require.js"></script>
   <script language="javascript" type="text/javascript" src="lib/jquery-1.10.1.js"></script>
   <script language="javascript" type="text/javascript" src="correspondence.js"></script>
   <script language="javascript" type="text/javascript" src="correspondence-configuration-browserified.js"></script>
 </head>
 
 <body>
-<h1>Item Groups</h1>
+<h1>rhoScript Example Using Bracketup</h1>
 
 <div class="author">Author: <a href="http://thinkinghard.com">Philip Dorrell</a></div>
 
-<p><a href="index.html">Correspondence</a> is a framework for interactively visualizing <i>correspondences</i> between
+<p><a href="http://pdorrell.github.io/correspondence/">Correspondence</a> is a framework for interactively visualizing <i>correspondences</i> between
 items in related structures.</p>
 
-<h2>Item Groups, with Interleaving</h2>
+<p><a href="https://github.com/pdorrell/bracketup">Bracketup</a> is a generic structured textual markup language
+(one that I have just invented).</p>
 
-<p>This page contains an example of a structure group where each structure consists of multiple 
-<b>item groups</b>. It is an example of translating code in the <b>Ruby</b> programming language
-into <b>English</b>.</p>
+<p>This particular page shows the same translation visualisation as
+<a href="http://thinkinghard.com/correspondence/rhoscript/index.html">http://thinkinghard.com/correspondence/rhoscript/index.html</a>.</p>
 
-<p>Check the "Interleaved" checkbox, to see the structures interleaved with each other so that 
-corresponding item groups within different structures are immediately adjacent.</p>
+<p>But there is one important difference. Whereas that page was generated off-line using the Ruby application
+<b>correspondence-markup</b>, from source code (a copy
+of which is included in the HTML page source as a comment), this page is <i>generated in the browser</i>,
+by Javascript code, from Bracketup source code included in a <b>&lt;script&gt;</b> element in the page 
+source.</p>
 
-<p>And uncheck to go back to the original un-interleaved view.</p>
+<p>(The <b>bracketup</b> source code is similar to, but not quite the same as, the original <b>correspondence-markup</b>
+source code.)</p>
 
-<script id="ruby-example-source" type="text/plain">
+<h2>rhoScript example: Eight Queens Puzzle</h2>
+
+<p>Mouse over the translations to see the relationships between them.</p>
+
+<!-- The following script element is the actual source for this page. It is interpreted
+by the Javascript code to generate the DOM, in the HTML format required by the Correspondence framework.-->
+
+<script id="rhoscript-example-source" type="text/plain">
 [correspondence [_title Queens Puzzle]
  [_text,rhoscript [_languageTitle rhoScript]
   [A [_word,1 8] [2 range]]
@@ -58,13 +68,13 @@ of the form \[[b x], [b y]\], where [b x] is a number that increases from 0 to 7
   [H [1 Keep only the unique IDs of those diagonals.]]
   [I [1 Join the two lists of diagonal IDs together.]]
   [J [1 Count how many diagonal IDs are in the joined list.]]
-  [K [1 Having done that for each [a [href http://en.wikipedia.org/Permutation]permutation], keep those permutations that have the maximum number of diagonals occupied.]]
+  [K [1 Having done that for each [a [href http://en.wikipedia.org/wiki/Permutation]permutation], keep those permutations that have the maximum number of diagonals occupied.]]
  ]
 ]
 
 </script>
 
-<div id="ruby-example-compiled"></div>
+<div id="rhoscript-example-compiled"></div>
 
 <div class="date">Last updated: 7 July 2013</div>
 

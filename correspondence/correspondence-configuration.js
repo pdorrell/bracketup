@@ -1,13 +1,11 @@
 function inspect(object) {return JSON.stringify(object);}
 
 $(document).ready(function(){
-  compileCorrespondenceSource($("#ruby-example-source"), $("#ruby-example-compiled"));
+  compileCorrespondenceSource($("#rhoscript-example-source"), $("#rhoscript-example-compiled"));
   initialiseInteraction();
 });
 
 var correspondenceBracketup = require("../correspondence-bracketup.js");
-
-console.log("correspondenceBracketup = " + inspect(correspondenceBracketup));
 
 function compileCorrespondenceSource(sourceElementSelector, compiledElementSelector) {
   var documentObject = new correspondenceBracketup.Document(window.document);
