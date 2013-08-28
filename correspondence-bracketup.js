@@ -2,7 +2,6 @@ var utils = require("./utils.js");
 var merge = utils.merge;
 var inspect = utils.inspect;
 
-var fs = require('fs');
 var bracketup = require("./bracketup.js");
 
 var bracketupScanner = new bracketup.BracketupScanner();
@@ -254,7 +253,6 @@ Text.prototype = merge(BaseNode.prototype, {
     return div;
   }
 });
-
 
 function Correspondence() {
   BaseNode.call(this);
