@@ -243,7 +243,7 @@ Text.prototype = merge(BaseNode.prototype, {
   ignoreWhiteSpaceText: true, 
   
   createInitialDom: function(document) {
-    var className = this.className ? ("structure " + this.className + "-structure") : "structure";
+    var className = this.languageCssClass ? ("structure " + this.languageCssClass + "-structure") : "structure";
     var div = document.createNode("div", {className: className});
     var languageTitle = this.attributes.languageTitle;
     if (languageTitle) {

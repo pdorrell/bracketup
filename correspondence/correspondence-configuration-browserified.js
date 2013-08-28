@@ -319,8 +319,6 @@ var inspect = utils.inspect;
 
 var bracketup = require("./bracketup.js");
 
-console.log("bracketup = " + inspect(bracketup));
-
 var bracketupScanner = new bracketup.BracketupScanner();
 
 function TextElement(string) {
@@ -560,7 +558,7 @@ Text.prototype = merge(BaseNode.prototype, {
   ignoreWhiteSpaceText: true, 
   
   createInitialDom: function(document) {
-    var className = this.className ? ("structure " + this.className + "-structure") : "structure";
+    var className = this.languageCssClass ? ("structure " + this.languageCssClass + "-structure") : "structure";
     var div = document.createNode("div", {className: className});
     var languageTitle = this.attributes.languageTitle;
     if (languageTitle) {
