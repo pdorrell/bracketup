@@ -8,7 +8,6 @@ var bracketup = require("./bracketup.js");
 var bracketupScanner = new bracketup.BracketupScanner();
 
 function TextElement(string) {
-  console.log("TextElement, string = " + inspect(string));
   this.string = string;
 }
 
@@ -87,6 +86,9 @@ function Document(document) {
 
 Document.prototype = {
   createNode: function(tag, options) {
+    if(!options) {
+      options = {};
+    }
     var dom = this.document.createElement(tag);
     var parent = options.parent;
     if (parent) {
@@ -141,6 +143,9 @@ function Bold() {
 }
 
 Bold.prototype = merge(BaseNode.prototype, {
+  createInitialDom: function(document) {
+    return document.createNode("b");
+  }
 });
 
 function Italic() {
@@ -148,6 +153,9 @@ function Italic() {
 }
 
 Italic.prototype = merge(BaseNode.prototype, {
+  createInitialDom: function(document) {
+    return document.createNode("b");
+  }
 });
 
 function HrefAttribute() {
@@ -162,7 +170,16 @@ function Link() {
 }
 
 Link.prototype = merge(BaseNode.prototype, {
-  classMap: {href: HrefAttribute}
+  classMap: {href: HrefAttribute}, 
+  
+  createInitialDom: function(document) {
+    var dom = document.createNode("a");
+    var href = this.attributes.href;
+    if (href) {
+      dom.setAttribute("href", href);
+    }
+    return dom;
+  }
 });
 
 function TitleAttribute() {
