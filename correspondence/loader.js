@@ -13,11 +13,18 @@ function ScriptDescriptor(url) {
 }
 
 ScriptDescriptor.prototype = {
-  runScript: function() {
+  runScript: function(descriptorByUrl) {
     window.exports = {};
     console.log("Running " + this.url + " ...");
     eval(this.source);
     this.exports = window.exports;
+    window.require = function(url) {
+      var requiredDescriptor = descriptorByUrl[url];
+      if (!requiredDescriptor) {
+        throw new Error("Fail to resolve required URL " + url + " from within script " + this.url);
+      }
+      return descriptorByUrl[url].exports;
+    }
     for (name in this.exports) {
       console.log(" exported " + name + " = " + window.exports[name]);
     }
@@ -59,7 +66,7 @@ ScriptLoader.prototype = {
   allScriptsLoaded: function(finished) {
     console.log("");
     for (var i=0; i<this.descriptors.length; i++) {
-      this.descriptors[i].runScript();
+      this.descriptors[i].runScript(this.descriptorByUrl);
     }
     console.log("ScriptLoader.allScriptsLoaded, now run the finish function ...");
     finished();
