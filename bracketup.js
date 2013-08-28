@@ -94,31 +94,35 @@ NodeCompiler.prototype = {
                                         rootElementNode.whitespace, 
                                         rootElementNode.children);
   }, 
-  compileChild: function(rootObject, childNode) {
-    childNode.addToResult(this, rootObject);
+  compileChild: function(parentObject, childNode) {
+    childNode.addToResult(this, parentObject);
   }, 
-  compileTextChild: function(rootObject, string) {
-    rootObject.addTextChild(string);
+  compileTextChild: function(parentObject, string) {
+    parentObject.addTextChild(string);
   }, 
-  compileEndOfLineChild: function(rootObject) {
-    rootObject.addEndOfLineChild();
+  compileEndOfLineChild: function(parentObject) {
+    parentObject.addEndOfLineChild();
   }, 
   compileElementChild: function(parentObject, childNode) {
     var elementArgs = childNode.args.slice(0);
+    console.log("compileElementChild, elementArgs = " + inspect(elementArgs));
     if(elementArgs.length>0 && elementArgs[0].match(/^_/)) {
+      console.log(" underscored first argument ...");
       elementArgs[0] = elementArgs[0].substring(1);
     }
     else {
       if(parentObject.defaultChildFunction) {
-        elementArgs = [parentObject.defaultChildFunction] + elementArgs;
+        console.log(" default parent child function = " + inspect(parentObject.defaultChildFunction));
+        elementArgs = [parentObject.defaultChildFunction].concat(elementArgs);
       }
     }
     if (elementArgs.length == 0) {
       throw new CompileError("No function argument given and no default child function for parent element");
     }
+    console.log("elementArgs with function = " + inspect(elementArgs))
     var functionName = elementArgs[0];
-    console.log("functionName = " + inspect(functionName));
     elementArgs = elementArgs.slice(1);
+    console.log("functionName = " + inspect(functionName) + ", elementArgs = " + inspect(elementArgs));
     var childFunctionClass = null;
     if (parentObject.classMap) {
       childFunctionClass = parentObject.classMap[functionName];

@@ -37,6 +37,26 @@ BaseNode.prototype = {
   }
 };
 
+function BaseAttribute(attributeName) {
+  this.attributeName = attributeName;
+  this.value = "";
+}
+
+BaseAttribute.prototype = {
+  addTextChild: function(string) {
+    this.value = this.value + string;
+  }, 
+  addChild: function(child) {
+    throw new CompileError("Unexpected non-text element inside " + this.attributeName + " attribute node");
+  }, 
+  addEndOfLineChild: function() {
+    this.addTextChild("\n");
+  }, 
+  addToParent: function(parent) {
+    parent.setAttribute(this.attributeName, this.value);
+  }
+};
+
 function Bold() {
   BaseNode.call(this);
 }
@@ -66,26 +86,6 @@ Link.prototype = merge(BaseNode.prototype, {
   classMap: {href: HrefAttribute}
 });
 
-function BaseAttribute(attributeName) {
-  this.attributeName = attributeName;
-  this.value = "";
-}
-
-BaseAttribute.prototype = {
-  addTextChild: function(string) {
-    this.value = this.value + string;
-  }, 
-  addChild: function(child) {
-    throw new CompileError("Unexpected non-text element inside " + this.attributeName + " attribute node");
-  }, 
-  addEndOfLineChild: function() {
-    this.addTextChild("\n");
-  }, 
-  addToParent: function(parent) {
-    parent.setAttribute(this.attributeName, this.value);
-  }
-};
-
 function TitleAttribute() {
   BaseAttribute.call(this, "title");
 }
@@ -98,7 +98,7 @@ function Word(id) {
   this.id = id;
 }
 
-Sentence.prototype = merge(BaseNode.prototype, {
+Word.prototype = merge(BaseNode.prototype, {
 });
 
 function Sentence(id) {
