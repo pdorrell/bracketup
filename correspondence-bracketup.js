@@ -35,24 +35,23 @@ BaseNode.prototype = {
   setAttribute: function(attributeName, value) {
     this.attributes[attributeName] = value;
   }, 
-  
-  createDomNode: function(document, parent, tag, className, attributes, text) {
-    var dom = document.createElement(tag);
-    if (parent) {
-      parent.appendChild(dom);
-    }
-    if (className) {
-      dom.className = className;
-    }
-    if (attributes) {
-      for (name in attributes) {
-        dom.setAttribute(name, attributes[name]);
+  createDom: function(document) {
+    if (this.createInitialDom) {
+      var dom = this.createInitialDom(document);
+      for (var i=0; i<this.children.length; i++) {
+        var child = this.children[i];
+        if (child.createDom) {
+          var childDom = child.createDom(document);
+          if (childDom) {
+            dom.appendChild(dom);
+          }
+        }
       }
+      return dom;
     }
-    if (text) {
-      dom.appendChild(document.createTextNode(text));
+    else {
+      return null;
     }
-    return dom;
   }
 };
 
@@ -63,7 +62,7 @@ function Document(document) {
 
 Document.prototype = {
   createNode: function(tag, options) {
-    var dom = this.document.createNode(tag);
+    var dom = this.document.createElement(tag);
     var parent = options.parent;
     if (parent) {
       parent.appendChild(dom);
@@ -205,14 +204,15 @@ function compileCorrespondence(source) {
   var nodeParser = new bracketup.NodeParser();
   bracketupScanner.scanSource(nodeParser, source);
   var parsedRootElements = nodeParser.rootElements;
+  var compiledObjects = [];
   for (var i=0; i<parsedRootElements.length; i++) {
     var rootElement = parsedRootElements[i];
-    console.log("Parsed root element " + rootElement);
+    //console.log("Parsed root element " + rootElement);
     var correspondence = correspondenceNodeCompiler.compile(rootElement);
-    console.log("");
-    console.log("Compiled into " + inspect(correspondence));
-    console.log("");
+    compiledObjects.push(correspondence);
   }
+  return compiledObjects;
 }
 
+exports.Document = Document;
 exports.compileCorrespondence = compileCorrespondence;
