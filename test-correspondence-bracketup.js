@@ -10,3 +10,4 @@ var testFileName = "sample.bracketup";
 var fileContents = fs.readFileSync(testFileName, {encoding: "utf-8"});
 
 correspondenceBracketup.compileCorrespondence(fileContents);
+

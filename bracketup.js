@@ -50,8 +50,13 @@ ElementNode.prototype = {
   }
 };
 
+function CustomError(className, message) {
+  this.error = new Error(message);
+  this.stack = this.error.stack.replace(/^Error:/g, className + ":")
+}
+
 function CompileError(message) {
-  this.message = message;
+  CustomError.call(this, "CompileError", message);
 }
 
 function NodeCompiler(topLevelClassMap) {
@@ -138,7 +143,7 @@ NodeCompiler.prototype = {
 };
 
 function NodeParseException(message) {
-  this.message = message;
+  CustomError.call(this, "NodeParseException", message);
 }
 
 function NodeParser() {
@@ -209,7 +214,7 @@ TestTokenReceiver.prototype = {
   }, 
   endItem: function() {
     if (this.indent.length < this.indentIncrement.length) {
-      throw new Error("Unexpected end of item");
+      throw new CompileError("Unexpected end of item");
     }
     this.indent = this.indent.substring(this.indentIncrement.length);
     console.log(this.indent + "END");
@@ -257,7 +262,7 @@ BracketupScanner.prototype = {
       else if (match[4]) {
         this.sendAnyTexts(tokenReceiver);
         if(this.depth <= 0) {
-          throw new Error("Unexpected ']'");
+          throw new NodeParseException("Unexpected ']'");
         }
         tokenReceiver.endItem();
         this.depth--;
@@ -270,7 +275,7 @@ BracketupScanner.prototype = {
       }
       else {
         console.log("match = " + inspect(match));
-        throw new Error("No match found");
+        throw new NodeParseException("No match found in lexer");
       }
     }
     this.sendAnyTexts(tokenReceiver);
@@ -278,7 +283,7 @@ BracketupScanner.prototype = {
 
     var reconstitutedMatches = matchedSubstrings.join("");
     if (reconstitutedMatches != line) {
-      throw new Error("Reconstituted " + inspect(reconstitutedMatches) + 
+      throw new NodeParseException("Reconstituted " + inspect(reconstitutedMatches) + 
                     "\n                  != " + inspect(line));
     }
     // console.log("matched substrings = " + inspect(matchedSubstrings.join("")));
@@ -291,7 +296,7 @@ BracketupScanner.prototype = {
       this.scanLine(tokenReceiver, lines[i]);
     }
     if (this.depth != 0) {
-      throw new Error(this.depth + " unbalanced '['s at end of file");
+      throw new NodeParseException(this.depth + " unbalanced '['s at end of file");
     }
   }
 };
