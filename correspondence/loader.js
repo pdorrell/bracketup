@@ -14,7 +14,10 @@ function ScriptDescriptor(url) {
 
 ScriptDescriptor.prototype = {
   evaluateSource: function() {
-    eval(this.source);
+    var scriptElement = $("<script type='text/javascript'/>").attr("src", this.url);
+    console.log("Appending script element ...");
+    $("head").append(scriptElement);
+    // eval(this.source);
   },    
   runScript: function(descriptorByUrl) {
     window.exports = {};
