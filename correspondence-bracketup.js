@@ -8,8 +8,15 @@ var bracketup = require("./bracketup.js");
 var bracketupScanner = new bracketup.BracketupScanner();
 
 function TextElement(string) {
+  console.log("TextElement, string = " + inspect(string));
   this.string = string;
 }
+
+TextElement.prototype = {
+  createDom: function(document) {
+    return document.createTextNode(this.string);
+  }
+};
 
 function EndOfLineElement() {
 }
@@ -103,6 +110,9 @@ Document.prototype = {
   }, 
   addTextNode: function(dom, text) {
     dom.appendChild(this.document.createTextNode(text));
+  }, 
+  createTextNode: function(text) {
+    return this.document.createTextNode(text);
   }
 };
 
@@ -176,8 +186,12 @@ function Word(id) {
 
 Word.prototype = merge(BaseNode.prototype, {
   createInitialDom: function(document) {
-    return document.createNode("span", {className: "item-group", 
-                                       attributes: {"data-group-id": this.id}});
+    var id = this.id;
+    if (id.match(/^[0-9]+$/)) {
+      id = this.parent.id + id;
+    }
+    return document.createNode("span", {className: "item", 
+                                        attributes: {"data-id": id}});
   }
 });
 
