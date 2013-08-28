@@ -23,6 +23,7 @@ BaseNode.prototype = {
   classMap: {}, 
   addChild: function(child) {
     this.children.push(child);
+    child.parent = this;
   }, 
   addTextChild: function(string) {
     this.children.push(new TextElement(string));
@@ -30,6 +31,12 @@ BaseNode.prototype = {
   setIndentInsertString: function(parentIndentInsertString) {
     if (this.childIndent) {
       this.indentInsertString = parentIndentInsertString + this.childIndent;
+      for (var i=0; i<this.children.length; i++) {
+        var child = this.children[i];
+        if (child.setIndentInsertString) {
+          child.setIndentInsertString(this.indentInsertString);
+        }
+      }
     }
   }, 
   addEndOfLineChild: function() {

@@ -37,9 +37,6 @@ ElementNode.prototype = {
   addChild: function(child) {
     child.parent = this;
     this.children.push(child);
-    if (this.indent && child.setIndentInsertString) {
-      child.setIndentInsertString(this.indentInsertString);
-    }
   }, 
   toString: function() {
     var childStrings = [];
@@ -112,24 +109,19 @@ NodeCompiler.prototype = {
   }, 
   compileElementChild: function(parentObject, childNode) {
     var elementArgs = childNode.args.slice(0);
-    console.log("compileElementChild, elementArgs = " + inspect(elementArgs));
     if(elementArgs.length>0 && elementArgs[0].match(/^_/)) {
-      console.log(" underscored first argument ...");
       elementArgs[0] = elementArgs[0].substring(1);
     }
     else {
       if(parentObject.defaultChildFunction) {
-        console.log(" default parent child function = " + inspect(parentObject.defaultChildFunction));
         elementArgs = [parentObject.defaultChildFunction].concat(elementArgs);
       }
     }
     if (elementArgs.length == 0) {
       throw new CompileError("No function argument given and no default child function for parent element");
     }
-    console.log("elementArgs with function = " + inspect(elementArgs))
     var functionName = elementArgs[0];
     elementArgs = elementArgs.slice(1);
-    console.log("functionName = " + inspect(functionName) + ", elementArgs = " + inspect(elementArgs));
     var childFunctionClass = null;
     if (parentObject.classMap) {
       childFunctionClass = parentObject.classMap[functionName];

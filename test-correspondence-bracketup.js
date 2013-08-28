@@ -18,7 +18,6 @@ var document = new correspondenceBracketup.Document(jsdomDocument);
 
 for (var i=0; i<compiledObjects.length; i++) {
   var correspondence = compiledObjects[i];
-  console.log("correspondence = " + inspect(correspondence));
   var correspondenceDom = correspondence.createDom(document);
   console.log("correspondenceDom = \n\n" + correspondenceDom.outerHTML);
 }
