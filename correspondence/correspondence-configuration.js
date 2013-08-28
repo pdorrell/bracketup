@@ -1,4 +1,5 @@
-function inspect(object) {return JSON.stringify(object);}
+var utils = require("../utils.js");
+inspect = utils.inspect;
 
 $(document).ready(function(){
   compileCorrespondenceSource($("#rhoscript-example-source"), $("#rhoscript-example-compiled"));

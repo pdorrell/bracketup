@@ -8,7 +8,29 @@
   <link rel="stylesheet" type="text/css" href="correspondence-programming-output.css" />
   <script language="javascript" type="text/javascript" src="lib/jquery-1.10.1.js"></script>
   <script language="javascript" type="text/javascript" src="correspondence.js"></script>
-  <script language="javascript" type="text/javascript" src="correspondence-configuration-browserified.js"></script>
+<script language="Javascript">
+exports={};
+requires={};
+</script>
+  <script language="javascript" type="text/javascript" src="../utils.js"></script>
+<script language="Javascript">
+requires.utils=window.exports;
+function require(url){return {"./utils.js": requires.utils}[url]}
+window.exports={};
+</script>
+  <script language="javascript" type="text/javascript" src="../bracketup.js"></script>
+<script language="Javascript">
+requires.bracketup=window.exports;
+function require(url){return {"./utils.js": requires.utils,"./bracketup.js": requires.bracketup}[url]}
+window.exports={};
+</script>
+  <script language="javascript" type="text/javascript" src="../correspondence-bracketup.js"></script>
+<script language="Javascript">
+requires.correspondenceBracketup=window.exports;
+function require(url){return {"../utils.js": requires.utils,
+                              "../correspondence-bracketup.js": requires.correspondenceBracketup}[url]}
+</script>
+  <script language="javascript" type="text/javascript" src="correspondence-configuration.js"></script>
 </head>
 
 <body>
