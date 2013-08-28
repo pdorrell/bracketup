@@ -13,10 +13,13 @@ function ScriptDescriptor(url) {
 }
 
 ScriptDescriptor.prototype = {
+  evaluateSource: function() {
+    eval(this.source);
+  },    
   runScript: function(descriptorByUrl) {
     window.exports = {};
     console.log("Running " + this.url + " ...");
-    eval(this.source);
+    this.evaluateSource();
     this.exports = window.exports;
     window.require = function(url) {
       var requiredDescriptor = descriptorByUrl[url];
