@@ -27,6 +27,11 @@ BaseNode.prototype = {
   addTextChild: function(string) {
     this.children.push(new TextElement(string));
   }, 
+  setIndentInsertString: function(parentIndentInsertString) {
+    if (this.childIndent) {
+      this.indentInsertString = parentIndentInsertString + this.childIndent;
+    }
+  }, 
   addEndOfLineChild: function() {
     if (this.endOfLineNode) {
       this.children.push(this.endOfLineNode);
@@ -43,9 +48,15 @@ BaseNode.prototype = {
         if (child.createDom) {
           var childDom = child.createDom(document);
           if (childDom) {
+            if (this.indentInsertString) {
+              document.addTextNode(dom, this.indentInsertString);
+            }
             dom.appendChild(childDom);
           }
         }
+      }
+      if (this.indentInsertString) {
+        document.addTextNode(dom, this.parent ? this.parent.indentInsertString : "\n");
       }
       return dom;
     }
@@ -82,6 +93,9 @@ Document.prototype = {
       dom.appendChild(this.document.createTextNode(text));
     }
     return dom;
+  }, 
+  addTextNode: function(dom, text) {
+    dom.appendChild(this.document.createTextNode(text));
   }
 };
 
@@ -163,7 +177,13 @@ function Sentence(id) {
 
 Sentence.prototype = merge(BaseNode.prototype, {
   defaultChildFunction: "word", 
-  classMap: {word: Word}
+  classMap: {word: Word}, 
+  childIndent: "  ", 
+  
+  createInitialDom: function(document) {
+    return document.createNode("div", {className: "item-group", 
+                                       attributes: {"data-group-id": this.id}});
+  }
 });
 
 function Text(languageCssClass) {
@@ -174,6 +194,7 @@ function Text(languageCssClass) {
 Text.prototype = merge(BaseNode.prototype, {
   defaultChildFunction: "sentence", 
   classMap: {sentence: Sentence, languageTitle: LanguageTitleAttribute}, 
+  childIndent: "  ", 
   
   createInitialDom: function(document) {
     var className = this.className ? ("structure " + this.className + "-structure") : "structure";
@@ -195,6 +216,7 @@ function Correspondence() {
 Correspondence.prototype = merge(BaseNode.prototype, {
   defaultChildFunction: "text", 
   classMap: {text: Text, title: TitleAttribute}, 
+  childIndent: "  ", 
   
   createInitialDom: function (document) {
     var div = document.createNode("div", {className: "structure-group"});

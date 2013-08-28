@@ -37,6 +37,9 @@ ElementNode.prototype = {
   addChild: function(child) {
     child.parent = this;
     this.children.push(child);
+    if (this.indent && child.setIndentInsertString) {
+      child.setIndentInsertString(this.indentInsertString);
+    }
   }, 
   toString: function() {
     var childStrings = [];
@@ -90,9 +93,13 @@ NodeCompiler.prototype = {
     if (!nodeFunctionClass) {
       throw new CompileError("Unknown top-level function for root element: " + functionName);
     }
-    return this.createFromFunctionClass(nodeFunctionClass, elementArgs.slice(1), 
-                                        rootElementNode.whitespace, 
-                                        rootElementNode.children);
+    var rootObject = this.createFromFunctionClass(nodeFunctionClass, elementArgs.slice(1), 
+                                                  rootElementNode.whitespace, 
+                                                  rootElementNode.children);
+    if (rootObject.setIndentInsertString) {
+      rootObject.setIndentInsertString("\n");
+    }
+    return rootObject;
   }, 
   compileChild: function(parentObject, childNode) {
     childNode.addToResult(this, parentObject);
