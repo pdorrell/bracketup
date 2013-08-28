@@ -175,6 +175,10 @@ function Word(id) {
 }
 
 Word.prototype = merge(BaseNode.prototype, {
+  createInitialDom: function(document) {
+    return document.createNode("span", {className: "item-group", 
+                                       attributes: {"data-group-id": this.id}});
+  }
 });
 
 function Sentence(id) {
