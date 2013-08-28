@@ -1,0 +1,12 @@
+{ 
+  "name" : "Bracketup",
+  "description" : "Bracketup - a simple generic markup language", 
+  "version" : "0.0.1", 
+  "repository" :  { 
+    "type" : "git", 
+    "url" : "https://github.com/pdorrell/bracketup"
+  },  
+  "dependencies" : { 
+    "jsdom" : "*"
+  }
+}
