@@ -32,8 +32,11 @@ BaseNode.prototype = {
     child.parent = this;
   }, 
   addTextChild: function(string) {
-    this.children.push(new TextElement(string));
+    if (!(this.ignoreWhiteSpaceText && string.match(/^\s*$/))) {
+      this.children.push(new TextElement(string));
+    }
   }, 
+  
   setIndentInsertString: function(parentIndentInsertString) {
     if (this.childIndent) {
       this.indentInsertString = parentIndentInsertString + this.childIndent;
@@ -61,7 +64,7 @@ BaseNode.prototype = {
         if (child.createDom) {
           var childDom = child.createDom(document);
           if (childDom) {
-            if (this.indentInsertString) {
+            if (this.indentInsertString && (this.indentAllChildren || i == 0)) {
               document.addTextNode(dom, this.indentInsertString);
             }
             dom.appendChild(childDom);
@@ -237,6 +240,8 @@ Text.prototype = merge(BaseNode.prototype, {
   defaultChildFunction: "sentence", 
   classMap: {sentence: Sentence, languageTitle: LanguageTitleAttribute}, 
   childIndent: "  ", 
+  indentAllChildren: true, 
+  ignoreWhiteSpaceText: true, 
   
   createInitialDom: function(document) {
     var className = this.className ? ("structure " + this.className + "-structure") : "structure";
@@ -259,6 +264,8 @@ Correspondence.prototype = merge(BaseNode.prototype, {
   defaultChildFunction: "text", 
   classMap: {text: Text, title: TitleAttribute}, 
   childIndent: "  ", 
+  indentAllChildren: true, 
+  ignoreWhiteSpaceText: true, 
   
   createInitialDom: function (document) {
     var div = document.createNode("div", {className: "structure-group"});
