@@ -4,7 +4,7 @@ var inspect = utils.inspect;
 
 var jsdom = require("jsdom").jsdom;
 
-console.log("jsdom = " + inspect(jsdom));
+console.log("jsdom = " + jsdom);
 
 var document = jsdom(null, null, {});
           
@@ -16,9 +16,9 @@ var p = document.createElement("p");
 p.className = "myClass";
 p.dataset = {};
 p.setAttribute("data-goodness", 35);
-body.appendChild(p);
+//body.appendChild(p);
 
 var t=document.createTextNode("Hello World");
 p.appendChild(t);
 
-console.log("document = " + document.outerHTML);
+console.log("document = " + p.outerHTML);

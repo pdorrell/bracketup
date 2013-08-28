@@ -93,6 +93,13 @@ function TitleAttribute() {
 TitleAttribute.prototype = merge(BaseAttribute.prototype, {
 });
 
+function LanguageTitleAttribute() {
+  BaseAttribute.call(this, "languageTitle");
+}
+
+LanguageTitleAttribute.prototype = merge(BaseAttribute.prototype, {
+});
+
 function Word(id) {
   BaseNode.call(this);
   this.id = id;
@@ -111,14 +118,14 @@ Sentence.prototype = merge(BaseNode.prototype, {
   classMap: {word: Word}
 });
 
-function Text(cssClass) {
+function Text(languageCssClass) {
   BaseNode.call(this);
-  this.cssClass = cssClass;
+  this.languageCssClass = languageCssClass;
 }
 
 Text.prototype = merge(BaseNode.prototype, {
   defaultChildFunction: "sentence", 
-  classMap: {sentence: Sentence, title: TitleAttribute}
+  classMap: {sentence: Sentence, languageTitle: LanguageTitleAttribute}
 });
 
 
@@ -128,7 +135,21 @@ function Correspondence() {
 
 Correspondence.prototype = merge(BaseNode.prototype, {
   defaultChildFunction: "text", 
-  classMap: {text: Text, title: TitleAttribute}
+  classMap: {text: Text, title: TitleAttribute}, 
+  
+  createInitialDom: function (document) {
+    var div = document.createElement("div");
+    div.className = "structure-group";
+    var title = this.attributes.title;
+    if (title) {
+      var titleDiv = document.createElement("div");
+      div.appendChild(titleDiv);
+      titleDiv.className = "description";
+      var textNode = document.createTextNode(title);
+      titleDiv.appendChild(textNode);
+    }
+    return div;
+  }
 });
 
 var correspondenceNodeCompiler = new bracketup.NodeCompiler({correspondence: Correspondence, 
