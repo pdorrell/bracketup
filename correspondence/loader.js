@@ -2,15 +2,23 @@ function inspect(object) {return JSON.stringify(object);}
 
 $(function () {
   new ScriptLoader([new ScriptDescriptor("test.js"), 
-                    new ScriptDescriptor("test2.js")]).load(function () {
+                    new ScriptDescriptor("test2.js"), 
+                    new ScriptDescriptor("test3.js")]).load(function () {
                       console.log("finished loading all the scripts");
                     });
 });
 
 function ScriptDescriptor(url) {
   this.url = url;
-  this.loaded = false;
 }
+
+ScriptDescriptor.prototype = {
+  runScript: function() {
+    console.log("Running " + this.url + " ...");
+    eval(this.source);
+    console.log("");
+  }
+};
 
 function ScriptLoader(descriptors) {
   this.descriptors = descriptors;
@@ -32,12 +40,17 @@ ScriptLoader.prototype = {
   }, 
   scriptLoaded: function(descriptor, text, finished) {
     this.numLoaded++;
-    console.log(" numloaded = " + this.numLoaded + ", from " + descriptor.url + ", loaded " + inspect(text));
+    //console.log(" numloaded = " + this.numLoaded + ", from " + descriptor.url + ", loaded " + inspect(text));
+    descriptor.source = text;
     if (this.numLoaded == this.descriptors.length) {
       this.allScriptsLoaded(finished);
     }
   }, 
   allScriptsLoaded: function(finished) {
+    console.log("");
+    for (var i=0; i<this.descriptors.length; i++) {
+      this.descriptors[i].runScript();
+    }
     console.log("ScriptLoader.allScriptsLoaded, now run the finish function ...");
     finished();
   }
