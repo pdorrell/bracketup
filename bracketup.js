@@ -1,4 +1,6 @@
-function inspect(object) {return JSON.stringify(object);}
+var utils = require("./utils.js");
+var merge = utils.merge;
+var inspect = utils.inspect;
 
 function TextNode(string) {
   this.string = string;
@@ -57,11 +59,16 @@ function NodeCompiler(topLevelClassMap) {
 }
 
 NodeCompiler.prototype = {
-  createObjectFromFunctionClass: function(functionClass, constructorArgs, initialWhitespace) {
+  createFromFunctionClass: function(functionClass, constructorArgs, initialWhitespace, 
+                                    childNodes) {
     var object = Object.create(functionClass.prototype);
     functionClass.apply(object, constructorArgs);
     if (object.prependWhitespace) {
       object.prependWhitespace(initialWhitespace);
+    }
+    for (var i=0; i<childNodes.length; i++) {
+      var childNode = childNodes[i];
+      this.compileChild(object, childNode);
     }
     return object;
   }, 
@@ -78,14 +85,9 @@ NodeCompiler.prototype = {
     if (!nodeFunctionClass) {
       throw new CompileError("Unknown top-level function for root element: " + functionName);
     }
-    var rootObject = this.createObjectFromFunctionClass(nodeFunctionClass, elementArgs.slice(1), 
-                                                        rootElementNode.whitespace);
-    var childNodes = rootElementNode.children;
-    for (var i=0; i<childNodes.length; i++) {
-      var childNode = childNodes[i];
-      this.compileChild(rootObject, childNode);
-    }
-    return rootObject;
+    return this.createFromFunctionClass(nodeFunctionClass, elementArgs.slice(1), 
+                                        rootElementNode.whitespace, 
+                                        rootElementNode.children);
   }, 
   compileChild: function(rootObject, childNode) {
     childNode.addToResult(this, rootObject);
@@ -110,6 +112,7 @@ NodeCompiler.prototype = {
       throw new CompileError("No function argument given and no default child function for parent element");
     }
     var functionName = elementArgs[0];
+    console.log("functionName = " + inspect(functionName));
     elementArgs = elementArgs.slice(1);
     var childFunctionClass = null;
     if (parentObject.classMap) {
@@ -122,9 +125,9 @@ NodeCompiler.prototype = {
       throw new CompileError("No function class found for " + inspect(functionName) + 
                              " in either parent class map or top-level class map");
     }
-    var childObject = this.createObjectFromFunctionClass(childFunctionClass, elementArgs, 
-                                                         childNode.whitespace);
-    childFunctionClass.apply(childObject, elementArgs);
+    var childObject = this.createFromFunctionClass(childFunctionClass, elementArgs, 
+                                                   childNode.whitespace, 
+                                                   childNode.children);
     if(childObject.addToParent) {
       childObject.addToParent(parentObject);
     }
@@ -297,4 +300,5 @@ exports.BracketupScanner = BracketupScanner;
 exports.NodeParser = NodeParser;
 exports.NodeCompiler = NodeCompiler;
 exports.TestTokenReceiver = TestTokenReceiver;
+exports.CompileError = CompileError;
 

@@ -4,6 +4,6 @@
  `(
    (:search-extensions (".js" ".html" ".css" ".scss"))
    (:run-project-command (javascript-run-file (project-file :main-javascript-file)))
-   (:main-javascript-file "test-bracketup.js")
+   (:main-javascript-file "test-correspondence-bracketup.js")
    (:sass-watch-src-output-argument ,(concat (project-base-directory)))
     ) )

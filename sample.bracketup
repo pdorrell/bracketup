@@ -24,8 +24,6 @@ of the form \[[b x], [b y]\], where [b x] is a number that increases from 0 to 7
   [H [1 Keep only the unique IDs of those diagonals.]]
   [I [1 Join the two lists of diagonal IDs together.]]
   [J [1 Count how many diagonal IDs are in the joined list.]]
-  [K [1 Having done that for each permutation, keep those permutations that have the maximum number of diagonals occupied.]]
+  [K [1 Having done that for each [a [href http://en.wikipedia.org/Permutation] permutation], keep those permutations that have the maximum number of diagonals occupied.]]
  ]
 ]
-
-[a [href http://thinkinghard.com/mypage.html] My Page]

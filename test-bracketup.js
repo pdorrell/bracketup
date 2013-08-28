@@ -1,4 +1,6 @@
-function inspect(object) {return JSON.stringify(object);}
+var utils = require("./utils.js");
+var merge = utils.merge;
+var inspect = utils.inspect;
 
 var fs = require('fs');
 var bracketup = require("./bracketup.js");
