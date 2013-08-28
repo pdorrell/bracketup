@@ -14,14 +14,24 @@ function ScriptDescriptor(url) {
 
 ScriptDescriptor.prototype = {
   runScript: function() {
+    window.exports = {};
     console.log("Running " + this.url + " ...");
     eval(this.source);
+    this.exports = window.exports;
+    for (name in this.exports) {
+      console.log(" exported " + name + " = " + window.exports[name]);
+    }
     console.log("");
   }
 };
 
 function ScriptLoader(descriptors) {
   this.descriptors = descriptors;
+  this.descriptorByUrl = {};
+  for (var i=0; i<descriptors.length; i++) {
+    var descriptor = descriptors[i];
+    this.descriptorByUrl[descriptor.url] = descriptor;
+  }
   this.numLoaded = 0;
 }
   
