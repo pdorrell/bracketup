@@ -34,6 +34,55 @@ BaseNode.prototype = {
   }, 
   setAttribute: function(attributeName, value) {
     this.attributes[attributeName] = value;
+  }, 
+  
+  createDomNode: function(document, parent, tag, className, attributes, text) {
+    var dom = document.createElement(tag);
+    if (parent) {
+      parent.appendChild(dom);
+    }
+    if (className) {
+      dom.className = className;
+    }
+    if (attributes) {
+      for (name in attributes) {
+        dom.setAttribute(name, attributes[name]);
+      }
+    }
+    if (text) {
+      dom.appendChild(document.createTextNode(text));
+    }
+    return dom;
+  }
+};
+
+// A wrapper for a browser DOM with easier method for creating nodes
+function Document(document) {
+  this.document = document;
+}
+
+Document.prototype = {
+  createNode: function(tag, options) {
+    var dom = this.document.createNode(tag);
+    var parent = options.parent;
+    if (parent) {
+      parent.appendChild(dom);
+    }
+    var className = options.className;
+    if (className) {
+      dom.className = className;
+    }
+    var attributes = options.attributes;
+    if (attributes) {
+      for (name in attributes) {
+        dom.setAttribute(name, attributes[name]);
+      }
+    }
+    var text = options.text;
+    if (text) {
+      dom.appendChild(this.document.createTextNode(text));
+    }
+    return dom;
   }
 };
 
@@ -138,15 +187,11 @@ Correspondence.prototype = merge(BaseNode.prototype, {
   classMap: {text: Text, title: TitleAttribute}, 
   
   createInitialDom: function (document) {
-    var div = document.createElement("div");
-    div.className = "structure-group";
+    var div = document.createNode("div", {className: "structure-group"});
     var title = this.attributes.title;
     if (title) {
-      var titleDiv = document.createElement("div");
-      div.appendChild(titleDiv);
-      titleDiv.className = "description";
-      var textNode = document.createTextNode(title);
-      titleDiv.appendChild(textNode);
+      document.createNode("div", {parent: div, className: "description", 
+                                  text: title});
     }
     return div;
   }
