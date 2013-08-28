@@ -43,7 +43,7 @@ BaseNode.prototype = {
         if (child.createDom) {
           var childDom = child.createDom(document);
           if (childDom) {
-            dom.appendChild(dom);
+            dom.appendChild(childDom);
           }
         }
       }
@@ -173,7 +173,18 @@ function Text(languageCssClass) {
 
 Text.prototype = merge(BaseNode.prototype, {
   defaultChildFunction: "sentence", 
-  classMap: {sentence: Sentence, languageTitle: LanguageTitleAttribute}
+  classMap: {sentence: Sentence, languageTitle: LanguageTitleAttribute}, 
+  
+  createInitialDom: function(document) {
+    var className = this.className ? ("structure " + this.className + "-structure") : "structure";
+    var div = document.createNode("div", {className: className});
+    var languageTitle = this.attributes.languageTitle;
+    if (languageTitle) {
+      document.createNode("div", {parent: div, className: "language", 
+                                  text: languageTitle});
+    }
+    return div;
+  }
 });
 
 
