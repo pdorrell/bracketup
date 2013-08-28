@@ -1,4 +1,24 @@
+function inspect(object) {return JSON.stringify(object);}
+
 $(document).ready(function(){
+  compileCorrespondenceSource($("#ruby-example-source"), $("#ruby-example-compiled"));
+  initialiseInteraction();
+});
+
+var correspondenceBracketup = require("../correspondence-bracketup.js");
+
+console.log("correspondenceBracketup = " + inspect(correspondenceBracketup));
+
+function compileCorrespondenceSource(sourceElementSelector, compiledElementSelector) {
+  var documentObject = new correspondenceBracketup.Document(window.document);
+  var correspondenceSource = sourceElementSelector.html();
+  var compiledObjects = correspondenceBracketup.compileCorrespondence(correspondenceSource);
+  var correspondence = compiledObjects[0];
+  var correspondenceDom = correspondence.createDom(documentObject);
+  compiledElementSelector.append(correspondenceDom);
+}
+  
+function initialiseInteraction() {
   var structureGroups = new CORRESPONDENCE.StructureGroups($(".structure-group"));
   
   structureGroups.setupInterleaving();
@@ -33,4 +53,5 @@ $(document).ready(function(){
   
   $(structureGroups).on("clickOutsideItems", 
                         function(event) { structureGroups.clearCurrentSelection(); });
-});
+}
+

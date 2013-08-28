@@ -6,9 +6,10 @@
   <link rel="stylesheet" type="text/css" href="correspondence.css" />
   <link rel="stylesheet" type="text/css" href="correspondence-ruby.css" />
   <link rel="stylesheet" type="text/css" href="correspondence-programming-output.css" />
+  <script language="javascript" type="text/javascript" src="require.js"></script>
   <script language="javascript" type="text/javascript" src="lib/jquery-1.10.1.js"></script>
   <script language="javascript" type="text/javascript" src="correspondence.js"></script>
-  <script language="javascript" type="text/javascript" src="correspondence-configuration.js"></script>
+  <script language="javascript" type="text/javascript" src="correspondence-configuration-browserified.js"></script>
 </head>
 
 <body>
@@ -30,41 +31,40 @@ corresponding item groups within different structures are immediately adjacent.<
 
 <p>And uncheck to go back to the original un-interleaved view.</p>
 
-<div>
-<div class="structure-group" style="width:28em;">
-  <div class="structure ruby-structure">
-    <div class="language">Ruby</div>
-    <div class="item-group" data-group-id="A">
-      <span data-id="A1">x</span>&nbsp;<span data-id="A2">=</span>&nbsp;<span data-id="A3">3</span>
-    </div>
-    <div class="item-group" data-group-id="B">
-      <span data-id="B1">x</span>&nbsp;<span data-id="B2">=</span>&nbsp;<span data-id="B3">4</span>
-    </div>
-    <div class="item-group" data-group-id="C">
-      <span data-id="C1">x</span>&nbsp;<span data-id="C2">=</span>&nbsp;<span data-id="C3">x</span>&nbsp;<span data-id="C4">+</span>&nbsp;<span data-id="C5">1</span>
-    </div>
-    <div class="item-group" data-group-id="D">
-      <span data-id="D1">puts</span>&nbsp;<span data-id="D2">x</span><br/><span class="output-marker">=></span>&nbsp;<span class="output"><span data-id="D3">5</span></span>
-    </div>
-  </div>
-  <div class="structure english-structure">
-    <div class="language">English</div>
-    <div class="item-group" data-group-id="A">
-      <span data-id="A2">Set the value of</span> <span data-id="A1">the variable <b>x</b></span> <span data-id="A2">to be</span> <span data-id="A3"><b>3</b></span>.
-    </div>
-    <div class="item-group" data-group-id="B">
-      <span data-id="B2">Set the value of</span> <span data-id="B1">the variable <b>x</b></span> <span data-id="B2">to be</span> <span data-id="B3"><b>4</b></span> (over-writing the previous value of <b>3</b>)
-    </div>
-    <div class="item-group" data-group-id="C">
-      <span data-id="C2">Set the new value of</span> <span data-id="C1">the variable <b>x</b></span> <span data-id="C2">to be</span> <span data-id="C3">the current value of <b>x</b></span> <span data-id="C4">plus</span> <span data-id="C5"><b>1</b></span>
-       (so the new value of  <b>x</b> will be <b>4 + 1 = 5</b>)
-    </div>
-    <div class="item-group" data-group-id="D">
-      <span data-id="D1">Print out</span> <span data-id="D2">the value of the variable <b>x</b></span> (prints out <span class="output"><span data-id="D3">5</span></span>)
-    </div>
-  </div>
-</div>
-</div>
+<script id="ruby-example-source" type="text/plain">
+[correspondence [_title Queens Puzzle]
+ [_text,rhoscript [_languageTitle rhoScript]
+  [A [_word,1 8] [2 range]]
+  [B [1 permutations]]
+  [C ([1 with-index]]
+  [D ([1 sum]) [2 map]]
+  [E [1 uniq]]
+  [F [1 arg-a] [2 with-index]]
+  [G ([1 *exploding] [2 subtract]) [3 map]]
+  [H [1 uniq]]
+  [I [1 concatenate]]
+  [J [1 length])]
+  [K [1 keep-maxes-by]]
+ ]
+ [english [_languageTitle English]
+  [A For [2 the sequence of numbers from 0 to 1 less than] [1 8],]
+  [B consider [1 all possible permutations].]
+  [C For a given permutation, [1 specify X and Y co-ordinates for the 8 queens (i.e. an "arrangement") as an array of arrays
+of the form \[[b x], [b y]\], where [b x] is a number that increases from 0 to 7, and [b y] is the corresponding value in the permutation.]]
+  [D [2 For each position of a queen in an arrangement], [1 add the [b x] and [b y] coordinates] to identify which diagonal in the [b x=-y] direction the queen is on.]
+  [E [1 Keep only the unique IDs of those occupied diagonals.]]
+  [F [1 Again, for each permutation], [2 convert it into an arrangement as a list of \[[b x], [b y]\] coordinate pairs].]
+  [G [3 For each coordinate pair within the arrangement], [2 subtract the Y coordinate from the X coordinate] [1 (having extracted the two coordinates from the array representing the coordinate pair to use as arguments to the [b subtract] function)], to determine the ID of the diagonal in the [_b x=y] direction.]
+  [H [1 Keep only the unique IDs of those diagonals.]]
+  [I [1 Join the two lists of diagonal IDs together.]]
+  [J [1 Count how many diagonal IDs are in the joined list.]]
+  [K [1 Having done that for each [a [href http://en.wikipedia.org/Permutation]permutation], keep those permutations that have the maximum number of diagonals occupied.]]
+ ]
+]
+
+</script>
+
+<div id="ruby-example-compiled"></div>
 
 <div class="date">Last updated: 7 July 2013</div>
 
