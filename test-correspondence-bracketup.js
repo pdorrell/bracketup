@@ -15,15 +15,24 @@ var jsdomDocument = jsdom(null, null, {});
 
 var correspondenceCompiler = correspondenceBracketup.correspondenceCompiler;
 
-var compiledDoms = correspondenceCompiler.compileDoms(fileContents, jsdomDocument);
+try {
+  var compiledDoms = correspondenceCompiler.compileDoms(fileContents, jsdomDocument);
+  
+  assert.equal(compiledDoms.length, 1);
+  
+  var expectedOutputFileName = "sample-bracket.output.html";
+  var expectedOutput = fs.readFileSync(expectedOutputFileName, {encoding: "utf-8"});
+  
+  var correspondenceDom = compiledDoms[0];
+  var correspondenceDomHtml = correspondenceDom.outerHTML;
+  
+  assert.equal(expectedOutput, correspondenceDomHtml);
+}
+catch (error) {
+  if (error.logSourceError) {
+    error.logSourceError();
+  }
+  throw error;
+}
 
-assert.equal(compiledDoms.length, 1);
-
-var expectedOutputFileName = "sample-bracket.output.html";
-var expectedOutput = fs.readFileSync(expectedOutputFileName, {encoding: "utf-8"});
-
-var correspondenceDom = compiledDoms[0];
-var correspondenceDomHtml = correspondenceDom.outerHTML;
-
-assert.equal(expectedOutput, correspondenceDomHtml);
 

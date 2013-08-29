@@ -52,10 +52,24 @@
     this.sourceLine = sourceLine;
     this.position = position;
   }
+  
+  function repeatedString(string, numRepeats) {
+    var array = [];
+    for (var i=0; i<numRepeats; i++) {
+      array.push(string);
+    }
+    return array.join("");
+  }
 
   SourceLinePosition.prototype = {
     toString: function() {
       return this.sourceLine + ":" + this.position;
+    }, 
+    logLineAndPosition: function() {
+      var linePrefix = this.toString() + ":";
+      var line1 = linePrefix + this.sourceLine.line;
+      var line2 = repeatedString(" ", this.position) + "^";
+      return [line1, line2];
     }
   };
   
@@ -114,10 +128,26 @@
     this.error = new Error(message);
     this.stack = this.error.stack.replace(/^Error:/g, className + ":")
   }
+  
+  CustomError.prototype = {
+    logSourceError: function() {
+      if (this.sourceLinePosition) {
+        console.log(this.getMessageLine());
+        console.log(this.sourceLinePosition.logLineAndPosition().join("\n"));
+      }
+    }
+  };
 
-  function CompileError(message) {
+  function CompileError(message, sourceLinePosition) {
     CustomError.call(this, "CompileError", message);
+    this.sourceLinePosition = sourceLinePosition;
   }
+  
+  CompileError.prototype = {
+    getMessageLine: function() {
+      return "Compile error: " + this.message;
+    }
+  };
 
   function NodeCompiler(topLevelClassMap) {
     this.topLevelClassMap = topLevelClassMap;
@@ -140,7 +170,8 @@
     compile: function(rootElementNode) {
       var elementArgs = rootElementNode.args;
       if (elementArgs.length == 0) {
-        throw new CompileError("No node function name given for root element");
+        throw new CompileError("No node function name given for root element", 
+                               rootElementNode.sourceLinePosition);
       }
       var functionName = elementArgs[0];
       if (functionName.match(/^_/)) {
@@ -148,7 +179,8 @@
       }
       var nodeFunctionClass = this.topLevelClassMap[functionName];
       if (!nodeFunctionClass) {
-        throw new CompileError("Unknown top-level function for root element: " + functionName);
+        throw new CompileError("Unknown top-level function for root element: " + functionName, 
+                               rootElementNode.sourceLinePosition);
       }
       var rootObject = this.createFromFunctionClass(nodeFunctionClass, elementArgs.slice(1), 
                                                     rootElementNode.whitespace, 
@@ -178,7 +210,8 @@
         }
       }
       if (elementArgs.length == 0) {
-        throw new CompileError("No function argument given and no default child function for parent element");
+        throw new CompileError("No function argument given and no default child function for parent element", 
+                               childNode.sourceLinePosition);
       }
       var functionName = elementArgs[0];
       elementArgs = elementArgs.slice(1);
@@ -191,7 +224,8 @@
       }
       if (!childFunctionClass) {
         throw new CompileError("No function class found for " + inspect(functionName) + 
-                               " in either parent class map or top-level class map");
+                               " in either parent class map or top-level class map", 
+                               childNode.sourceLinePosition);
       }
       var childObject = this.createFromFunctionClass(childFunctionClass, elementArgs, 
                                                      childNode.whitespace, 
@@ -209,6 +243,12 @@
     CustomError.call(this, "NodeParseException", message);
     this.sourceLinePosition = sourceLinePosition;
   }
+  
+  NodeParseException.prototype = {
+    getMessageLine: function() {
+      return "Syntax error: " + this.message;
+    }
+  };
 
   function NodeParser() {
     this.nodesStack = [];
@@ -279,7 +319,7 @@
     }, 
     endItem: function(sourceLinePosition) {
       if (this.indent.length < this.indentIncrement.length) {
-        throw new CompileError("Unexpected end of item");
+        throw new CompileError("Unexpected end of item", sourceLinePosition);
       }
       this.indent = this.indent.substring(this.indentIncrement.length);
       console.log(this.indent + "END [" + sourceLinePosition + "]");
@@ -501,7 +541,8 @@
       this.value = this.value + string;
     }, 
     addChild: function(child) {
-      throw new CompileError("Unexpected non-text element inside " + this.attributeName + " attribute node");
+      throw new CompileError("Unexpected non-text element inside " + this.attributeName + " attribute node", 
+                             child.sourceLinePosition);
     }, 
     addEndOfLineChild: function() {
       this.addTextChild("\n");
@@ -584,7 +625,6 @@
       }
       return compiledDoms;
     }
-      
   };
   
   exports.BracketupScanner = BracketupScanner;
