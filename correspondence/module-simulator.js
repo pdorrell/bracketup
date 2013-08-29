@@ -16,3 +16,19 @@ function saveExports(moduleName) {
   exports = {};
 }
 
+function setRequires(requireMap) {
+  require = function(url) {
+    console.log(" requiring " + url + " ...");
+    var moduleName = requireMap[url];
+    if (!moduleName) {
+      throw new Error("Module for URL " + url + " not found");
+    }
+    console.log("  looking up module " + moduleName + " ...");
+    var module = requires[moduleName];
+    if (!module) {
+      throw new Error("Module " + moduleName + " does not exist");
+    }
+    return module;
+  }
+}
+

@@ -12,18 +12,22 @@
   <script language="javascript" type="text/javascript" src="../utils.js"></script>
 <script language="Javascript">
 saveExports("utils");
-function require(url){return {"./utils.js": requires.utils}[url]}
+
+setRequires({"./utils.js": "utils"});
 </script>
   <script language="javascript" type="text/javascript" src="../bracketup.js"></script>
 <script language="Javascript">
 saveExports("bracketup");
-function require(url){return {"./utils.js": requires.utils,"./bracketup.js": requires.bracketup}[url]}
+
+setRequires({"./utils.js": "utils",
+             "./bracketup.js": "bracketup"});
 </script>
   <script language="javascript" type="text/javascript" src="../correspondence-bracketup.js"></script>
 <script language="Javascript">
 saveExports("correspondenceBracketup");
-function require(url){return {"../utils.js": requires.utils,
-                              "../correspondence-bracketup.js": requires.correspondenceBracketup}[url]}
+
+setRequires({"../utils.js": "utils",
+             "../correspondence-bracketup.js": "correspondenceBracketup"});
 </script>
   <script language="javascript" type="text/javascript" src="correspondence-configuration.js"></script>
 </head>
