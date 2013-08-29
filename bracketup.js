@@ -135,6 +135,7 @@
       if (this.sourceLinePosition) {
         console.log("");
         console.log(this.getMessageLine());
+        console.log("");
         console.log(this.sourceLinePosition.logLineAndPosition().join("\n"));
       }
     }
@@ -157,7 +158,7 @@
 
   NodeCompiler.prototype = {
     createFromFunctionClass: function(functionClass, constructorArgs, initialWhitespace, 
-                                      childNodes) {
+                                      childNodes, sourceLinePosition) {
       var object = Object.create(functionClass.prototype);
       functionClass.apply(object, constructorArgs);
       if (object.prependWhitespace) {
@@ -167,6 +168,7 @@
         var childNode = childNodes[i];
         this.compileChild(object, childNode);
       }
+      object.sourceLinePosition = sourceLinePosition;
       return object;
     }, 
     compile: function(rootElementNode) {
@@ -186,7 +188,8 @@
       }
       var rootObject = this.createFromFunctionClass(nodeFunctionClass, elementArgs.slice(1), 
                                                     rootElementNode.whitespace, 
-                                                    rootElementNode.children);
+                                                    rootElementNode.children, 
+                                                    rootElementNode.sourceLinePosition);
       if (rootObject.setIndentInsertString) {
         rootObject.setIndentInsertString("\n");
       }
@@ -231,7 +234,8 @@
       }
       var childObject = this.createFromFunctionClass(childFunctionClass, elementArgs, 
                                                      childNode.whitespace, 
-                                                     childNode.children);
+                                                     childNode.children, 
+                                                     childNode.sourceLinePosition);
       if(childObject.addToParent) {
         childObject.addToParent(parentObject);
       }
