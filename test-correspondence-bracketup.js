@@ -32,8 +32,5 @@ catch (error) {
   if (error.logSourceError) {
     error.logSourceError();
   }
-  else {
-    console.log(" no logSourceError");
-  }
   throw error;
 }
