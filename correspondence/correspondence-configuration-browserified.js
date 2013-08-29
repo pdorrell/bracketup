@@ -482,6 +482,31 @@
       return dom;
     }
   });
+  
+  function compile(nodeCompiler, source) {
+    var bracketupScanner = new BracketupScanner();
+    var nodeParser = new NodeParser();
+    bracketupScanner.scanSource(nodeParser, source);
+    var parsedRootElements = nodeParser.rootElements;
+    var compiledObjects = [];
+    for (var i=0; i<parsedRootElements.length; i++) {
+      var rootElement = parsedRootElements[i];
+      //console.log("Parsed root element " + rootElement);
+      var correspondence = nodeCompiler.compile(rootElement);
+      compiledObjects.push(correspondence);
+    }
+    return compiledObjects;
+  }
+  
+  function compileIntoDoms(nodeCompiler, source, document) {
+    var compiledDoms = [];
+    var compiledObjects = compile(nodeCompiler, source);
+    var documentWrapper = new Document(document);
+    for (var i=0; i<compiledObjects.length; i++) {
+      compiledDoms.push(compiledObjects[i].createDom(documentWrapper));
+    }
+    return compiledDoms;
+  }
 
   exports.BracketupScanner = BracketupScanner;
   exports.NodeParser = NodeParser;
@@ -491,12 +516,14 @@
   
   exports.TextElement = TextElement;
   exports.BaseNode = BaseNode;
-  exports.Document = Document;
   exports.BaseAttribute = BaseAttribute;
   exports.Bold = Bold;
   exports.Italic = Italic;
   exports.HrefAttribute = HrefAttribute;
   exports.Link = Link;
+
+  exports.compile = compile;
+  exports.compileIntoDoms = compileIntoDoms;
   
 })();
 
@@ -507,8 +534,6 @@
   var inspect = utils.inspect;
 
   var bracketup = require("./bracketup.js");
-
-  var bracketupScanner = new bracketup.BracketupScanner();
 
   function TitleAttribute() {
     bracketup.BaseAttribute.call(this, "title");
@@ -608,22 +633,15 @@
                                                                a: bracketup.Link});
 
   function compileCorrespondence(source) {
-    var bracketupScanner = new bracketup.BracketupScanner();
-    var nodeParser = new bracketup.NodeParser();
-    bracketupScanner.scanSource(nodeParser, source);
-    var parsedRootElements = nodeParser.rootElements;
-    var compiledObjects = [];
-    for (var i=0; i<parsedRootElements.length; i++) {
-      var rootElement = parsedRootElements[i];
-      //console.log("Parsed root element " + rootElement);
-      var correspondence = correspondenceNodeCompiler.compile(rootElement);
-      compiledObjects.push(correspondence);
-    }
-    return compiledObjects;
+    return bracketup.compile(correspondenceNodeCompiler, source);
+  }
+  
+  function compileCorrespondenceIntoDoms(source, document) {
+    return bracketup.compileIntoDoms(correspondenceNodeCompiler, source, document);
   }
 
   exports.compileCorrespondence = compileCorrespondence;
-
+  exports.compileCorrespondenceIntoDoms = compileCorrespondenceIntoDoms;
 })();
 
 },{"./bracketup.js":1,"./utils.js":4}],3:[function(require,module,exports){
@@ -640,13 +658,12 @@ var correspondenceBracketup = require("../correspondence-bracketup.js");
 
 function compileCorrespondenceSource(sourceElements) {
   sourceElements.each(function(index, sourceElement) {
-    var documentObject = new bracketup.Document(window.document);
     var sourceElementSelector = $(sourceElement);
     var correspondenceSource = sourceElementSelector.html();
-    var compiledObjects = correspondenceBracketup.compileCorrespondence(correspondenceSource);
-    var correspondence = compiledObjects[0];
-    var correspondenceDom = correspondence.createDom(documentObject);
-    sourceElementSelector.after(correspondenceDom);
+    var compiledDoms = correspondenceBracketup.compileCorrespondenceIntoDoms(correspondenceSource, document);
+    for (var i=0; i<compiledDoms.length; i++) {
+      sourceElementSelector.after(compiledDoms[i]);
+    }
   });
 }
   
