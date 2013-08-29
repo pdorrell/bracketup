@@ -3,9 +3,80 @@
   var utils = require("./utils.js");
   var merge = utils.merge;
   var inspect = utils.inspect;
+  
+  function SourceFileName(fileName) {
+    this.fileName = fileName;
+  }
+  
+  SourceFileName.prototype = {
+    toString: function() {
+      return this.fileName;
+    }, 
+    line: function (string, lineNumber) {
+      return new SourceLine(this, string, lineNumber);
+    }, 
+    endOfFilePosition: function(lines) {
+      var numLines = lines.length;
+      var lastLine = numLines > 0 ? lines[numLines-1] : null;
+      return new EndOfSourceFilePosition(this, numLines, lastLine);
+    }
+  };
+  
+  function EndOfSourceFilePosition(sourceFileName, numLines, lastLine) {
+    this.sourceFileName = sourceFileName;
+    this.numLines = numLines;
+    this.lastLine = lastLine;
+  };
+  
+  EndOfSourceFilePosition.prototype = {
+    toString: function() {
+      return this.sourceFileName + ":" + this.numLines;
+    }
+  };
+  
+  function SourceLine(sourceFileName, line, lineNumber) {
+    this.sourceFileName = sourceFileName;
+    this.line = line;
+    this.lineNumber = lineNumber;
+  }
+  
+  SourceLine.prototype = {
+    toString: function() {
+      return this.sourceFileName + ":" + this.lineNumber;
+    }, 
+    position: function(linePosition) {
+      return new SourceLinePosition(this, linePosition);
+    }
+  };
+  
+  function SourceLinePosition(sourceLine, position) {
+    this.sourceLine = sourceLine;
+    this.position = position;
+  }
+  
+  function repeatedString(string, numRepeats) {
+    var array = [];
+    for (var i=0; i<numRepeats; i++) {
+      array.push(string);
+    }
+    return array.join("");
+  }
 
-  function TextNode(string) {
+  SourceLinePosition.prototype = {
+    toString: function() {
+      return this.sourceLine + ":" + this.position;
+    }, 
+    logLineAndPosition: function() {
+      var linePrefix = this.toString() + ":";
+      var line1 = linePrefix + this.sourceLine.line;
+      var line2 = repeatedString(" ", linePrefix.length + this.position - 1) + "^";
+      return [line1, line2];
+    }
+  };
+  
+  function TextNode(string, sourceLinePosition) {
     this.string = string;
+    this.sourceLinePosition = sourceLinePosition;
   }
 
   TextNode.prototype = {
@@ -17,7 +88,8 @@
     }
   };
 
-  function EndOfLineNode() {
+  function EndOfLineNode(sourceLinePosition) {
+    this.sourceLinePosition = sourceLinePosition;
   }
 
   EndOfLineNode.prototype = {
@@ -29,9 +101,10 @@
     }
   }
 
-  function ElementNode(args, whitespace) {
+  function ElementNode(args, whitespace, sourceLinePosition) {
     this.args = args;
     this.whitespace = whitespace;
+    this.sourceLinePosition = sourceLinePosition;
     this.children = [];
   }
 
@@ -53,13 +126,32 @@
   };
 
   function CustomError(className, message) {
+    this.message = message;
     this.error = new Error(message);
     this.stack = this.error.stack.replace(/^Error:/g, className + ":")
   }
+  
+  CustomError.prototype = {
+    logSourceError: function() {
+      if (this.sourceLinePosition) {
+        console.log("");
+        console.log(this.getMessageLine());
+        console.log("");
+        console.log(this.sourceLinePosition.logLineAndPosition().join("\n"));
+      }
+    }
+  };
 
-  function CompileError(message) {
+  function CompileError(message, sourceLinePosition) {
     CustomError.call(this, "CompileError", message);
+    this.sourceLinePosition = sourceLinePosition;
   }
+  
+  CompileError.prototype = merge(CustomError.prototype, {
+    getMessageLine: function() {
+      return "Compile error: " + this.message;
+    }
+  });
 
   function NodeCompiler(topLevelClassMap) {
     this.topLevelClassMap = topLevelClassMap;
@@ -67,7 +159,7 @@
 
   NodeCompiler.prototype = {
     createFromFunctionClass: function(functionClass, constructorArgs, initialWhitespace, 
-                                      childNodes) {
+                                      childNodes, sourceLinePosition) {
       var object = Object.create(functionClass.prototype);
       functionClass.apply(object, constructorArgs);
       if (object.prependWhitespace) {
@@ -77,12 +169,14 @@
         var childNode = childNodes[i];
         this.compileChild(object, childNode);
       }
+      object.sourceLinePosition = sourceLinePosition;
       return object;
     }, 
     compile: function(rootElementNode) {
       var elementArgs = rootElementNode.args;
       if (elementArgs.length == 0) {
-        throw new CompileError("No node function name given for root element");
+        throw new CompileError("No node function name given for root element", 
+                               rootElementNode.sourceLinePosition);
       }
       var functionName = elementArgs[0];
       if (functionName.match(/^_/)) {
@@ -90,11 +184,13 @@
       }
       var nodeFunctionClass = this.topLevelClassMap[functionName];
       if (!nodeFunctionClass) {
-        throw new CompileError("Unknown top-level function for root element: " + functionName);
+        throw new CompileError("Unknown top-level function for root element: " + functionName, 
+                               rootElementNode.sourceLinePosition);
       }
       var rootObject = this.createFromFunctionClass(nodeFunctionClass, elementArgs.slice(1), 
                                                     rootElementNode.whitespace, 
-                                                    rootElementNode.children);
+                                                    rootElementNode.children, 
+                                                    rootElementNode.sourceLinePosition);
       if (rootObject.setIndentInsertString) {
         rootObject.setIndentInsertString("\n");
       }
@@ -120,7 +216,8 @@
         }
       }
       if (elementArgs.length == 0) {
-        throw new CompileError("No function argument given and no default child function for parent element");
+        throw new CompileError("No function argument given and no default child function for parent element", 
+                               childNode.sourceLinePosition);
       }
       var functionName = elementArgs[0];
       elementArgs = elementArgs.slice(1);
@@ -133,11 +230,13 @@
       }
       if (!childFunctionClass) {
         throw new CompileError("No function class found for " + inspect(functionName) + 
-                               " in either parent class map or top-level class map");
+                               " in either parent class map or top-level class map", 
+                               childNode.sourceLinePosition);
       }
       var childObject = this.createFromFunctionClass(childFunctionClass, elementArgs, 
                                                      childNode.whitespace, 
-                                                     childNode.children);
+                                                     childNode.children, 
+                                                     childNode.sourceLinePosition);
       if(childObject.addToParent) {
         childObject.addToParent(parentObject);
       }
@@ -147,9 +246,16 @@
     }
   };
 
-  function NodeParseException(message) {
+  function NodeParseException(message, sourceLinePosition) {
     CustomError.call(this, "NodeParseException", message);
+    this.sourceLinePosition = sourceLinePosition;
   }
+  
+  NodeParseException.prototype = merge(CustomError.prototype, {
+    getMessageLine: function() {
+      return "Syntax error: " + this.message;
+    }
+  });
 
   function NodeParser() {
     this.nodesStack = [];
@@ -158,8 +264,8 @@
   }
 
   NodeParser.prototype = {
-    startItem: function(itemArguments, whitespace) {
-      var elementNode = new ElementNode(itemArguments, whitespace);
+    startItem: function(itemArguments, whitespace, sourceLinePosition) {
+      var elementNode = new ElementNode(itemArguments, whitespace, sourceLinePosition);
       if (this.currentElementNode == null) {
         this.rootElements.push(elementNode);
       }    
@@ -169,7 +275,7 @@
       }
       this.currentElementNode = elementNode;
     }, 
-    endItem: function() {
+    endItem: function(sourceLinePosition) {
       if (this.currentElementNode != null) {
         if (this.nodesStack.length > 0) {
           this.currentElementNode = this.nodesStack.pop();
@@ -179,25 +285,26 @@
         }
       }
       else {
-        throw new NodeParseException("Unexpected end of element node");
+        throw new NodeParseException("Unexpected end of element node", sourceLinePosition);
       }
     }, 
-    text: function(string) {
+    text: function(string, sourceLinePosition) {
       if (this.currentElementNode != null) {
-        this.currentElementNode.addChild(new TextNode(string));
+        this.currentElementNode.addChild(new TextNode(string, sourceLinePosition));
       }
       else {
         if (string.match("^\s*$")) {
           //console.log("Ignoring whitespace outside of root element: " + inspect(string));
         }
         else {
-          throw new NodeParseException("Unexpected text outside of root element: " + inspect(string));
+          throw new NodeParseException("Unexpected text outside of root element: " + inspect(string), 
+                                       sourceLinePosition);
         }
       }
     }, 
-    endOfLine: function() {
+    endOfLine: function(sourceLinePosition) {
       if (this.currentElementNode != null) {
-        this.currentElementNode.addChild(new EndOfLineNode());
+        this.currentElementNode.addChild(new EndOfLineNode(sourceLinePosition));
       }
       else {
         //console.log("Ignoring end-of-line outside of root element");
@@ -212,23 +319,23 @@
   TestTokenReceiver.prototype = {
     indentIncrement: "  ", 
     
-    startItem: function(itemArguments, whitespace) {
+    startItem: function(itemArguments, whitespace, sourceLinePosition) {
       console.log(this.indent + "START " + inspect(itemArguments) + 
-                  "  (whitespace = " + inspect(whitespace) + ")");
+                  "  (whitespace = " + inspect(whitespace) + ") [" + sourceLinePosition + "]");
       this.indent = this.indent + this.indentIncrement;
     }, 
-    endItem: function() {
+    endItem: function(sourceLinePosition) {
       if (this.indent.length < this.indentIncrement.length) {
-        throw new CompileError("Unexpected end of item");
+        throw new CompileError("Unexpected end of item", sourceLinePosition);
       }
       this.indent = this.indent.substring(this.indentIncrement.length);
-      console.log(this.indent + "END");
+      console.log(this.indent + "END [" + sourceLinePosition + "]");
     }, 
-    text: function(string) {
-      console.log(this.indent + "TEXT " + inspect(string));
+    text: function(string, sourceLinePosition) {
+      console.log(this.indent + "TEXT " + inspect(string) + " [" + sourceLinePosition + "]");
     }, 
-    endOfLine: function() {
-      console.log(this.indent + "EOLN");
+    endOfLine: function(sourceLinePosition) {
+      console.log(this.indent + "EOLN [" + sourceLinePosition + "]");
     }
   };
 
@@ -243,65 +350,77 @@
     
     sendAnyTexts: function(tokenReceiver) {
       if (this.textPortions.length > 0) {
-        tokenReceiver.text(this.textPortions.join(""));
+        tokenReceiver.text(this.textPortions.join(""), this.textPortionsSourceLinePosition);
         this.textPortions = [];
       }
     }, 
-    
-    scanLine: function(tokenReceiver, line) {
+    saveTextPortion: function(textPortion, sourceLinePosition) {
+      if (this.textPortions.length == 0) {
+        this.textPortionsSourceLinePosition = sourceLinePosition;
+      }
+      this.textPortions.push(textPortion);
+    }, 
+    scanLine: function(tokenReceiver, line, sourceLine) {
       var scanningRegex = new RegExp(this.regex.source, "g");
       // console.log("Scanning " + inspect(line) + "\n  with " + scanningRegex + " ..."); 
       var matchedSubstrings = [];
       this.textPortions = [];
+      var linePosition = 1;
       while ((match = scanningRegex.exec(line)) !== null) {
+        var sourceLinePosition = sourceLine.position(linePosition);
         // console.log("  match = " + inspect(match));
-        matchedSubstrings.push(match[0]);
+        var matchedSubstring = match[0];
+        matchedSubstrings.push(matchedSubstring);
         // console.log("==> " + inspect(match[0]));
         if(match[1]) {
           this.sendAnyTexts(tokenReceiver);
           var itemArguments = match[2].split(",");
           var whitespace = match[3];
-          tokenReceiver.startItem(itemArguments, whitespace);
+          tokenReceiver.startItem(itemArguments, whitespace, sourceLinePosition);
           this.depth++;
         }
         else if (match[4]) {
           this.sendAnyTexts(tokenReceiver);
           if(this.depth <= 0) {
-            throw new NodeParseException("Unexpected ']'");
+            throw new NodeParseException("Unexpected ']'", sourceLinePosition);
           }
-          tokenReceiver.endItem();
+          tokenReceiver.endItem(sourceLinePosition);
           this.depth--;
         }
         else if (match[5]) {
-          this.textPortions.push(match[6]);
+          this.saveTextPortion(match[6], sourceLinePosition);
         }
         else if (match[7]) {
-          this.textPortions.push(match[7]);
+          this.saveTextPortion(match[7], sourceLinePosition);
         }
         else {
           console.log("match = " + inspect(match));
-          throw new NodeParseException("No match found in lexer");
+          throw new NodeParseException("No match found in lexer", sourceLinePosition);
         }
+        linePosition += matchedSubstring.length;
       }
       this.sendAnyTexts(tokenReceiver);
-      tokenReceiver.endOfLine();
+      tokenReceiver.endOfLine(sourceLinePosition);
 
       var reconstitutedMatches = matchedSubstrings.join("");
       if (reconstitutedMatches != line) {
         throw new NodeParseException("Reconstituted " + inspect(reconstitutedMatches) + 
-                                     "\n                  != " + inspect(line));
+                                     "\n                  != " + inspect(line), sourceLinePosition);
       }
       // console.log("matched substrings = " + inspect(matchedSubstrings.join("")));
     }, 
     
-    scanSource: function(tokenReceiver, source) {
+    scanSource: function(tokenReceiver, source, sourceFileName) {
       this.depth = 0;
       var lines = source.split("\n");
+      var sourceFileName = new SourceFileName(sourceFileName);
       for (var i=0; i<lines.length; i++) {
-        this.scanLine(tokenReceiver, lines[i]);
+        var line = lines[i];
+        this.scanLine(tokenReceiver, line, sourceFileName.line(line, i+1));
       }
       if (this.depth != 0) {
-        throw new NodeParseException(this.depth + " unbalanced '['s at end of file");
+        throw new NodeParseException(this.depth + " unbalanced '['s at end of file", 
+                                     sourceFileName.endOfFilePosition(lines));
       }
     }
   };
@@ -429,7 +548,8 @@
       this.value = this.value + string;
     }, 
     addChild: function(child) {
-      throw new CompileError("Unexpected non-text element inside " + this.attributeName + " attribute node");
+      throw new CompileError("Unexpected non-text element inside " + this.attributeName + " attribute node", 
+                             child.sourceLinePosition);
     }, 
     addEndOfLineChild: function() {
       this.addTextChild("\n");
@@ -488,10 +608,10 @@
   }
   
   BracketupCompiler.prototype = {
-    compile: function(source) {
+    compile: function(source, sourceFileName) {
       var bracketupScanner = new BracketupScanner();
       var nodeParser = new NodeParser();
-      bracketupScanner.scanSource(nodeParser, source);
+      bracketupScanner.scanSource(nodeParser, source, sourceFileName);
       var parsedRootElements = nodeParser.rootElements;
       var compiledObjects = [];
       for (var i=0; i<parsedRootElements.length; i++) {
@@ -503,16 +623,15 @@
       return compiledObjects;
     }, 
     
-    compileDoms: function(source, document) {
+    compileDoms: function(source, document, sourceFileName) {
       var compiledDoms = [];
-      var compiledObjects = this.compile(source);
+      var compiledObjects = this.compile(source, sourceFileName);
       var documentWrapper = new Document(document);
       for (var i=0; i<compiledObjects.length; i++) {
         compiledDoms.push(compiledObjects[i].createDom(documentWrapper));
       }
       return compiledDoms;
     }
-      
   };
   
   exports.BracketupScanner = BracketupScanner;
@@ -656,13 +775,50 @@ var correspondenceBracketup = require("../correspondence-bracketup.js");
 
 var correspondenceCompiler = correspondenceBracketup.correspondenceCompiler;
 
+function nth(n){
+    if(isNaN(n) || n%1) return n;   
+    var s= n%100;
+    if(s>3 && s<21) return n+'th';
+    switch(s%10){
+        case 1: return n+'st';
+        case 2: return n+'nd';
+        case 3: return n+'rd';
+        default: return n+'th';
+    }
+}
+function ordinalSuffix(n) {
+  var nMod100 = n%100;
+  if(nMod100 > 3 && nMod100 < 21) {
+    return "th";
+  }
+  else {
+    var lastDigit = nMod100%10;
+    return lastDigit < 4 ? ["th", "st", "nd", "rd"][lastDigit] : "th";
+  }
+}
+
 function compileCorrespondenceSource(sourceElements) {
   sourceElements.each(function(index, sourceElement) {
     var sourceElementSelector = $(sourceElement);
     var correspondenceSource = sourceElementSelector.html();
-    var compiledDoms = correspondenceCompiler.compileDoms(correspondenceSource, document);
-    for (var i=0; i<compiledDoms.length; i++) {
-      sourceElementSelector.after(compiledDoms[i]);
+    try {
+      var scriptNumber = index+1;
+      var id = sourceElementSelector.attr("id");
+      var sourceFileName = scriptNumber + ordinalSuffix(scriptNumber) + 
+        " Correspondence script element" + 
+        (id ? " (id = " + id + ")" : "");
+      var compiledDoms = correspondenceCompiler.compileDoms(correspondenceSource, document, sourceFileName);
+      for (var i=0; i<compiledDoms.length; i++) {
+        sourceElementSelector.after(compiledDoms[i]);
+      }
+    }
+    catch (error) {
+      alert("Error compiling Correspondence source: \"" + error.message + "\"\n\n" + 
+            "See browser console for further details.");
+      if (error.logSourceError) {
+        error.logSourceError();
+      }
+      throw error;
     }
   });
 }
