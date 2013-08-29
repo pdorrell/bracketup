@@ -304,11 +304,27 @@
       }
     }
   };
+  
+  /** Base and generic classes for application-specific Bracketup interpreters */
+  
+  function TextElement(string) {
+    this.string = string;
+  }
+
+  TextElement.prototype = {
+    createDom: function(document) {
+      return document.createTextNode(this.string);
+    }
+  };
+
+
 
   exports.BracketupScanner = BracketupScanner;
   exports.NodeParser = NodeParser;
   exports.NodeCompiler = NodeCompiler;
   exports.TestTokenReceiver = TestTokenReceiver;
   exports.CompileError = CompileError;
+  
+  exports.TextElement = TextElement;
   
 })();

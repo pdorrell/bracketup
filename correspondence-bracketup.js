@@ -7,19 +7,6 @@
 
   var bracketupScanner = new bracketup.BracketupScanner();
 
-  function TextElement(string) {
-    this.string = string;
-  }
-
-  TextElement.prototype = {
-    createDom: function(document) {
-      return document.createTextNode(this.string);
-    }
-  };
-
-  function EndOfLineElement() {
-  }
-
   function BaseNode() {
     this.children = [];
     this.attributes = {};
@@ -33,7 +20,7 @@
     }, 
     addTextChild: function(string) {
       if (!(this.ignoreWhiteSpaceText && string.match(/^\s*$/))) {
-        this.children.push(new TextElement(string));
+        this.children.push(new bracketup.TextElement(string));
       }
     }, 
     
