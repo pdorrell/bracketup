@@ -40,7 +40,7 @@ source code.)</p>
 
 <!-- The following script element is the actual source for this page. It is interpreted
 by the Javascript code to generate the DOM, in the HTML format required by the Correspondence framework.-->
-<script id="rhoscript-example-source" type="text/plain">
+<script type="text/correspondence-bracketup">
 [correspondence [_title Queens Puzzle]
  [_text,rhoscript [_languageTitle rhoScript]
   [A [_word,1 8] [2 range]]
@@ -79,7 +79,7 @@ compile Javascript modules using CommonJS <b>require</b> and <b>exports</b>
 into a single file.</p>
 
 <p>For development, it is preferable to run source code directly, without
-an explicit compilation step. I have written a script <b>module-simulator.js</b>
+a separate compilation step. I have written a script <b>module-simulator.js</b>
 which simulates the basic <b>require</b> and <b>exports</b> (currently with
 hand-coded resolutions for <b>require</b> as used in each Javascript module),
 which is used in <a href="rhoScriptExample.html">this version of the page</a>.</p>

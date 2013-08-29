@@ -2,7 +2,7 @@ var utils = require("../utils.js");
 inspect = utils.inspect;
 
 $(document).ready(function(){
-  compileCorrespondenceSource($("#rhoscript-example-source"));
+  compileCorrespondenceSource($("script[type='text/correspondence-bracketup']"));
   initialiseInteraction();
 });
 
