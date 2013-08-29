@@ -105,7 +105,11 @@
   function compileCorrespondence(source) {
     return bracketup.compile(correspondenceNodeCompiler, source);
   }
+  
+  function compileCorrespondenceIntoDoms(source, document) {
+    return bracketup.compileIntoDoms(correspondenceNodeCompiler, source, document);
+  }
 
   exports.compileCorrespondence = compileCorrespondence;
-
+  exports.compileCorrespondenceIntoDoms = compileCorrespondenceIntoDoms;
 })();

@@ -10,20 +10,17 @@ var correspondenceBracketup = require("./correspondence-bracketup.js");
 var testFileName = "sample.bracketup";
 var fileContents = fs.readFileSync(testFileName, {encoding: "utf-8"});
 
-var compiledObjects = correspondenceBracketup.compileCorrespondence(fileContents);
-
 var jsdom = require("jsdom").jsdom;
 var jsdomDocument = jsdom(null, null, {});
 
-var document = new bracketup.Document(jsdomDocument);
+var compiledDoms = correspondenceBracketup.compileCorrespondenceIntoDoms(fileContents, jsdomDocument);
 
-assert.equal(compiledObjects.length, 1);
+assert.equal(compiledDoms.length, 1);
 
 var expectedOutputFileName = "sample-bracket.output.html";
 var expectedOutput = fs.readFileSync(expectedOutputFileName, {encoding: "utf-8"});
 
-var correspondence = compiledObjects[0];
-var correspondenceDom = correspondence.createDom(document);
+var correspondenceDom = compiledDoms[0];
 var correspondenceDomHtml = correspondenceDom.outerHTML;
 
 assert.equal(expectedOutput, correspondenceDomHtml);

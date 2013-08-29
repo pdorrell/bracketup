@@ -496,6 +496,16 @@
     }
     return compiledObjects;
   }
+  
+  function compileIntoDoms(nodeCompiler, source, document) {
+    var compiledDoms = [];
+    var compiledObjects = compile(nodeCompiler, source);
+    var documentWrapper = new Document(document);
+    for (var i=0; i<compiledObjects.length; i++) {
+      compiledDoms.push(compiledObjects[i].createDom(documentWrapper));
+    }
+    return compiledDoms;
+  }
 
   exports.BracketupScanner = BracketupScanner;
   exports.NodeParser = NodeParser;
@@ -505,7 +515,6 @@
   
   exports.TextElement = TextElement;
   exports.BaseNode = BaseNode;
-  exports.Document = Document;
   exports.BaseAttribute = BaseAttribute;
   exports.Bold = Bold;
   exports.Italic = Italic;
@@ -513,5 +522,6 @@
   exports.Link = Link;
 
   exports.compile = compile;
+  exports.compileIntoDoms = compileIntoDoms;
   
 })();
