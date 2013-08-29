@@ -481,6 +481,21 @@
       return dom;
     }
   });
+  
+  function compile(nodeCompiler, source) {
+    var bracketupScanner = new BracketupScanner();
+    var nodeParser = new NodeParser();
+    bracketupScanner.scanSource(nodeParser, source);
+    var parsedRootElements = nodeParser.rootElements;
+    var compiledObjects = [];
+    for (var i=0; i<parsedRootElements.length; i++) {
+      var rootElement = parsedRootElements[i];
+      //console.log("Parsed root element " + rootElement);
+      var correspondence = nodeCompiler.compile(rootElement);
+      compiledObjects.push(correspondence);
+    }
+    return compiledObjects;
+  }
 
   exports.BracketupScanner = BracketupScanner;
   exports.NodeParser = NodeParser;
@@ -496,5 +511,7 @@
   exports.Italic = Italic;
   exports.HrefAttribute = HrefAttribute;
   exports.Link = Link;
+
+  exports.compile = compile;
   
 })();

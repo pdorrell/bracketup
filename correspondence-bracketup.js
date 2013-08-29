@@ -5,8 +5,6 @@
 
   var bracketup = require("./bracketup.js");
 
-  var bracketupScanner = new bracketup.BracketupScanner();
-
   function TitleAttribute() {
     bracketup.BaseAttribute.call(this, "title");
   }
@@ -105,18 +103,7 @@
                                                                a: bracketup.Link});
 
   function compileCorrespondence(source) {
-    var bracketupScanner = new bracketup.BracketupScanner();
-    var nodeParser = new bracketup.NodeParser();
-    bracketupScanner.scanSource(nodeParser, source);
-    var parsedRootElements = nodeParser.rootElements;
-    var compiledObjects = [];
-    for (var i=0; i<parsedRootElements.length; i++) {
-      var rootElement = parsedRootElements[i];
-      //console.log("Parsed root element " + rootElement);
-      var correspondence = correspondenceNodeCompiler.compile(rootElement);
-      compiledObjects.push(correspondence);
-    }
-    return compiledObjects;
+    return bracketup.compile(correspondenceNodeCompiler, source);
   }
 
   exports.compileCorrespondence = compileCorrespondence;
