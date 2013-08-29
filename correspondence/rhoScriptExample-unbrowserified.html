@@ -11,23 +11,23 @@
   <script language="javascript" type="text/javascript" src="module-simulator.js"></script>
   <script language="javascript" type="text/javascript" src="../utils.js"></script>
 <script language="Javascript">
-saveExports("utils");
+MODULE_SIMULATOR.saveExports("utils");
 
-setRequires({"./utils.js": "utils"});
+MODULE_SIMULATOR.setRequires({"./utils.js": "utils"});
 </script>
   <script language="javascript" type="text/javascript" src="../bracketup.js"></script>
 <script language="Javascript">
-saveExports("bracketup");
+MODULE_SIMULATOR.saveExports("bracketup");
 
-setRequires({"./utils.js": "utils",
-             "./bracketup.js": "bracketup"});
+MODULE_SIMULATOR.setRequires({"./utils.js": "utils",
+                              "./bracketup.js": "bracketup"});
 </script>
   <script language="javascript" type="text/javascript" src="../correspondence-bracketup.js"></script>
 <script language="Javascript">
-saveExports("correspondenceBracketup");
+MODULE_SIMULATOR.saveExports("correspondenceBracketup");
 
-setRequires({"../utils.js": "utils",
-             "../correspondence-bracketup.js": "correspondenceBracketup"});
+MODULE_SIMULATOR.setRequires({"../utils.js": "utils",
+                              "../correspondence-bracketup.js": "correspondenceBracketup"});
 </script>
   <script language="javascript" type="text/javascript" src="correspondence-configuration.js"></script>
 </head>
