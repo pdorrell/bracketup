@@ -32,3 +32,13 @@ body {
 .author {
   font-style: italic;
   text-align: right; }
+
+noscript {
+  font-family: Arial, Helvetic, sans-serif;
+  border: solid 0.2em red;
+  background-color: #fff5f5;
+  color: #e00000;
+  font-size: 2em;
+  display: inline-block;
+  padding: 0.5em;
+}
