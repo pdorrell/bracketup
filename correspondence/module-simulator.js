@@ -10,20 +10,22 @@ exports={};
 /** Accumulated list of loaded modules */
 requires={};
 
+/** Call this method after loading a specific Javascript file, to save it's
+    CommonJS exports as a module with a name of your choice.*/
 function saveExports(moduleName) {
-  console.log("Saving exports for module " + moduleName + " ...");
   requires[moduleName] = exports;
   exports = {};
 }
 
+/** Call this method before loading a specific Javascript file, to specify
+    the resolution of all CommonJS "require" calls within the Javascript file.
+    Each resolution entry maps a URL to a named module (as saved by saveExports) */
 function setRequires(requireMap) {
   require = function(url) {
-    console.log(" requiring " + url + " ...");
     var moduleName = requireMap[url];
     if (!moduleName) {
       throw new Error("Module for URL " + url + " not found");
     }
-    console.log("  looking up module " + moduleName + " ...");
     var module = requires[moduleName];
     if (!module) {
       throw new Error("Module " + moduleName + " does not exist");
