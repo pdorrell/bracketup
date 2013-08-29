@@ -15,9 +15,19 @@ function compileCorrespondenceSource(sourceElements) {
   sourceElements.each(function(index, sourceElement) {
     var sourceElementSelector = $(sourceElement);
     var correspondenceSource = sourceElementSelector.html();
-    var compiledDoms = correspondenceCompiler.compileDoms(correspondenceSource, document);
-    for (var i=0; i<compiledDoms.length; i++) {
-      sourceElementSelector.after(compiledDoms[i]);
+    try {
+      var compiledDoms = correspondenceCompiler.compileDoms(correspondenceSource, document);
+      for (var i=0; i<compiledDoms.length; i++) {
+        sourceElementSelector.after(compiledDoms[i]);
+      }
+    }
+    catch (error) {
+      alert("Error compiling Correspondence source: " + message + "\n" + 
+            "See browser console for further details.");
+      if (error.logSourceError) {
+        error.logSourceError();
+      }
+      throw error;
     }
   });
 }
