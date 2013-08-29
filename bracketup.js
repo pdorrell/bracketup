@@ -13,6 +13,23 @@
     }, 
     line: function (string, lineNumber) {
       return new SourceLine(this, string, lineNumber);
+    }, 
+    endOfFilePosition: function(lines) {
+      var numLines = lines.length;
+      var lastLine = numLines > 0 ? lines[numLines-1] : null;
+      return new EndOfSourceFilePosition(this, numLines, lastLine);
+    }
+  };
+  
+  function EndOfSourceFilePosition(sourceFileName, numLines, lastLine) {
+    this.sourceFileName = sourceFileName;
+    this.numLines = numLines;
+    this.lastLine = lastLine;
+  };
+  
+  EndOfSourceFilePosition.prototype = {
+    toString: function() {
+      return this.sourceFileName + ":" + this.numLines;
     }
   };
   
@@ -188,8 +205,9 @@
     }
   };
 
-  function NodeParseException(message) {
+  function NodeParseException(message, sourceLinePosition) {
     CustomError.call(this, "NodeParseException", message);
+    this.sourceLinePosition = sourceLinePosition;
   }
 
   function NodeParser() {
@@ -220,7 +238,7 @@
         }
       }
       else {
-        throw new NodeParseException("Unexpected end of element node");
+        throw new NodeParseException("Unexpected end of element node", sourceLinePosition);
       }
     }, 
     text: function(string, sourceLinePosition) {
@@ -232,7 +250,8 @@
           //console.log("Ignoring whitespace outside of root element: " + inspect(string));
         }
         else {
-          throw new NodeParseException("Unexpected text outside of root element: " + inspect(string));
+          throw new NodeParseException("Unexpected text outside of root element: " + inspect(string), 
+                                       sourceLinePosition);
         }
       }
     }, 
@@ -316,7 +335,7 @@
         else if (match[4]) {
           this.sendAnyTexts(tokenReceiver);
           if(this.depth <= 0) {
-            throw new NodeParseException("Unexpected ']'");
+            throw new NodeParseException("Unexpected ']'", sourceLinePosition);
           }
           tokenReceiver.endItem(sourceLinePosition);
           this.depth--;
@@ -329,7 +348,7 @@
         }
         else {
           console.log("match = " + inspect(match));
-          throw new NodeParseException("No match found in lexer");
+          throw new NodeParseException("No match found in lexer", sourceLinePosition);
         }
         linePosition += matchedSubstring.length;
       }
@@ -339,7 +358,7 @@
       var reconstitutedMatches = matchedSubstrings.join("");
       if (reconstitutedMatches != line) {
         throw new NodeParseException("Reconstituted " + inspect(reconstitutedMatches) + 
-                                     "\n                  != " + inspect(line));
+                                     "\n                  != " + inspect(line), sourceLinePosition);
       }
       // console.log("matched substrings = " + inspect(matchedSubstrings.join("")));
     }, 
@@ -353,7 +372,8 @@
         this.scanLine(tokenReceiver, line, sourceFileName.line(line, i+1));
       }
       if (this.depth != 0) {
-        throw new NodeParseException(this.depth + " unbalanced '['s at end of file");
+        throw new NodeParseException(this.depth + " unbalanced '['s at end of file", 
+                                     sourceFileName.endOfFilePosition(lines));
       }
     }
   };
