@@ -6,11 +6,12 @@ $(document).ready(function(){
   initialiseInteraction();
 });
 
+var bracketup = require("../bracketup.js");
 var correspondenceBracketup = require("../correspondence-bracketup.js");
 
 function compileCorrespondenceSource(sourceElements) {
   sourceElements.each(function(index, sourceElement) {
-    var documentObject = new correspondenceBracketup.Document(window.document);
+    var documentObject = new bracketup.Document(window.document);
     var sourceElementSelector = $(sourceElement);
     var correspondenceSource = sourceElementSelector.html();
     var compiledObjects = correspondenceBracketup.compileCorrespondence(correspondenceSource);

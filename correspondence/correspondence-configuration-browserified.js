@@ -305,25 +305,9 @@
       }
     }
   };
-
-  exports.BracketupScanner = BracketupScanner;
-  exports.NodeParser = NodeParser;
-  exports.NodeCompiler = NodeCompiler;
-  exports.TestTokenReceiver = TestTokenReceiver;
-  exports.CompileError = CompileError;
   
-})();
-
-},{"./utils.js":4}],2:[function(require,module,exports){
-(function() {
-  var utils = require("./utils.js");
-  var merge = utils.merge;
-  var inspect = utils.inspect;
-
-  var bracketup = require("./bracketup.js");
-
-  var bracketupScanner = new bracketup.BracketupScanner();
-
+  /** Base and generic classes for application-specific Bracketup interpreters */
+  
   function TextElement(string) {
     this.string = string;
   }
@@ -333,9 +317,6 @@
       return document.createTextNode(this.string);
     }
   };
-
-  function EndOfLineElement() {
-  }
 
   function BaseNode() {
     this.children = [];
@@ -502,26 +483,53 @@
     }
   });
 
+  exports.BracketupScanner = BracketupScanner;
+  exports.NodeParser = NodeParser;
+  exports.NodeCompiler = NodeCompiler;
+  exports.TestTokenReceiver = TestTokenReceiver;
+  exports.CompileError = CompileError;
+  
+  exports.TextElement = TextElement;
+  exports.BaseNode = BaseNode;
+  exports.Document = Document;
+  exports.BaseAttribute = BaseAttribute;
+  exports.Bold = Bold;
+  exports.Italic = Italic;
+  exports.HrefAttribute = HrefAttribute;
+  exports.Link = Link;
+  
+})();
+
+},{"./utils.js":4}],2:[function(require,module,exports){
+(function() {
+  var utils = require("./utils.js");
+  var merge = utils.merge;
+  var inspect = utils.inspect;
+
+  var bracketup = require("./bracketup.js");
+
+  var bracketupScanner = new bracketup.BracketupScanner();
+
   function TitleAttribute() {
-    BaseAttribute.call(this, "title");
+    bracketup.BaseAttribute.call(this, "title");
   }
 
-  TitleAttribute.prototype = merge(BaseAttribute.prototype, {
+  TitleAttribute.prototype = merge(bracketup.BaseAttribute.prototype, {
   });
 
   function LanguageTitleAttribute() {
-    BaseAttribute.call(this, "languageTitle");
+    bracketup.BaseAttribute.call(this, "languageTitle");
   }
 
-  LanguageTitleAttribute.prototype = merge(BaseAttribute.prototype, {
+  LanguageTitleAttribute.prototype = merge(bracketup.BaseAttribute.prototype, {
   });
 
   function Word(id) {
-    BaseNode.call(this);
+    bracketup.BaseNode.call(this);
     this.id = id;
   }
 
-  Word.prototype = merge(BaseNode.prototype, {
+  Word.prototype = merge(bracketup.BaseNode.prototype, {
     createInitialDom: function(document) {
       var id = this.id;
       if (id.match(/^[0-9]+$/)) {
@@ -533,11 +541,11 @@
   });
 
   function Sentence(id) {
-    BaseNode.call(this);
+    bracketup.BaseNode.call(this);
     this.id = id;
   }
 
-  Sentence.prototype = merge(BaseNode.prototype, {
+  Sentence.prototype = merge(bracketup.BaseNode.prototype, {
     defaultChildFunction: "word", 
     classMap: {word: Word}, 
     childIndent: "  ", 
@@ -549,11 +557,11 @@
   });
 
   function Text(languageCssClass) {
-    BaseNode.call(this);
+    bracketup.BaseNode.call(this);
     this.languageCssClass = languageCssClass;
   }
 
-  Text.prototype = merge(BaseNode.prototype, {
+  Text.prototype = merge(bracketup.BaseNode.prototype, {
     defaultChildFunction: "sentence", 
     classMap: {sentence: Sentence, languageTitle: LanguageTitleAttribute}, 
     childIndent: "  ", 
@@ -573,10 +581,10 @@
   });
 
   function Correspondence() {
-    BaseNode.call(this);
+    bracketup.BaseNode.call(this);
   }
 
-  Correspondence.prototype = merge(BaseNode.prototype, {
+  Correspondence.prototype = merge(bracketup.BaseNode.prototype, {
     defaultChildFunction: "text", 
     classMap: {text: Text, title: TitleAttribute}, 
     childIndent: "  ", 
@@ -595,7 +603,9 @@
   });
 
   var correspondenceNodeCompiler = new bracketup.NodeCompiler({correspondence: Correspondence, 
-                                                               b: Bold, i: Italic, a: Link});
+                                                               b: bracketup.Bold, 
+                                                               i: bracketup.Italic, 
+                                                               a: bracketup.Link});
 
   function compileCorrespondence(source) {
     var bracketupScanner = new bracketup.BracketupScanner();
@@ -612,7 +622,6 @@
     return compiledObjects;
   }
 
-  exports.Document = Document;
   exports.compileCorrespondence = compileCorrespondence;
 
 })();
@@ -626,11 +635,12 @@ $(document).ready(function(){
   initialiseInteraction();
 });
 
+var bracketup = require("../bracketup.js");
 var correspondenceBracketup = require("../correspondence-bracketup.js");
 
 function compileCorrespondenceSource(sourceElements) {
   sourceElements.each(function(index, sourceElement) {
-    var documentObject = new correspondenceBracketup.Document(window.document);
+    var documentObject = new bracketup.Document(window.document);
     var sourceElementSelector = $(sourceElement);
     var correspondenceSource = sourceElementSelector.html();
     var compiledObjects = correspondenceBracketup.compileCorrespondence(correspondenceSource);
@@ -678,7 +688,7 @@ function initialiseInteraction() {
 }
 
 
-},{"../correspondence-bracketup.js":2,"../utils.js":4}],4:[function(require,module,exports){
+},{"../bracketup.js":1,"../correspondence-bracketup.js":2,"../utils.js":4}],4:[function(require,module,exports){
 (function() {
 
   // merge any number of objects, creating a new object

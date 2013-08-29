@@ -4,6 +4,7 @@ var merge = utils.merge;
 var inspect = utils.inspect;
 
 var fs = require('fs');
+var bracketup = require("./bracketup.js");
 var correspondenceBracketup = require("./correspondence-bracketup.js");
 
 var testFileName = "sample.bracketup";
@@ -14,7 +15,7 @@ var compiledObjects = correspondenceBracketup.compileCorrespondence(fileContents
 var jsdom = require("jsdom").jsdom;
 var jsdomDocument = jsdom(null, null, {});
 
-var document = new correspondenceBracketup.Document(jsdomDocument);
+var document = new bracketup.Document(jsdomDocument);
 
 assert.equal(compiledObjects.length, 1);
 

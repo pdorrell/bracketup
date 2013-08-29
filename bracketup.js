@@ -379,6 +379,109 @@
     }
   };
 
+  // A wrapper for a browser DOM with easier method for creating nodes
+  function Document(document) {
+    this.document = document;
+  }
+
+  Document.prototype = {
+    createNode: function(tag, options) {
+      if(!options) {
+        options = {};
+      }
+      var dom = this.document.createElement(tag);
+      var parent = options.parent;
+      if (parent) {
+        parent.appendChild(dom);
+      }
+      var className = options.className;
+      if (className) {
+        dom.className = className;
+      }
+      var attributes = options.attributes;
+      if (attributes) {
+        for (name in attributes) {
+          dom.setAttribute(name, attributes[name]);
+        }
+      }
+      var text = options.text;
+      if (text) {
+        dom.appendChild(this.document.createTextNode(text));
+      }
+      return dom;
+    }, 
+    addTextNode: function(dom, text) {
+      dom.appendChild(this.document.createTextNode(text));
+    }, 
+    createTextNode: function(text) {
+      return this.document.createTextNode(text);
+    }
+  };
+
+  function BaseAttribute(attributeName) {
+    this.attributeName = attributeName;
+    this.value = "";
+  }
+
+  BaseAttribute.prototype = {
+    addTextChild: function(string) {
+      this.value = this.value + string;
+    }, 
+    addChild: function(child) {
+      throw new CompileError("Unexpected non-text element inside " + this.attributeName + " attribute node");
+    }, 
+    addEndOfLineChild: function() {
+      this.addTextChild("\n");
+    }, 
+    addToParent: function(parent) {
+      parent.setAttribute(this.attributeName, this.value);
+    }
+  };
+
+  function Bold() {
+    BaseNode.call(this);
+  }
+
+  Bold.prototype = merge(BaseNode.prototype, {
+    createInitialDom: function(document) {
+      return document.createNode("b");
+    }
+  });
+
+  function Italic() {
+    BaseNode.call(this);
+  }
+
+  Italic.prototype = merge(BaseNode.prototype, {
+    createInitialDom: function(document) {
+      return document.createNode("b");
+    }
+  });
+
+  function HrefAttribute() {
+    BaseAttribute.call(this, "href");
+  }
+
+  HrefAttribute.prototype = merge(BaseAttribute.prototype, {
+  });
+
+  function Link() {
+    BaseNode.call(this);
+  }
+
+  Link.prototype = merge(BaseNode.prototype, {
+    classMap: {href: HrefAttribute}, 
+    
+    createInitialDom: function(document) {
+      var dom = document.createNode("a");
+      var href = this.attributes.href;
+      if (href) {
+        dom.setAttribute("href", href);
+      }
+      return dom;
+    }
+  });
+
   exports.BracketupScanner = BracketupScanner;
   exports.NodeParser = NodeParser;
   exports.NodeCompiler = NodeCompiler;
@@ -387,5 +490,11 @@
   
   exports.TextElement = TextElement;
   exports.BaseNode = BaseNode;
+  exports.Document = Document;
+  exports.BaseAttribute = BaseAttribute;
+  exports.Bold = Bold;
+  exports.Italic = Italic;
+  exports.HrefAttribute = HrefAttribute;
+  exports.Link = Link;
   
 })();
