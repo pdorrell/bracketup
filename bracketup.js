@@ -203,11 +203,11 @@
       }
     }
   };
-
+  
   function TestTokenReceiver() {
     this.indent = "";
   }
-
+  
   TestTokenReceiver.prototype = {
     indentIncrement: "  ", 
     
@@ -481,32 +481,39 @@
       return dom;
     }
   });
-  
-  function compile(nodeCompiler, source) {
-    var bracketupScanner = new BracketupScanner();
-    var nodeParser = new NodeParser();
-    bracketupScanner.scanSource(nodeParser, source);
-    var parsedRootElements = nodeParser.rootElements;
-    var compiledObjects = [];
-    for (var i=0; i<parsedRootElements.length; i++) {
-      var rootElement = parsedRootElements[i];
-      //console.log("Parsed root element " + rootElement);
-      var correspondence = nodeCompiler.compile(rootElement);
-      compiledObjects.push(correspondence);
-    }
-    return compiledObjects;
+    
+  function BracketupCompiler(topLevelClassMap) {
+    this.nodeCompiler = new NodeCompiler(topLevelClassMap);
   }
   
-  function compileIntoDoms(nodeCompiler, source, document) {
-    var compiledDoms = [];
-    var compiledObjects = compile(nodeCompiler, source);
-    var documentWrapper = new Document(document);
-    for (var i=0; i<compiledObjects.length; i++) {
-      compiledDoms.push(compiledObjects[i].createDom(documentWrapper));
+  BracketupCompiler.prototype = {
+    compile: function(source) {
+      var bracketupScanner = new BracketupScanner();
+      var nodeParser = new NodeParser();
+      bracketupScanner.scanSource(nodeParser, source);
+      var parsedRootElements = nodeParser.rootElements;
+      var compiledObjects = [];
+      for (var i=0; i<parsedRootElements.length; i++) {
+        var rootElement = parsedRootElements[i];
+        //console.log("Parsed root element " + rootElement);
+        var correspondence = this.nodeCompiler.compile(rootElement);
+        compiledObjects.push(correspondence);
+      }
+      return compiledObjects;
+    }, 
+    
+    compileDoms: function(source, document) {
+      var compiledDoms = [];
+      var compiledObjects = this.compile(source);
+      var documentWrapper = new Document(document);
+      for (var i=0; i<compiledObjects.length; i++) {
+        compiledDoms.push(compiledObjects[i].createDom(documentWrapper));
+      }
+      return compiledDoms;
     }
-    return compiledDoms;
-  }
-
+      
+  };
+  
   exports.BracketupScanner = BracketupScanner;
   exports.NodeParser = NodeParser;
   exports.NodeCompiler = NodeCompiler;
@@ -521,7 +528,6 @@
   exports.HrefAttribute = HrefAttribute;
   exports.Link = Link;
 
-  exports.compile = compile;
-  exports.compileIntoDoms = compileIntoDoms;
+  exports.BracketupCompiler = BracketupCompiler;
   
 })();

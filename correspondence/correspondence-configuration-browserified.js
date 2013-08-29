@@ -204,11 +204,11 @@
       }
     }
   };
-
+  
   function TestTokenReceiver() {
     this.indent = "";
   }
-
+  
   TestTokenReceiver.prototype = {
     indentIncrement: "  ", 
     
@@ -482,32 +482,39 @@
       return dom;
     }
   });
-  
-  function compile(nodeCompiler, source) {
-    var bracketupScanner = new BracketupScanner();
-    var nodeParser = new NodeParser();
-    bracketupScanner.scanSource(nodeParser, source);
-    var parsedRootElements = nodeParser.rootElements;
-    var compiledObjects = [];
-    for (var i=0; i<parsedRootElements.length; i++) {
-      var rootElement = parsedRootElements[i];
-      //console.log("Parsed root element " + rootElement);
-      var correspondence = nodeCompiler.compile(rootElement);
-      compiledObjects.push(correspondence);
-    }
-    return compiledObjects;
+    
+  function BracketupCompiler(topLevelClassMap) {
+    this.nodeCompiler = new NodeCompiler(topLevelClassMap);
   }
   
-  function compileIntoDoms(nodeCompiler, source, document) {
-    var compiledDoms = [];
-    var compiledObjects = compile(nodeCompiler, source);
-    var documentWrapper = new Document(document);
-    for (var i=0; i<compiledObjects.length; i++) {
-      compiledDoms.push(compiledObjects[i].createDom(documentWrapper));
+  BracketupCompiler.prototype = {
+    compile: function(source) {
+      var bracketupScanner = new BracketupScanner();
+      var nodeParser = new NodeParser();
+      bracketupScanner.scanSource(nodeParser, source);
+      var parsedRootElements = nodeParser.rootElements;
+      var compiledObjects = [];
+      for (var i=0; i<parsedRootElements.length; i++) {
+        var rootElement = parsedRootElements[i];
+        //console.log("Parsed root element " + rootElement);
+        var correspondence = this.nodeCompiler.compile(rootElement);
+        compiledObjects.push(correspondence);
+      }
+      return compiledObjects;
+    }, 
+    
+    compileDoms: function(source, document) {
+      var compiledDoms = [];
+      var compiledObjects = this.compile(source);
+      var documentWrapper = new Document(document);
+      for (var i=0; i<compiledObjects.length; i++) {
+        compiledDoms.push(compiledObjects[i].createDom(documentWrapper));
+      }
+      return compiledDoms;
     }
-    return compiledDoms;
-  }
-
+      
+  };
+  
   exports.BracketupScanner = BracketupScanner;
   exports.NodeParser = NodeParser;
   exports.NodeCompiler = NodeCompiler;
@@ -522,8 +529,7 @@
   exports.HrefAttribute = HrefAttribute;
   exports.Link = Link;
 
-  exports.compile = compile;
-  exports.compileIntoDoms = compileIntoDoms;
+  exports.BracketupCompiler = BracketupCompiler;
   
 })();
 
@@ -626,22 +632,14 @@
       return div;
     }
   });
-
-  var correspondenceNodeCompiler = new bracketup.NodeCompiler({correspondence: Correspondence, 
-                                                               b: bracketup.Bold, 
-                                                               i: bracketup.Italic, 
-                                                               a: bracketup.Link});
-
-  function compileCorrespondence(source) {
-    return bracketup.compile(correspondenceNodeCompiler, source);
-  }
   
-  function compileCorrespondenceIntoDoms(source, document) {
-    return bracketup.compileIntoDoms(correspondenceNodeCompiler, source, document);
-  }
+  var correspondenceCompiler = 
+    new bracketup.BracketupCompiler({correspondence: Correspondence, 
+                                     b: bracketup.Bold, 
+                                     i: bracketup.Italic, 
+                                     a: bracketup.Link});
 
-  exports.compileCorrespondence = compileCorrespondence;
-  exports.compileCorrespondenceIntoDoms = compileCorrespondenceIntoDoms;
+  exports.correspondenceCompiler = correspondenceCompiler;
 })();
 
 },{"./bracketup.js":1,"./utils.js":4}],3:[function(require,module,exports){
@@ -656,11 +654,13 @@ $(document).ready(function(){
 var bracketup = require("../bracketup.js");
 var correspondenceBracketup = require("../correspondence-bracketup.js");
 
+var correspondenceCompiler = correspondenceBracketup.correspondenceCompiler;
+
 function compileCorrespondenceSource(sourceElements) {
   sourceElements.each(function(index, sourceElement) {
     var sourceElementSelector = $(sourceElement);
     var correspondenceSource = sourceElementSelector.html();
-    var compiledDoms = correspondenceBracketup.compileCorrespondenceIntoDoms(correspondenceSource, document);
+    var compiledDoms = correspondenceCompiler.compileDoms(correspondenceSource, document);
     for (var i=0; i<compiledDoms.length; i++) {
       sourceElementSelector.after(compiledDoms[i]);
     }

@@ -96,20 +96,12 @@
       return div;
     }
   });
-
-  var correspondenceNodeCompiler = new bracketup.NodeCompiler({correspondence: Correspondence, 
-                                                               b: bracketup.Bold, 
-                                                               i: bracketup.Italic, 
-                                                               a: bracketup.Link});
-
-  function compileCorrespondence(source) {
-    return bracketup.compile(correspondenceNodeCompiler, source);
-  }
   
-  function compileCorrespondenceIntoDoms(source, document) {
-    return bracketup.compileIntoDoms(correspondenceNodeCompiler, source, document);
-  }
+  var correspondenceCompiler = 
+    new bracketup.BracketupCompiler({correspondence: Correspondence, 
+                                     b: bracketup.Bold, 
+                                     i: bracketup.Italic, 
+                                     a: bracketup.Link});
 
-  exports.compileCorrespondence = compileCorrespondence;
-  exports.compileCorrespondenceIntoDoms = compileCorrespondenceIntoDoms;
+  exports.correspondenceCompiler = correspondenceCompiler;
 })();

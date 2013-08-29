@@ -9,11 +9,13 @@ $(document).ready(function(){
 var bracketup = require("../bracketup.js");
 var correspondenceBracketup = require("../correspondence-bracketup.js");
 
+var correspondenceCompiler = correspondenceBracketup.correspondenceCompiler;
+
 function compileCorrespondenceSource(sourceElements) {
   sourceElements.each(function(index, sourceElement) {
     var sourceElementSelector = $(sourceElement);
     var correspondenceSource = sourceElementSelector.html();
-    var compiledDoms = correspondenceBracketup.compileCorrespondenceIntoDoms(correspondenceSource, document);
+    var compiledDoms = correspondenceCompiler.compileDoms(correspondenceSource, document);
     for (var i=0; i<compiledDoms.length; i++) {
       sourceElementSelector.after(compiledDoms[i]);
     }
