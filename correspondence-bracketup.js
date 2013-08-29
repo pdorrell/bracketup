@@ -7,68 +7,6 @@
 
   var bracketupScanner = new bracketup.BracketupScanner();
 
-  function BaseNode() {
-    this.children = [];
-    this.attributes = {};
-  }
-
-  BaseNode.prototype = {
-    classMap: {}, 
-    addChild: function(child) {
-      this.children.push(child);
-      child.parent = this;
-    }, 
-    addTextChild: function(string) {
-      if (!(this.ignoreWhiteSpaceText && string.match(/^\s*$/))) {
-        this.children.push(new bracketup.TextElement(string));
-      }
-    }, 
-    
-    setIndentInsertString: function(parentIndentInsertString) {
-      if (this.childIndent) {
-        this.indentInsertString = parentIndentInsertString + this.childIndent;
-        for (var i=0; i<this.children.length; i++) {
-          var child = this.children[i];
-          if (child.setIndentInsertString) {
-            child.setIndentInsertString(this.indentInsertString);
-          }
-        }
-      }
-    }, 
-    addEndOfLineChild: function() {
-      if (this.endOfLineNode) {
-        this.children.push(this.endOfLineNode);
-      } 
-    }, 
-    setAttribute: function(attributeName, value) {
-      this.attributes[attributeName] = value;
-    }, 
-    createDom: function(document) {
-      if (this.createInitialDom) {
-        var dom = this.createInitialDom(document);
-        for (var i=0; i<this.children.length; i++) {
-          var child = this.children[i];
-          if (child.createDom) {
-            var childDom = child.createDom(document);
-            if (childDom) {
-              if (this.indentInsertString && (this.indentAllChildren || i == 0)) {
-                document.addTextNode(dom, this.indentInsertString);
-              }
-              dom.appendChild(childDom);
-            }
-          }
-        }
-        if (this.indentInsertString) {
-          document.addTextNode(dom, this.parent ? this.parent.indentInsertString : "\n");
-        }
-        return dom;
-      }
-      else {
-        return null;
-      }
-    }
-  };
-
   // A wrapper for a browser DOM with easier method for creating nodes
   function Document(document) {
     this.document = document;
@@ -129,20 +67,20 @@
   };
 
   function Bold() {
-    BaseNode.call(this);
+    bracketup.BaseNode.call(this);
   }
 
-  Bold.prototype = merge(BaseNode.prototype, {
+  Bold.prototype = merge(bracketup.BaseNode.prototype, {
     createInitialDom: function(document) {
       return document.createNode("b");
     }
   });
 
   function Italic() {
-    BaseNode.call(this);
+    bracketup.BaseNode.call(this);
   }
 
-  Italic.prototype = merge(BaseNode.prototype, {
+  Italic.prototype = merge(bracketup.BaseNode.prototype, {
     createInitialDom: function(document) {
       return document.createNode("b");
     }
@@ -156,10 +94,10 @@
   });
 
   function Link() {
-    BaseNode.call(this);
+    bracketup.BaseNode.call(this);
   }
 
-  Link.prototype = merge(BaseNode.prototype, {
+  Link.prototype = merge(bracketup.BaseNode.prototype, {
     classMap: {href: HrefAttribute}, 
     
     createInitialDom: function(document) {
@@ -187,11 +125,11 @@
   });
 
   function Word(id) {
-    BaseNode.call(this);
+    bracketup.BaseNode.call(this);
     this.id = id;
   }
 
-  Word.prototype = merge(BaseNode.prototype, {
+  Word.prototype = merge(bracketup.BaseNode.prototype, {
     createInitialDom: function(document) {
       var id = this.id;
       if (id.match(/^[0-9]+$/)) {
@@ -203,11 +141,11 @@
   });
 
   function Sentence(id) {
-    BaseNode.call(this);
+    bracketup.BaseNode.call(this);
     this.id = id;
   }
 
-  Sentence.prototype = merge(BaseNode.prototype, {
+  Sentence.prototype = merge(bracketup.BaseNode.prototype, {
     defaultChildFunction: "word", 
     classMap: {word: Word}, 
     childIndent: "  ", 
@@ -219,11 +157,11 @@
   });
 
   function Text(languageCssClass) {
-    BaseNode.call(this);
+    bracketup.BaseNode.call(this);
     this.languageCssClass = languageCssClass;
   }
 
-  Text.prototype = merge(BaseNode.prototype, {
+  Text.prototype = merge(bracketup.BaseNode.prototype, {
     defaultChildFunction: "sentence", 
     classMap: {sentence: Sentence, languageTitle: LanguageTitleAttribute}, 
     childIndent: "  ", 
@@ -243,10 +181,10 @@
   });
 
   function Correspondence() {
-    BaseNode.call(this);
+    bracketup.BaseNode.call(this);
   }
 
-  Correspondence.prototype = merge(BaseNode.prototype, {
+  Correspondence.prototype = merge(bracketup.BaseNode.prototype, {
     defaultChildFunction: "text", 
     classMap: {text: Text, title: TitleAttribute}, 
     childIndent: "  ", 
