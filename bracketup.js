@@ -331,7 +331,7 @@
           console.log("match = " + inspect(match));
           throw new NodeParseException("No match found in lexer");
         }
-        sourceLinePosition += matchedSubstring.length;
+        linePosition += matchedSubstring.length;
       }
       this.sendAnyTexts(tokenReceiver);
       tokenReceiver.endOfLine(sourceLinePosition);
@@ -347,9 +347,10 @@
     scanSource: function(tokenReceiver, source, sourceFileName) {
       this.depth = 0;
       var lines = source.split("\n");
-      var sourceFile = new SourceFile(sourceFileName);
+      var sourceFileName = new SourceFileName(sourceFileName);
       for (var i=0; i<lines.length; i++) {
-        this.scanLine(tokenReceiver, lines[i], sourceFile.line(line, i+1));
+        var line = lines[i];
+        this.scanLine(tokenReceiver, line, sourceFileName.line(line, i+1));
       }
       if (this.depth != 0) {
         throw new NodeParseException(this.depth + " unbalanced '['s at end of file");

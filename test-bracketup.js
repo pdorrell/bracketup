@@ -19,8 +19,12 @@ var fileContents = fs.readFileSync(testFileName, {encoding: "utf-8"});
 
 //console.log("fileLines = " + inspect(fileLines));
 
+var testTokenReceiver = new bracketup.TestTokenReceiver();
+
+bracketupScanner.scanSource(testTokenReceiver, fileContents, testFileName);
+
 var nodeParser = new bracketup.NodeParser();
-bracketupScanner.scanSource(nodeParser, fileContents);
+bracketupScanner.scanSource(nodeParser, fileContents, testFileName);
 
 var rootElements = nodeParser.rootElements;
 console.log("Read in " + rootElements.length + " root elements from " + testFileName);
