@@ -8,13 +8,16 @@ $(document).ready(function(){
 
 var correspondenceBracketup = require("../correspondence-bracketup.js");
 
-function compileCorrespondenceSource(sourceElementSelector) {
-  var documentObject = new correspondenceBracketup.Document(window.document);
-  var correspondenceSource = sourceElementSelector.html();
-  var compiledObjects = correspondenceBracketup.compileCorrespondence(correspondenceSource);
-  var correspondence = compiledObjects[0];
-  var correspondenceDom = correspondence.createDom(documentObject);
-  sourceElementSelector.after(correspondenceDom);
+function compileCorrespondenceSource(sourceElements) {
+  sourceElements.each(function(index, sourceElement) {
+    var documentObject = new correspondenceBracketup.Document(window.document);
+    var sourceElementSelector = $(sourceElement);
+    var correspondenceSource = sourceElementSelector.html();
+    var compiledObjects = correspondenceBracketup.compileCorrespondence(correspondenceSource);
+    var correspondence = compiledObjects[0];
+    var correspondenceDom = correspondence.createDom(documentObject);
+    sourceElementSelector.after(correspondenceDom);
+  });
 }
   
 function initialiseInteraction() {
