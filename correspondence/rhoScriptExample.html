@@ -8,7 +8,28 @@
   <link rel="stylesheet" type="text/css" href="correspondence-programming-output.css" />
   <script language="javascript" type="text/javascript" src="lib/jquery-1.10.1.js"></script>
   <script language="javascript" type="text/javascript" src="correspondence.js"></script>
-  <script language="javascript" type="text/javascript" src="correspondence-configuration-browserified.js"></script>
+  <script language="javascript" type="text/javascript" src="module-simulator.js"></script>
+  <script language="javascript" type="text/javascript" src="../utils.js"></script>
+<script language="Javascript">
+MODULE_SIMULATOR.saveExports("utils");
+
+MODULE_SIMULATOR.setRequires({"./utils.js": "utils"});
+</script>
+  <script language="javascript" type="text/javascript" src="../bracketup.js"></script>
+<script language="Javascript">
+MODULE_SIMULATOR.saveExports("bracketup");
+
+MODULE_SIMULATOR.setRequires({"./utils.js": "utils",
+                              "./bracketup.js": "bracketup"});
+</script>
+  <script language="javascript" type="text/javascript" src="../correspondence-bracketup.js"></script>
+<script language="Javascript">
+MODULE_SIMULATOR.saveExports("correspondenceBracketup");
+
+MODULE_SIMULATOR.setRequires({"../utils.js": "utils",
+                              "../correspondence-bracketup.js": "correspondenceBracketup"});
+</script>
+  <script language="javascript" type="text/javascript" src="correspondence-configuration.js"></script>
 </head>
 
 <body>
@@ -75,6 +96,18 @@ by the Javascript code to generate the DOM, in the HTML format required by the C
 </script>
 
 <div id="rhoscript-example-compiled"></div>
+
+<h2>Alternative "Browserified" Version of this Page</h2>
+
+<p>This page uses the <b>module-simulator.js</b> script to provide compability between
+Node and the browser, so that the same Javascript source code files will run in either 
+Node or in the browser.</p>
+
+<p>Using <b>module-simulator.js</b> does add a bit of noise the HTML page source.</p>
+
+<p>An alternative approach is to use <a href="http://browserify.org/">browserify</a> to compile
+separate Javascript modules into a single Javascript file, which can then be included as is
+into the HTML page, as done <a href="rhoScriptExample-browserified.html">here</a>.</p>
 
 <div class="date">Last updated: 29 August 2013</div>
 
