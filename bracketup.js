@@ -2,9 +2,49 @@
   var utils = require("./utils.js");
   var merge = utils.merge;
   var inspect = utils.inspect;
+  
+  function SourceFileName(fileName) {
+    this.fileName = fileName;
+  }
+  
+  SourceFileName.prototype = {
+    toString: function() {
+      return this.fileName;
+    }, 
+    line: function (string, lineNumber) {
+      return new SourceLine(this, string, lineNumber);
+    }
+  };
+  
+  function SourceLine(sourceFileName, line, lineNumber) {
+    this.sourceFileName = sourceFileName;
+    this.line = line;
+    this.lineNumber = lineNumber;
+  }
+  
+  SourceLine.prototype = {
+    toString: function() {
+      return this.sourceFileName + ":" + this.lineNumber;
+    }, 
+    position: function(linePosition) {
+      return new SourceLinePosition(this, linePosition);
+    }
+  };
+  
+  function SourceLinePosition(sourceLine, position) {
+    this.sourceLine = sourceLine;
+    this.position = position;
+  }
 
-  function TextNode(string) {
+  SourceLinePosition.prototype = {
+    toString: function() {
+      return this.sourceLine + ":" + this.position;
+    }
+  };
+  
+  function TextNode(string, sourceLinePosition) {
     this.string = string;
+    this.sourceLinePosition = sourceLinePosition;
   }
 
   TextNode.prototype = {
@@ -16,7 +56,8 @@
     }
   };
 
-  function EndOfLineNode() {
+  function EndOfLineNode(sourceLinePosition) {
+    this.sourceLinePosition = sourceLinePosition;
   }
 
   EndOfLineNode.prototype = {
@@ -28,9 +69,10 @@
     }
   }
 
-  function ElementNode(args, whitespace) {
+  function ElementNode(args, whitespace, sourceLinePosition) {
     this.args = args;
     this.whitespace = whitespace;
+    this.sourceLinePosition = sourceLinePosition;
     this.children = [];
   }
 
@@ -157,8 +199,8 @@
   }
 
   NodeParser.prototype = {
-    startItem: function(itemArguments, whitespace) {
-      var elementNode = new ElementNode(itemArguments, whitespace);
+    startItem: function(itemArguments, whitespace, sourceLinePosition) {
+      var elementNode = new ElementNode(itemArguments, whitespace, sourceLinePosition);
       if (this.currentElementNode == null) {
         this.rootElements.push(elementNode);
       }    
@@ -168,7 +210,7 @@
       }
       this.currentElementNode = elementNode;
     }, 
-    endItem: function() {
+    endItem: function(sourceLinePosition) {
       if (this.currentElementNode != null) {
         if (this.nodesStack.length > 0) {
           this.currentElementNode = this.nodesStack.pop();
@@ -181,9 +223,9 @@
         throw new NodeParseException("Unexpected end of element node");
       }
     }, 
-    text: function(string) {
+    text: function(string, sourceLinePosition) {
       if (this.currentElementNode != null) {
-        this.currentElementNode.addChild(new TextNode(string));
+        this.currentElementNode.addChild(new TextNode(string, sourceLinePosition));
       }
       else {
         if (string.match("^\s*$")) {
@@ -194,9 +236,9 @@
         }
       }
     }, 
-    endOfLine: function() {
+    endOfLine: function(sourceLinePosition) {
       if (this.currentElementNode != null) {
-        this.currentElementNode.addChild(new EndOfLineNode());
+        this.currentElementNode.addChild(new EndOfLineNode(sourceLinePosition));
       }
       else {
         //console.log("Ignoring end-of-line outside of root element");
@@ -211,23 +253,23 @@
   TestTokenReceiver.prototype = {
     indentIncrement: "  ", 
     
-    startItem: function(itemArguments, whitespace) {
+    startItem: function(itemArguments, whitespace, sourceLinePosition) {
       console.log(this.indent + "START " + inspect(itemArguments) + 
-                  "  (whitespace = " + inspect(whitespace) + ")");
+                  "  (whitespace = " + inspect(whitespace) + ") [" + sourceLinePosition + "]");
       this.indent = this.indent + this.indentIncrement;
     }, 
-    endItem: function() {
+    endItem: function(sourceLinePosition) {
       if (this.indent.length < this.indentIncrement.length) {
         throw new CompileError("Unexpected end of item");
       }
       this.indent = this.indent.substring(this.indentIncrement.length);
-      console.log(this.indent + "END");
+      console.log(this.indent + "END [" + sourceLinePosition + "]");
     }, 
-    text: function(string) {
-      console.log(this.indent + "TEXT " + inspect(string));
+    text: function(string, sourceLinePosition) {
+      console.log(this.indent + "TEXT " + inspect(string) + " [" + sourceLinePosition + "]");
     }, 
-    endOfLine: function() {
-      console.log(this.indent + "EOLN");
+    endOfLine: function(sourceLinePosition) {
+      console.log(this.indent + "EOLN [" + sourceLinePosition + "]");
     }
   };
 
@@ -242,25 +284,33 @@
     
     sendAnyTexts: function(tokenReceiver) {
       if (this.textPortions.length > 0) {
-        tokenReceiver.text(this.textPortions.join(""));
+        tokenReceiver.text(this.textPortions.join(""), this.textPortionsSourceLinePosition);
         this.textPortions = [];
       }
     }, 
-    
-    scanLine: function(tokenReceiver, line) {
+    saveTextPortion: function(textPortion, sourceLinePosition) {
+      if (this.textPortions.length == 0) {
+        this.textPortionsSourceLinePosition = sourceLinePosition;
+      }
+      this.textPortions.push(textPortion);
+    }, 
+    scanLine: function(tokenReceiver, line, sourceLine) {
       var scanningRegex = new RegExp(this.regex.source, "g");
       // console.log("Scanning " + inspect(line) + "\n  with " + scanningRegex + " ..."); 
       var matchedSubstrings = [];
       this.textPortions = [];
+      var linePosition = 1;
       while ((match = scanningRegex.exec(line)) !== null) {
+        var sourceLinePosition = sourceLine.position(linePosition);
         // console.log("  match = " + inspect(match));
-        matchedSubstrings.push(match[0]);
+        var matchedSubstring = match[0];
+        matchedSubstrings.push(matchedSubstring);
         // console.log("==> " + inspect(match[0]));
         if(match[1]) {
           this.sendAnyTexts(tokenReceiver);
           var itemArguments = match[2].split(",");
           var whitespace = match[3];
-          tokenReceiver.startItem(itemArguments, whitespace);
+          tokenReceiver.startItem(itemArguments, whitespace, sourceLinePosition);
           this.depth++;
         }
         else if (match[4]) {
@@ -268,22 +318,23 @@
           if(this.depth <= 0) {
             throw new NodeParseException("Unexpected ']'");
           }
-          tokenReceiver.endItem();
+          tokenReceiver.endItem(sourceLinePosition);
           this.depth--;
         }
         else if (match[5]) {
-          this.textPortions.push(match[6]);
+          this.saveTextPortion(match[6], sourceLinePosition);
         }
         else if (match[7]) {
-          this.textPortions.push(match[7]);
+          this.saveTextPortion(match[7], sourceLinePosition);
         }
         else {
           console.log("match = " + inspect(match));
           throw new NodeParseException("No match found in lexer");
         }
+        sourceLinePosition += matchedSubstring.length;
       }
       this.sendAnyTexts(tokenReceiver);
-      tokenReceiver.endOfLine();
+      tokenReceiver.endOfLine(sourceLinePosition);
 
       var reconstitutedMatches = matchedSubstrings.join("");
       if (reconstitutedMatches != line) {
@@ -293,11 +344,12 @@
       // console.log("matched substrings = " + inspect(matchedSubstrings.join("")));
     }, 
     
-    scanSource: function(tokenReceiver, source) {
+    scanSource: function(tokenReceiver, source, sourceFileName) {
       this.depth = 0;
       var lines = source.split("\n");
+      var sourceFile = new SourceFile(sourceFileName);
       for (var i=0; i<lines.length; i++) {
-        this.scanLine(tokenReceiver, lines[i]);
+        this.scanLine(tokenReceiver, lines[i], sourceFile.line(line, i+1));
       }
       if (this.depth != 0) {
         throw new NodeParseException(this.depth + " unbalanced '['s at end of file");
@@ -487,10 +539,10 @@
   }
   
   BracketupCompiler.prototype = {
-    compile: function(source) {
+    compile: function(source, sourceFileName) {
       var bracketupScanner = new BracketupScanner();
       var nodeParser = new NodeParser();
-      bracketupScanner.scanSource(nodeParser, source);
+      bracketupScanner.scanSource(nodeParser, source, sourceFileName);
       var parsedRootElements = nodeParser.rootElements;
       var compiledObjects = [];
       for (var i=0; i<parsedRootElements.length; i++) {
