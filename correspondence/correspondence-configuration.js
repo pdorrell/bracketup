@@ -2,19 +2,19 @@ var utils = require("../utils.js");
 inspect = utils.inspect;
 
 $(document).ready(function(){
-  compileCorrespondenceSource($("#rhoscript-example-source"), $("#rhoscript-example-compiled"));
+  compileCorrespondenceSource($("#rhoscript-example-source"));
   initialiseInteraction();
 });
 
 var correspondenceBracketup = require("../correspondence-bracketup.js");
 
-function compileCorrespondenceSource(sourceElementSelector, compiledElementSelector) {
+function compileCorrespondenceSource(sourceElementSelector) {
   var documentObject = new correspondenceBracketup.Document(window.document);
   var correspondenceSource = sourceElementSelector.html();
   var compiledObjects = correspondenceBracketup.compileCorrespondence(correspondenceSource);
   var correspondence = compiledObjects[0];
   var correspondenceDom = correspondence.createDom(documentObject);
-  compiledElementSelector.append(correspondenceDom);
+  sourceElementSelector.after(correspondenceDom);
 }
   
 function initialiseInteraction() {

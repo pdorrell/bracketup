@@ -618,22 +618,23 @@
 })();
 
 },{"./bracketup.js":1,"./utils.js":4}],3:[function(require,module,exports){
-function inspect(object) {return JSON.stringify(object);}
+var utils = require("../utils.js");
+inspect = utils.inspect;
 
 $(document).ready(function(){
-  compileCorrespondenceSource($("#rhoscript-example-source"), $("#rhoscript-example-compiled"));
+  compileCorrespondenceSource($("#rhoscript-example-source"));
   initialiseInteraction();
 });
 
 var correspondenceBracketup = require("../correspondence-bracketup.js");
 
-function compileCorrespondenceSource(sourceElementSelector, compiledElementSelector) {
+function compileCorrespondenceSource(sourceElementSelector) {
   var documentObject = new correspondenceBracketup.Document(window.document);
   var correspondenceSource = sourceElementSelector.html();
   var compiledObjects = correspondenceBracketup.compileCorrespondence(correspondenceSource);
   var correspondence = compiledObjects[0];
   var correspondenceDom = correspondence.createDom(documentObject);
-  compiledElementSelector.append(correspondenceDom);
+  sourceElementSelector.after(correspondenceDom);
 }
   
 function initialiseInteraction() {
@@ -674,7 +675,7 @@ function initialiseInteraction() {
 }
 
 
-},{"../correspondence-bracketup.js":2}],4:[function(require,module,exports){
+},{"../correspondence-bracketup.js":2,"../utils.js":4}],4:[function(require,module,exports){
 (function() {
 
   // merge any number of objects, creating a new object
