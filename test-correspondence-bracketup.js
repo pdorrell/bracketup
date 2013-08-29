@@ -16,7 +16,7 @@ var jsdomDocument = jsdom(null, null, {});
 var correspondenceCompiler = correspondenceBracketup.correspondenceCompiler;
 
 try {
-  var compiledDoms = correspondenceCompiler.compileDoms(fileContents, jsdomDocument);
+  var compiledDoms = correspondenceCompiler.compileDoms(fileContents, jsdomDocument, testFileName);
   
   assert.equal(compiledDoms.length, 1);
   
@@ -32,7 +32,8 @@ catch (error) {
   if (error.logSourceError) {
     error.logSourceError();
   }
+  else {
+    console.log(" no logSourceError");
+  }
   throw error;
 }
-
-

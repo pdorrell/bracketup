@@ -68,7 +68,7 @@
     logLineAndPosition: function() {
       var linePrefix = this.toString() + ":";
       var line1 = linePrefix + this.sourceLine.line;
-      var line2 = repeatedString(" ", this.position) + "^";
+      var line2 = repeatedString(" ", linePrefix.length + this.position - 1) + "^";
       return [line1, line2];
     }
   };
@@ -125,6 +125,7 @@
   };
 
   function CustomError(className, message) {
+    this.message = message;
     this.error = new Error(message);
     this.stack = this.error.stack.replace(/^Error:/g, className + ":")
   }
@@ -132,6 +133,7 @@
   CustomError.prototype = {
     logSourceError: function() {
       if (this.sourceLinePosition) {
+        console.log("");
         console.log(this.getMessageLine());
         console.log(this.sourceLinePosition.logLineAndPosition().join("\n"));
       }
@@ -143,11 +145,11 @@
     this.sourceLinePosition = sourceLinePosition;
   }
   
-  CompileError.prototype = {
+  CompileError.prototype = merge(CustomError.prototype, {
     getMessageLine: function() {
       return "Compile error: " + this.message;
     }
-  };
+  });
 
   function NodeCompiler(topLevelClassMap) {
     this.topLevelClassMap = topLevelClassMap;
@@ -244,11 +246,11 @@
     this.sourceLinePosition = sourceLinePosition;
   }
   
-  NodeParseException.prototype = {
+  NodeParseException.prototype = merge(CustomError.prototype, {
     getMessageLine: function() {
       return "Syntax error: " + this.message;
     }
-  };
+  });
 
   function NodeParser() {
     this.nodesStack = [];
@@ -616,9 +618,9 @@
       return compiledObjects;
     }, 
     
-    compileDoms: function(source, document) {
+    compileDoms: function(source, document, sourceFileName) {
       var compiledDoms = [];
-      var compiledObjects = this.compile(source);
+      var compiledObjects = this.compile(source, sourceFileName);
       var documentWrapper = new Document(document);
       for (var i=0; i<compiledObjects.length; i++) {
         compiledDoms.push(compiledObjects[i].createDom(documentWrapper));
