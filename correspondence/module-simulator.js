@@ -77,12 +77,12 @@ var MODULE_SIMULATOR = window.MODULE_SIMULATOR || {};
       Each resolution entry maps a URL to a named module (as saved by saveExports) */
   function setRequires(requireMap) {
     require = function(url) {
-      console.log("  requiring " + url + " ...");
+      log("  requiring " + url + " ...");
       var moduleName = requireMap[url]; // look up module name by URL
       if (!moduleName) {
         moduleName = scriptUrl.resolveRelatively(url);
       }
-      console.log("   resolved to " + moduleName);
+      log("   resolved to " + moduleName);
       var module = requires[moduleName]; // look up module by module name
       if (!module) {
         throw new Error("Module " + moduleName + " does not exist");
@@ -92,15 +92,23 @@ var MODULE_SIMULATOR = window.MODULE_SIMULATOR || {};
   }
   
   MODULE_SIMULATOR.startScript = function(url, requireMap) {
-    console.log("MODULE_SIMULATOR.startScript " + url);
+    log("MODULE_SIMULATOR.startScript " + url);
     setRequires(requireMap ? requireMap : {});
     scriptUrl = new ScriptUrl(url);
   }
   
   MODULE_SIMULATOR.endScript = function() {
-    console.log("MODULE_SIMULATOR.endScript " + scriptUrl.url);
+    log("MODULE_SIMULATOR.endScript " + scriptUrl.url);
     saveExports(scriptUrl.url);
     scriptUrl = null;
+  }
+  
+  MODULE_SIMULATOR.logging = false;
+  
+  function log(message) {
+    if (MODULE_SIMULATOR.logging) {
+      console.log(message);
+    }
   }
 
 })();
