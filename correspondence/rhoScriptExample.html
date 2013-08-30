@@ -17,27 +17,23 @@ MODULE_SIMULATOR.startScript("../utils.js");
 <script language="Javascript">
 MODULE_SIMULATOR.endScript();
 
-MODULE_SIMULATOR.startScript("../bracketup.js", {"./utils.js": "../utils.js"});
+MODULE_SIMULATOR.startScript("../bracketup.js");
 </script>
   <script language="javascript" type="text/javascript" src="../bracketup.js"></script>
 <script language="Javascript">
 MODULE_SIMULATOR.endScript();
 
-MODULE_SIMULATOR.startScript("../correspondence-bracketup.js",
-                             {"./utils.js": "../utils.js",
-                              "./bracketup.js": "../bracketup.js"});
+MODULE_SIMULATOR.startScript("../correspondence-bracketup.js");
 </script>
   <script language="javascript" type="text/javascript" src="../correspondence-bracketup.js"></script>
 <script language="Javascript">
 MODULE_SIMULATOR.endScript();
 
-MODULE_SIMULATOR.startScript("correspondence-configuration.js",
-                             {"../utils.js": "../utils.js",
-                              "../bracketup.js": "../bracketup.js",
-                              "../correspondence-bracketup.js": "../correspondence-bracketup.js"});
+MODULE_SIMULATOR.startScript("correspondence-configuration.js");
 </script>
   <script language="javascript" type="text/javascript" src="correspondence-configuration.js"></script>
 </head>
+<!-- No endScript required for last script in sequence -->
 
 <body>
 <h1>Correspondence rhoScript Example Using Bracketup</h1>

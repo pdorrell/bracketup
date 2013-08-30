@@ -78,15 +78,11 @@ var MODULE_SIMULATOR = window.MODULE_SIMULATOR || {};
   function setRequires(requireMap) {
     require = function(url) {
       console.log("  requiring " + url + " ...");
-      var urlResolvedRelatively = scriptUrl.resolveRelatively(url);
       var moduleName = requireMap[url]; // look up module name by URL
-      if (moduleName != urlResolvedRelatively) {
-        throw new Error("Inconsistent relative URL resolution: " + inspect(urlResolvedRelatively) + 
-                       " != " + inspect(moduleName));
-      }
       if (!moduleName) {
-        throw new Error("Module for URL " + url + " not found");
+        moduleName = scriptUrl.resolveRelatively(url);
       }
+      console.log("   resolved to " + moduleName);
       var module = requires[moduleName]; // look up module by module name
       if (!module) {
         throw new Error("Module " + moduleName + " does not exist");
