@@ -6,8 +6,6 @@ var spawn = require('child_process').spawn;
 
 var async = require('async');
 
-console.log("__dirname = " + __dirname);
-
 function CoffeeScriptSourceFile(dir, file, baseName) {
   this.dir = dir;
   this.file = file;
@@ -17,6 +15,7 @@ function CoffeeScriptSourceFile(dir, file, baseName) {
 }
 
 CoffeeScriptSourceFile.prototype = {
+  forceCompile: true, 
   toString: function() {
     return "[CoffeeScriptSourceFile: " + this.coffeeFileName + " => " + this.javascriptFileName + "]";
   }, 
@@ -27,13 +26,14 @@ CoffeeScriptSourceFile.prototype = {
   }, 
   // Checks if compilation required, also, if it is, deletes the old output file
   requiresCompilation: function() {
+    if(this.forceCompile) return true;
     var compileNeeded = false;
     if (fs.existsSync(this.javascriptFileName)) {
-      console.log("  " + this.javascriptFileName + " exists");
+      //console.log("  " + this.javascriptFileName + " exists");
       var coffeeModTime = fs.statSync(this.coffeeFileName).mtime;
-      console.log("  coffeeModTime = " + coffeeModTime);
+      //console.log("  coffeeModTime = " + coffeeModTime);
       var javascriptModTime = fs.statSync(this.javascriptFileName).mtime;
-      console.log("  javascriptModTime = " + coffeeModTime);
+      //console.log("  javascriptModTime = " + coffeeModTime);
       var javascriptOutOfDate = javascriptModTime.getTime() < coffeeModTime.getTime();
       console.log("    javascriptOutOfDate = " + javascriptOutOfDate);
       if (javascriptOutOfDate) {
@@ -47,11 +47,13 @@ CoffeeScriptSourceFile.prototype = {
     }
     return compileNeeded;
   }, 
-  compile: function() {
+  
+  compile: function(callback) {
     var process = spawn('coffee', ["-c", this.coffeeFileName], { stdio: 'inherit' });
+    var $this = this;
     process.on('close', function (code) {
       if (code != 0) {
-        console.log(" compilation of " + coffeeFileName + " failed");
+        callback({message: "Compilation of " + $this.coffeeFileName + " failed with status code " + code});
       }
     });
   }
@@ -61,12 +63,10 @@ function findCoffeeFilesToCompile(dir) {
   console.log("findCoffeeFilesToCompile, dir = " + dir);
   var files = fs.readdirSync(dir)
   var filesToCompile = []
-  console.log("files = " + inspect(files));
   for (var i=0; i<files.length; i++) {
     var file = files[i];
     var coffeeMatch = file.match(/^(.*)\.coffee$/)
     if (coffeeMatch) {
-      console.log("   coffeeMatch = " + inspect(coffeeMatch));
       var baseName = coffeeMatch[1];
       filesToCompile.push(new CoffeeScriptSourceFile(dir, file, baseName));
     }
@@ -78,10 +78,12 @@ function compileCoffeeFilesInDir(dir) {
   var filesToCompile = findCoffeeFilesToCompile(dir);
   for (var i=0; i<filesToCompile.length; i++) {
     var fileToCompile = filesToCompile[i];
-    console.log("fileToCompile = " + fileToCompile);
+    console.log(" " + fileToCompile);
     if (fileToCompile.requiresCompilation()) {
-      console.log("  compiling ...");
-      fileToCompile.compile();
+      console.log("   compiling ...");
+      fileToCompile.compile(function(err) {
+        console.log("ERROR: " + err.message);
+      });
     }
   }
 }
