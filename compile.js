@@ -14,6 +14,19 @@ function CoffeeScriptSourceFile(dir, file, baseName) {
   this.javascriptFileName = path.join(dir, baseName + ".js");
 }
 
+function runCommand(callback, command, args, description) {
+  var process = spawn(command, args, { stdio: 'inherit' });
+  var $this = this;
+  process.on('close', function (code) {
+    if (code == 0) {
+      callback();
+    }
+    else {
+      callback({message: description + " failed with status code " + code});
+    }
+  });
+}
+
 CoffeeScriptSourceFile.prototype = {
   forceCompile: true, 
   toString: function() {
@@ -50,16 +63,8 @@ CoffeeScriptSourceFile.prototype = {
   
   compile: function(callback) {
     console.log("compile, this = " + this);
-    var process = spawn('coffee', ["-c", this.coffeeFileName], { stdio: 'inherit' });
-    var $this = this;
-    process.on('close', function (code) {
-      if (code == 0) {
-        callback();
-      }
-      else {
-        callback({message: "Compilation of " + $this.coffeeFileName + " failed with status code " + code});
-      }
-    });
+    runCommand(callback, "coffee", ["-c", this.coffeeFileName], 
+               "Compilation of " + this.coffeeFileName);
   }, 
   compiler: function() {
     var $this = this;
@@ -96,7 +101,17 @@ function compileCoffeeFilesInDirectories(callback, dirs) {
       compileTasks.push(fileToCompile.compiler());
     }
   }
-  async.parallel(compileTasks, callback);
+  async.waterfall(compileTasks, callback);
+}
+
+function runFile(callback, file) {
+  console.log("Running " + file + " ...");
+  var coffeeMatch = file.match(/^(.*)\.coffee$/);
+  if (coffeeMatch) {
+    file = coffeeMatch[1] + ".js";
+    console.log("   (actually run " + file + " ...)");
+  }
+  
 }
 
 function handleCompilationResult(err) {
