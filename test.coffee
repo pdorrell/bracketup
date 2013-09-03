@@ -1,7 +1,7 @@
 utils = require("./utils")
 inspect = utils.inspect
 
-myTest = )() ->
+myTest = () ->
   console.log(inspect("Hello world"))
 
 myTest()

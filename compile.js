@@ -49,18 +49,27 @@ CoffeeScriptSourceFile.prototype = {
   }, 
   
   compile: function(callback) {
+    console.log("compile, this = " + this);
     var process = spawn('coffee', ["-c", this.coffeeFileName], { stdio: 'inherit' });
     var $this = this;
     process.on('close', function (code) {
-      if (code != 0) {
+      if (code == 0) {
+        callback();
+      }
+      else {
         callback({message: "Compilation of " + $this.coffeeFileName + " failed with status code " + code});
       }
     });
+  }, 
+  compiler: function() {
+    var $this = this;
+    return function(callback) {
+      return $this.compile(callback);
+    }
   }
 };
 
 function findCoffeeFilesToCompile(dir) {
-  console.log("findCoffeeFilesToCompile, dir = " + dir);
   var files = fs.readdirSync(dir)
   var filesToCompile = []
   for (var i=0; i<files.length; i++) {
@@ -74,18 +83,29 @@ function findCoffeeFilesToCompile(dir) {
   return filesToCompile;
 }
 
-function compileCoffeeFilesInDir(dir) {
-  var filesToCompile = findCoffeeFilesToCompile(dir);
-  for (var i=0; i<filesToCompile.length; i++) {
-    var fileToCompile = filesToCompile[i];
-    console.log(" " + fileToCompile);
-    if (fileToCompile.requiresCompilation()) {
-      console.log("   compiling ...");
-      fileToCompile.compile(function(err) {
-        console.log("ERROR: " + err.message);
-      });
+function compileCoffeeFilesInDirectories(callback, dirs) {
+  console.log("compileCoffeeFilesInDirectories " + inspect(dirs));
+  for (var j=0; j<dirs.length; j++) {
+    var dir = dirs[j];
+    console.log("  " + dir +  " ...");
+    var filesToCompile = findCoffeeFilesToCompile(dir);
+    var compileTasks = [];
+    for (var i=0; i<filesToCompile.length; i++) {
+      var fileToCompile = filesToCompile[i];
+      console.log("    " + fileToCompile.coffeeFileName);
+      compileTasks.push(fileToCompile.compiler());
     }
+  }
+  async.parallel(compileTasks, callback);
+}
+
+function handleCompilationResult(err) {
+  if (err) {
+    console.log("ERROR: " + err.message);
+  }
+  else {
+    console.log("Compilation finished!");
   }
 }
 
-compileCoffeeFilesInDir(__dirname);
+compileCoffeeFilesInDirectories(handleCompilationResult, [__dirname]);
