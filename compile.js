@@ -112,27 +112,27 @@ function runFile(file, callback) {
     file = coffeeMatch[1] + ".js";
     console.log("   (actually run " + file + " ...)");
   }
+  console.log("");
   runCommand("node", [file], "Execution of " + file, function(err, result) {
     if (err) {
       callback(err);
     }
     else {
-      return file;
+      callback(null, file);
     }
   });
 }
 
 function handleCompileAndRunResult(err, fileThatWasRun) {
-  console.log("handleCompileAndRunResult ...");
   if (err) {
     console.log("ERROR: " + err.message);
   }
   else {
     if (fileThatWasRun) {
-      console.log("Finished compiling files and running " + fileThatWasRun + "!");
+      console.log("\nFinished compiling files and running " + fileThatWasRun + "!");
     }
     else {
-      console.log("Compilation finished!");
+      console.log("\nCompilation finished!");
     }
   }
 }
