@@ -28,7 +28,7 @@ function CoffeeScriptSourceFile(dir, file, baseName) {
 }
 
 CoffeeScriptSourceFile.prototype = {
-  forceCompile: true, 
+  forceCompile: false, 
   toString: function() {
     return "[CoffeeScriptSourceFile: " + this.coffeeFileName + " => " + this.javascriptFileName + "]";
   }, 
@@ -48,21 +48,21 @@ CoffeeScriptSourceFile.prototype = {
       var javascriptModTime = fs.statSync(this.javascriptFileName).mtime;
       //console.log("  javascriptModTime = " + coffeeModTime);
       var javascriptOutOfDate = javascriptModTime.getTime() < coffeeModTime.getTime();
-      console.log("    javascriptOutOfDate = " + javascriptOutOfDate);
+      //console.log("    javascriptOutOfDate = " + javascriptOutOfDate);
       if (javascriptOutOfDate) {
         fs.unlinkSync(this.javascriptFileName);
         compileNeeded = true;
       }
     }
     else {
-      console.log("  " + this.javascriptFileName + " does not exist");
+      //console.log("  " + this.javascriptFileName + " does not exist");
       compileNeeded = true;
     }
     return compileNeeded;
   }, 
   
   compile: function(callback) {
-    console.log("compile, this = " + this);
+    console.log("  " + this.coffeeFileName + " ...");
     runCommand("coffee", ["-c", this.coffeeFileName], 
                "Compilation of " + this.coffeeFileName, callback);
   }, 
@@ -75,7 +75,6 @@ CoffeeScriptSourceFile.prototype = {
 };
 
 function findCoffeeFilesToCompile(dir) {
-  console.log("findCoffeeFilesToCompile, dir = " + inspect(dir));
   var files = fs.readdirSync(dir)
   var filesToCompile = []
   for (var i=0; i<files.length; i++) {
@@ -83,42 +82,51 @@ function findCoffeeFilesToCompile(dir) {
     var coffeeMatch = file.match(/^(.*)\.coffee$/)
     if (coffeeMatch) {
       var baseName = coffeeMatch[1];
-      filesToCompile.push(new CoffeeScriptSourceFile(dir, file, baseName));
+      var sourceFile = new CoffeeScriptSourceFile(dir, file, baseName);
+      if (sourceFile.requiresCompilation()) {
+        filesToCompile.push(sourceFile);
+      }
     }
   }
   return filesToCompile;
 }
 
 function compileCoffeeFilesInDirectories(dirs, callback) {
-  console.log("compileCoffeeFilesInDirectories " + inspect(dirs));
   for (var j=0; j<dirs.length; j++) {
     var dir = dirs[j];
-    console.log("  " + dir +  " ...");
+    //console.log("  " + dir +  " ...");
     var filesToCompile = findCoffeeFilesToCompile(dir);
     var compileTasks = [];
     for (var i=0; i<filesToCompile.length; i++) {
       var fileToCompile = filesToCompile[i];
-      console.log("    " + fileToCompile.coffeeFileName);
       compileTasks.push(fileToCompile.compiler());
     }
+  }
+  if (compileTasks.length > 0) {
+    console.log(" Compiling ...");
+  }
+  else {
+    console.log("   (no files require compilation)");
   }
   async.waterfall(compileTasks, callback);
 }
 
 function runFile(file, callback) {
-  console.log("Running " + file + " ...");
   var coffeeMatch = file.match(/^(.*)\.coffee$/);
+  var fileToRun = file;
+  var actualFileAside = "";
   if (coffeeMatch) {
-    file = coffeeMatch[1] + ".js";
-    console.log("   (actually run " + file + " ...)");
+    fileToRun = coffeeMatch[1] + ".js";
+    actualFileAside = " (" + path.basename(fileToRun) + ")";
   }
+  console.log("Running " + file + actualFileAside + " ...");
   console.log("");
-  runCommand("node", [file], "Execution of " + file, function(err, result) {
+  runCommand("node", [fileToRun], "Execution of " + fileToRun, function(err, result) {
     if (err) {
       callback(err);
     }
     else {
-      callback(null, file);
+      callback(null, fileToRun);
     }
   });
 }
@@ -129,16 +137,17 @@ function handleCompileAndRunResult(err, fileThatWasRun) {
   }
   else {
     if (fileThatWasRun) {
-      console.log("\nFinished compiling files and running " + fileThatWasRun + "!");
+      console.log("\nFinished compiling files and running " + fileThatWasRun);
     }
     else {
-      console.log("\nCompilation finished!");
+      console.log("\nCompilation finished");
     }
   }
 }
 
 function compileCoffeeFilesInDirectoriesAndRunFile(dirs, file, callback) {
-  console.log("compileCoffeeFilesInDirectoriesAndRunFile, dirs = " + inspect(dirs));
+  console.log("Compile coffee files in " + inspect(dirs) + 
+              (file ? " and run " + file : ""));
   var tasks = [async.apply(compileCoffeeFilesInDirectories, dirs)];
   if (file) {
     var fileToRun = path.resolve(__dirname, file);
