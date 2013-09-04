@@ -4,10 +4,21 @@ Bracketup
 **Bracketup** is a simple generic markup language which provides a framework
 for defining application-specific markup languages.
 
-It's main intended use is to create structured content that supports specific
+I have designed primarily to allow creation of structured content that supports specific
 interaction models in a web browser.
 
-The one current working example is **correspondence-bracketup**, which provides
+It is an evolution from the application-specific
+markup language [https://github.com/pdorrell/correspondence-markup](correspondence-markup), 
+which is implemented in Ruby. 
+
+**Bracketup** has been implemented in Javascript, which allows it to run in the browser, avoiding
+any dependence on separate CMS or other server-side generation.
+
+But, you can still run it server-side if you want to, for example using **Node**.
+
+Perhaps unsurprisingly, given this history,
+the one current working example of an application-specific **bracketup**-based markup languge
+is **correspondence-bracketup**, which provides
 markup to support [Correspondence](http://pdorrell.github.io/correspondence/).
 An actual page example is at http://pdorrell.github.io/bracketup/correspondence/rhoScriptExample.html,
 and the markup can be seen inside the source for that web page.
