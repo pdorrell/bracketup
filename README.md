@@ -70,6 +70,11 @@ Any additional function arguments are passed as string arguments to the correspo
 Default child element functions are specified by the **defaultChildFunction** property
 on the parent element's constructor prototype.
 
+(I call the initial map of function names the "top-level" map, because it is provided to the compiler
+which uses it to interpret the function name on the top-level element. Inner elements can provide their
+own maps, which will map functions relating to their own child elements, but which will typically fall
+back to the top-level map to map functions that might occur anywhere within the source.)
+
 ### Parsing and Compiling
 
 Compilation of **bracketup** markup occurs in four main stages:
@@ -93,6 +98,32 @@ To support this, **bracketup.js** retains precise information about the location
 source code when initially parsed into tokens, and preserves this information as the tokens
 are parsed into elements and then into application-specific objects, so that errors can
 be properly reported, at whichever stage of compilation they occur.
+
+### A Worked Example
+
+The following is a cut-down version of the example at http://pdorrell.github.io/bracketup/correspondence/rhoScriptExample.html:
+
+```
+```
+[correspondence [_title Queens Puzzle]
+ [rhoscript [_languageTitle rhoScript]
+  [A [1 8] [2 range]]
+  [B [1 permutations]]
+  [C ([1 with-index]]
+  [D ...]
+  [K [1 keep-maxes-by]]
+ ]
+ [english [_languageTitle English]
+  [A For [2 the sequence of numbers from 0 to 1 less than] [1 8],]
+  [B consider [1 all possible permutations].]
+  [C For a given permutation, [1 specify X and Y co-ordinates for 8 queens] as an array of arrays
+    of the form \[[b x], [b y]\]]
+  [D ...]
+  [K [1 Having done that for each [a [href http://en.wikipedia.org/wiki/Permutation]permutation], 
+     keep those permutations that have the maximum number of diagonals occupied.]]
+ ]
+]
+```
 
 ### Bracketup Javascript Classes
 
