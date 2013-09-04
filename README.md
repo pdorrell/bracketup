@@ -110,23 +110,24 @@ Three base classes are provide to support the most common use cases:
 Other classes defined in **bracketup.js** which are relevant to implementing application-specific
 markup languages are:
 
-* **BracketupCompiler** this class constructs a compiler from a map of function names to constructor functions.
+* **BracketupCompiler** constructed with a map of function names to constructor functions, this object 
+  compiles elements into the application-specific objects
 * **Document** this is a wrapper for the browser **document** object which provides two convenience methods
   for creating DOM nodes:
-  * **addTextNode(dom, text)** which adds a text node to a DOM element.
-  * **createNode(tag,options)** which creates a DOM element with the given **tag**, and the following options:
-    * **parent** the parent DOM element to append the new DOM element onto
-    * **className** the CSS class name
-    * **attributes** a map of attributes to set as attribute values on the DOM element
-    * **text** text for a text node to be added to the DOM element
-* **Bold**, **Italic**, **Link** - classes representing HTML nodes of type **<b>**, **<i>** and **<a>** respectively.
-* **HrefAttribute** - a class which as a child element of a **Link** object, sets the **href** attribute
-  of the **<a>** element.
+    * **addTextNode(dom, text)** which adds a text node to a DOM element.
+    * **createNode(tag,options)** which creates a DOM element with the given **tag**, and the following options:
+        * **parent** the parent DOM element to append the new DOM element onto
+        * **className** the CSS class name
+        * **attributes** a map of attributes to set as attribute values on the DOM element
+        * **text** text for a text node to be added to the DOM element
+* **Bold**, **Italic**, **Link** - classes representing HTML nodes of type **&lt;b&gt;**, **&lt;i&gt;** and **&lt;a&gt;** respectively.
+* **HrefAttribute** - an object which, as a child element of a **Link** object, sets the **href** attribute
+  of the **&lt;a&gt;** element.
 
 #### Internal Classes
 
 
-Other classes defined in **bracketup.js** are:
+Other classes defined in **bracketup.js** are, by category:
 
 ##### Source Location
 
@@ -154,11 +155,8 @@ Other classes defined in **bracketup.js** are:
 ##### Scanning and Compiling
 
 * **BracketupScanner** which uses a single Javascript regex to scan the source code into tokens.
-
 * **NodeParser** the object which receives tokens from BracketupScanner and compiles them into elements.
-
 * **NodeCompiler** the object which, given a function-to-constructor map, compiles a parsed element into
   an application-specific object.
-
 * **TestTokenReceiver** a test object which receives tokens from BracketupScanner and displays them
   in a readable fasion.
