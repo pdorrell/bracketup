@@ -7,27 +7,29 @@ var fs = require('fs');
 var bracketup = require("./bracketup.js");
 var correspondenceBracketup = require("./correspondence-bracketup.js");
 
-var testFileName = "sample.bracketup";
-var fileContents = fs.readFileSync(testFileName, {encoding: "utf-8"});
-
 var jsdom = require("jsdom").jsdom;
-var jsdomDocument = jsdom(null, null, {});
 
 var correspondenceCompiler = correspondenceBracketup.correspondenceCompiler;
+
+function compileSourceIntoDoms(sourceFileName) {
+  var fileContents = readUtf8TextFile(sourceFileName);
+  var jsdomDocument = jsdom(null, null, {});
+  return correspondenceCompiler.compileDoms(fileContents, jsdomDocument, sourceFileName);
+}
+
+function readUtf8TextFile(fileName) {
+  return fs.readFileSync(fileName, {encoding: "utf-8"});
+}
 
 var correspondenceTests = {
   testCompilation: function() {
     try {
-      var compiledDoms = correspondenceCompiler.compileDoms(fileContents, jsdomDocument, testFileName);
-      
+      var compiledDoms = compileSourceIntoDoms("test/data/sample.bracketup");
       assert.equal(compiledDoms.length, 1);
-      
-      var expectedOutputFileName = "sample-bracket.output.html";
-      var expectedOutput = fs.readFileSync(expectedOutputFileName, {encoding: "utf-8"});
-      
       var correspondenceDom = compiledDoms[0];
       var correspondenceDomHtml = correspondenceDom.outerHTML;
       
+      var expectedOutput = readUtf8TextFile("test/data/sample-bracket.output.html");
       assert.equal(expectedOutput, correspondenceDomHtml);
     }
     catch (error) {
@@ -36,6 +38,16 @@ var correspondenceTests = {
       }
       throw error;
     }
+  }, 
+  testBadBracketupSyntax: function() {
+    assert.throws( function() {
+      var compiledDoms = compileSourceIntoDoms("test/data/sample.bad.bracketup");
+    }, 
+                   function(err) {
+                     assert.equal(err.sourceLinePosition.toString(), "test/data/sample.bad.bracketup:8:19");
+                     assert.equal(err.message, "Unexpected ']'");
+                     return true;
+                   });
   }
 }
 
