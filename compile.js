@@ -145,16 +145,25 @@ function handleCompileAndRunResult(err, fileThatWasRun) {
   }
 }
 
-function compileCoffeeFilesInDirectoriesAndRunFile(dirs, file, callback) {
+function compileCoffeeFilesInDirectoriesAndRunFile(baseDir, dirs, file, callback) {
   console.log("Compile coffee files in " + inspect(dirs) + 
+              (baseDir ? " (relative to " + baseDir + ")" : "") +
               (file ? " and run " + file : ""));
+  if (baseDir) {
+    for (var i=0; i<dirs.length; i++) {
+      dirs[i] = path.resolve(baseDir, dirs[i]);
+    }
+  }
   var tasks = [async.apply(compileCoffeeFilesInDirectories, dirs)];
   if (file) {
-    var fileToRun = path.resolve(__dirname, file);
+    var fileToRun = file;
+    if (baseDir) {
+      fileToRun = path.resolve(baseDir, fileToRun);
+    }
     tasks.push(async.apply(runFile, fileToRun));
   }
   async.waterfall(tasks, callback);
 }
   
-compileCoffeeFilesInDirectoriesAndRunFile([__dirname], "test2.coffee", 
+compileCoffeeFilesInDirectoriesAndRunFile(__dirname, [".", "correspondence"], "test2.coffee", 
                                           handleCompileAndRunResult);

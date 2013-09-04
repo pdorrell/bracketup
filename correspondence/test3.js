@@ -17,5 +17,5 @@
 }).call(this);
 
 /*
-//@ sourceMappingURL=test2.map
+//@ sourceMappingURL=test3.map
 */
