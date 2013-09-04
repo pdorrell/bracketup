@@ -70,12 +70,42 @@ Any additional function arguments are passed as string arguments to the correspo
 Default child element functions are specified by the **defaultChildFunction** property
 on the parent element's constructor prototype.
 
+### Parsing and Compiling
+
+Compilation of **bracketup** markup occurs in four main stages:
+
+* Scanning of source into tokens. There are four types of token:
+  * "[" + comma-separated list of identifiers + optional whitespace
+  * Backslash-quoted plain text
+  * All other plain text
+  * Closing "]"
+* Compilation of tokens into elements.
+* Compilation of elements into application-specific objects.
+* Generation of HTML DOM elements from application-specific objects.
+
+#### Error-handling
+
+An essential element of any parsing or compiling application is the handling of errors.
+
+If something goes wrong, we want to know what went wrong, and *where* it went wrong.
+
+To support this, **bracketup.js** retains precise information about the location of
+source code when initially parsed into tokens, and preserves this information as the tokens
+are parsed into elements and then into application-specific objects, so that errors can
+be properly reported, at whichever stage of compilation they occur.
+
+### Bracketup Javascript Classes
+
+#### Base Classes
+
 Three base classes are provide to support the most common use cases:
 
 * **BaseNode** which represents an object that outputs a DOM from the **createDom** method.
 * **TextElement** - an object representing the standard implementation of plain text added to a **BaseNode**.
 * **BaseAttribute** - an object representing a child element which acts on the parent element by
   setting an attribute value on the DOM element created by the parent.
+
+#### Implementation Classes
 
 Other classes defined in **bracketup.js** which are relevant to implementing application-specific
 markup languages are:
@@ -92,3 +122,43 @@ markup languages are:
 * **Bold**, **Italic**, **Link** - classes representing HTML nodes of type **<b>**, **<i>** and **<a>** respectively.
 * **HrefAttribute** - a class which as a child element of a **Link** object, sets the **href** attribute
   of the **<a>** element.
+
+#### Internal Classes
+
+
+Other classes defined in **bracketup.js** are:
+
+##### Source Location
+
+* **SourceFileName** representation of the name of a source file (which may be a URL, or 
+  an id of a DOM element within HTML source, or whatever)
+* **EndOfSourceFilePosition** representation of the end of a source file, for errors
+  where source code is missing closing brackets
+* **SourceLine** representation of a line of source code and its location
+* **SourceLinePosition** representation of a specific character position within a line of source code
+
+##### Element Structure
+* **TextNode** plain text, as parsed, with associated source location information.
+* **EndOfLineNode** end of a line, as parsed,  with associated source location information (**bracketup.js**
+  parses source line-by-line, so line endings are parsed separately from other plain text, and implementation
+  objects can easily give special treatment to line endings).
+* **ElementNode** an element, as parsed, with associated source location information.
+
+##### Error Classes
+* **CustomError** a base class that supports defining specific custom error classes that
+  can have source location information added to them.
+* **NodeParseException** an exception when parsing the bracketup markup.
+
+* **CompileError** base class for errors that occur when compiling (i.e. when interpreting parsed elements).
+
+##### Scanning and Compiling
+
+* **BracketupScanner** which uses a single Javascript regex to scan the source code into tokens.
+
+* **NodeParser** the object which receives tokens from BracketupScanner and compiles them into elements.
+
+* **NodeCompiler** the object which, given a function-to-constructor map, compiles a parsed element into
+  an application-specific object.
+
+* **TestTokenReceiver** a test object which receives tokens from BracketupScanner and displays them
+  in a readable fasion.
