@@ -4,7 +4,7 @@ Bracketup
 **Bracketup** is a simple generic markup language which provides a framework
 for defining application-specific markup languages.
 
-It's main intended use is to create structure content that supports specific
+It's main intended use is to create structured content that supports specific
 interaction models in a web browser.
 
 The one current working example is **correspondence-bracketup**, which provides
@@ -26,7 +26,7 @@ The syntax rules for **Bracketup** are very simple:
   * One or more **children**.
   * Closing square bracket, i.e. **]**.
 
-**Children** can be one of the following:
+**Children** can be either of the following:
   * Plain text
   * Elements
 
@@ -54,7 +54,7 @@ Interpretation
 --------------
 
 The syntax and markup structure given above does not specify any particular interpretation of the data.
-However the **Bracketup** Javascript code provided in the project does support a specify type of interpretation.
+However the **Bracketup** Javascript code provided in this project does support a specify type of interpretation.
 
 Typically, an element will correspond to a Javascript object which is used to generate a DOM element
 in the browser. Most child elements will represent child DOM elements of the parent's DOM element.
@@ -68,7 +68,3 @@ Javascript constructor functions, and the constructors construct Javascript obje
 have a **createDom** element, which given a suitable **document** object, generates an HTML DOM element.
 Default child element functions are specified by the **defaultChildFunction** property
 on the parent element's constructor prototype.
-
-
-
-
