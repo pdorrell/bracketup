@@ -104,7 +104,6 @@ be properly reported, at whichever stage of compilation they occur.
 The following is a cut-down version of the example at http://pdorrell.github.io/bracketup/correspondence/rhoScriptExample.html:
 
 ```
-```
 [correspondence [_title Queens Puzzle]
  [rhoscript [_languageTitle rhoScript]
   [A [1 8] [2 range]]
