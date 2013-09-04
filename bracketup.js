@@ -311,6 +311,7 @@
     }
   };
   
+  /** A class to receive output from BracketupScanner and display it nicely described and indented. */
   function TestTokenReceiver() {
     this.indent = "";
   }
