@@ -4,10 +4,10 @@ Bracketup
 **Bracketup** is a simple generic markup language which provides a framework
 for defining application-specific markup languages.
 
-I have designed primarily to allow creation of structured content that supports specific
+I have designed it primarily to allow creation of structured content that supports specific
 interaction models in a web browser.
 
-It is an evolution from the application-specific
+It has evolved from the application-specific
 markup language [https://github.com/pdorrell/correspondence-markup](correspondence-markup), 
 which is implemented in Ruby. 
 
@@ -17,7 +17,7 @@ any dependence on separate CMS or other server-side generation.
 But, you can still run it server-side if you want to, for example using **Node**.
 
 Perhaps unsurprisingly, given this history,
-the one current working example of an application-specific **bracketup**-based markup languge
+the one current working example of an application-specific **bracketup**-based markup language
 is **correspondence-bracketup**, which provides
 markup to support [Correspondence](http://pdorrell.github.io/correspondence/).
 An actual page example is at http://pdorrell.github.io/bracketup/correspondence/rhoScriptExample.html,
@@ -26,9 +26,9 @@ and the markup can be seen inside the source for that web page.
 Syntax Rules
 ------------
 
-The syntax rules for **Bracketup** are very simple:
+The syntax rules for **Bracketup** are fairly simple:
 
-* A **Bracketup** document consists of an element, which contains the following:
+* A **Bracketup** document consists of one or more **elements**, where each element consists of the following:
   * Opening square bracket, i.e. **[**.
   * Zero or more comma-separated **identifiers** (with no whitespace before or after the commas)
   * Optional whitespace following the identifiers. (If the identifiers
@@ -135,7 +135,7 @@ The following is a cut-down version of the example at http://pdorrell.github.io/
 ]
 ```
 
-Here is some explanation of what is going on in that example:
+Here is some explanation of what is going on in this example:
 
 * `correspondence` is a function name which is mapped at the top-level to the Javascript **Correspondence**
 constructor which constructs the top-level object, which has a **createDom** method which will generate
