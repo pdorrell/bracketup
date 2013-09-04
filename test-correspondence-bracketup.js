@@ -48,6 +48,19 @@ var correspondenceTests = {
                      assert.equal(err.message, "Unexpected ']'");
                      return true;
                    });
+  }, 
+  
+  testWrongFunction: function() {
+    assert.throws( function() {
+      var compiledDoms = compileSourceIntoDoms("test/data/unknown-function.bracketup");
+    }, 
+                   function(err) {
+                     assert.equal(err.sourceLinePosition.toString(), "test/data/unknown-function.bracketup:8:3");
+                     assert.equal(err.message, 
+                                  "No function class found for \"wrong\" in either " + 
+                                  "parent class map or top-level class map");
+                     return true;
+                   });
   }
 }
 
