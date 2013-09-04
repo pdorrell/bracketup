@@ -3,6 +3,8 @@
   var merge = utils.merge;
   var inspect = utils.inspect;
   
+  require("./bracketup1.js");
+  
   function SourceFileName(fileName) {
     this.fileName = fileName;
   }

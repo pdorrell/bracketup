@@ -92,13 +92,14 @@ function findCoffeeFilesToCompile(dir) {
 }
 
 function compileCoffeeFilesInDirectories(dirs, callback) {
+  var compileTasks = [];
   for (var j=0; j<dirs.length; j++) {
     var dir = dirs[j];
     //console.log("  " + dir +  " ...");
     var filesToCompile = findCoffeeFilesToCompile(dir);
-    var compileTasks = [];
     for (var i=0; i<filesToCompile.length; i++) {
       var fileToCompile = filesToCompile[i];
+      console.log(" make compile task for " + fileToCompile);
       compileTasks.push(fileToCompile.compiler());
     }
   }
