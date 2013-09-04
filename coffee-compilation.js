@@ -151,7 +151,7 @@ function compileCoffeeFilesAndRunFile(baseDir, dirs, file, callback) {
   }
   console.log("Compile coffee files in " + inspect(dirs) + 
               (baseDir ? " (relative to " + baseDir + ")" : "") +
-              (file ? " and run " + file : ""));
+              (file ? "\n  and run " + file : ""));
   if (baseDir) {
     for (var i=0; i<dirs.length; i++) {
       dirs[i] = path.resolve(baseDir, dirs[i]);
