@@ -133,14 +133,14 @@ the HTML DOM to be shown in the web page.
 first arguments passed to this function in each case.
 * `_title` starts with the "_" character, so it specifies a non-default function `title`. This function maps
   to a Javascript **TitleAttribute** constructor, which constructs an object which sets a property **title**
-  on the parent **Correspondence** object, which gets output in the HTML as a child &lt;div&gt; element. 
+  on the parent **Correspondence** object, which gets output in the HTML as a child **&lt;div&gt;** element. 
   (The title is specified within a child element rather than a function argument, because it can
    contain non-identifier characters such as space characters.)
 * The `text` function maps to the Javascript **Text** constructor which accepts one argument of a CSS class name.
 * The default child function for a **Text** object is `sentence`, which maps to **Sentence**.
 * `languageTitle` is a non-default child function that maps to a **LanguageTitleAttribute** which sets
   a **languageTitle** property on the parent **Text** object, which uses that value (if provided) to output
-  a child &lt;div&gt; element displaying the language title.
+  a child **&lt;div&gt;** element displaying the language title.
 * The **Sentence** constructor takes one **id** argument.
 * A **Sentence** object has a default child function `word`, which maps to the **Word** class, which accepts
   a single **id** argument in its constructor.
@@ -197,7 +197,7 @@ Other classes defined in **bracketup.js** are, by category:
 
 ##### Element Structure
 * **TextNode** plain text, as parsed, with associated source location information.
-* **EndOfLineNode** end of a line, as parsed,  with associated source location information (**bracketup.js**
+* **EndOfLineNode** end of a line, as parsed,  with associated source location information ( **bracketup.js**
   parses source line-by-line, so line endings are parsed separately from other plain text, and implementation
   objects can easily give special treatment to line endings).
 * **ElementNode** an element, as parsed, with associated source location information.
@@ -205,15 +205,15 @@ Other classes defined in **bracketup.js** are, by category:
 ##### Error Classes
 * **CustomError** a base class that supports defining specific custom error classes that
   can have source location information added to them.
-* **NodeParseException** an exception when parsing the bracketup markup.
+* **NodeParseException** an exception when parsing the **bracketup** markup.
 
 * **CompileError** base class for errors that occur when compiling (i.e. when interpreting parsed elements).
 
 ##### Scanning and Compiling
 
 * **BracketupScanner** which uses a single Javascript regex to scan the source code into tokens.
-* **NodeParser** the object which receives tokens from BracketupScanner and compiles them into elements.
+* **NodeParser** the object which receives tokens from **BracketupScanner** and compiles them into elements.
 * **NodeCompiler** the object which, given a function-to-constructor map, compiles a parsed element into
   an application-specific object.
-* **TestTokenReceiver** a test object which receives tokens from BracketupScanner and displays them
+* **TestTokenReceiver** a test object which receives tokens from **BracketupScanner** and displays them
   in a readable fasion.
