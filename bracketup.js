@@ -531,9 +531,6 @@
     }, 
     addTextNode: function(dom, text) {
       dom.appendChild(this.document.createTextNode(text));
-    }, 
-    createTextNode: function(text) {
-      return this.document.createTextNode(text);
     }
   };
 
