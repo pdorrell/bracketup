@@ -1,10 +1,10 @@
 var fs = require("fs");
 var path = require("path");
-var utils = require("./utils.js");
-var inspect = utils.inspect;
 var spawn = require('child_process').spawn;
 
 var async = require('async');
+
+function inspect(object) {return JSON.stringify(object);}
 
 function runCommand(command, args, description, callback) {
   var process = spawn(command, args, { stdio: 'inherit' });
