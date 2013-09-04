@@ -3,25 +3,9 @@
   var merge = utils.merge;
   var inspect = utils.inspect;
   
-  require("./bracketup1.js");
+  var bracketup1 = require("./bracketup1.js");
   
-  function SourceFileName(fileName) {
-    this.fileName = fileName;
-  }
-  
-  SourceFileName.prototype = {
-    toString: function() {
-      return this.fileName;
-    }, 
-    line: function (string, lineNumber) {
-      return new SourceLine(this, string, lineNumber);
-    }, 
-    endOfFilePosition: function(lines, EndOfSourceFilePosition) {
-      var numLines = lines.length;
-      var lastLine = numLines > 0 ? lines[numLines-1] : null;
-      return new EndOfSourceFilePosition(this, numLines, lastLine);
-    }
-  };
+  var SourceFileName = bracketup1.SourceFileName;
   
   function EndOfSourceFilePosition(sourceFileName, numLines, lastLine) {
     this.sourceFileName = sourceFileName;
@@ -417,7 +401,7 @@
       var sourceFileName = new SourceFileName(sourceFileName);
       for (var i=0; i<lines.length; i++) {
         var line = lines[i];
-        this.scanLine(tokenReceiver, line, sourceFileName.line(line, i+1));
+        this.scanLine(tokenReceiver, line, sourceFileName.line(line, i+1, SourceLine));
       }
       if (this.depth != 0) {
         throw new NodeParseException(this.depth + " unbalanced '['s at end of file", 

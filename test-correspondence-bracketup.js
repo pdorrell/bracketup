@@ -1,3 +1,5 @@
+require('source-map-support').install();
+
 var utils = require("./utils.js");
 var assert = require("assert");
 var merge = utils.merge;

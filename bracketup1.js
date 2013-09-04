@@ -17,7 +17,7 @@
       return this.fileName;
     };
 
-    SourceFileName.prototype.line = function(string, lineNumber) {
+    SourceFileName.prototype.line = function(string, lineNumber, SourceLine) {
       return new SourceLine(this, string, lineNumber);
     };
 
@@ -31,6 +31,8 @@
     return SourceFileName;
 
   })();
+
+  exports.SourceFileName = SourceFileName;
 
 }).call(this);
 
