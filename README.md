@@ -66,5 +66,29 @@ on an element that generates an **<a>** HTML link element.
 **bracketup.js** provides a simple implementation of functions, where the function names are mapped to
 Javascript constructor functions, and the constructors construct Javascript objects, which, by default,
 have a **createDom** element, which given a suitable **document** object, generates an HTML DOM element.
+Any additional function arguments are passed as string arguments to the corresponding constructor function.
 Default child element functions are specified by the **defaultChildFunction** property
 on the parent element's constructor prototype.
+
+Three base classes are provide to support the most common use cases:
+
+* **BaseNode** which represents an object that outputs a DOM from the **createDom** method.
+* **TextElement** - an object representing the standard implementation of plain text added to a **BaseNode**.
+* **BaseAttribute** - an object representing a child element which acts on the parent element by
+  setting an attribute value on the DOM element created by the parent.
+
+Other classes defined in **bracketup.js** which are relevant to implementing application-specific
+markup languages are:
+
+* **BracketupCompiler** this class constructs a compiler from a map of function names to constructor functions.
+* **Document** this is a wrapper for the browser **document** object which provides two convenience methods
+  for creating DOM nodes:
+  * **addTextNode(dom, text)** which adds a text node to a DOM element.
+  * **createNode(tag,options)** which creates a DOM element with the given **tag**, and the following options:
+    * **parent** the parent DOM element to append the new DOM element onto
+    * **className** the CSS class name
+    * **attributes** a map of attributes to set as attribute values on the DOM element
+    * **text** text for a text node to be added to the DOM element
+* **Bold**, **Italic**, **Link** - classes representing HTML nodes of type **<b>**, **<i>** and **<a>** respectively.
+* **HrefAttribute** - a class which as a child element of a **Link** object, sets the **href** attribute
+  of the **<a>** element.
