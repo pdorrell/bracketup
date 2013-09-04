@@ -16,7 +16,7 @@
     line: function (string, lineNumber) {
       return new SourceLine(this, string, lineNumber);
     }, 
-    endOfFilePosition: function(lines) {
+    endOfFilePosition: function(lines, EndOfSourceFilePosition) {
       var numLines = lines.length;
       var lastLine = numLines > 0 ? lines[numLines-1] : null;
       return new EndOfSourceFilePosition(this, numLines, lastLine);
@@ -421,7 +421,7 @@
       }
       if (this.depth != 0) {
         throw new NodeParseException(this.depth + " unbalanced '['s at end of file", 
-                                     sourceFileName.endOfFilePosition(lines));
+                                     sourceFileName.endOfFilePosition(lines,  EndOfSourceFilePosition));
       }
     }
   };
