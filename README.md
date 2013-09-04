@@ -124,25 +124,28 @@ The following is a cut-down version of the example at http://pdorrell.github.io/
 ]
 ```
 
-And here is some explanation of what is going on here:
+Here is some explanation of what is going on in that example:
 
-* `correspondence` is the a function name which is mapped at the top-level to the Javascript **Correspondence**
+* `correspondence` is a function name which is mapped at the top-level to the Javascript **Correspondence**
 constructor which constructs the top-level object, which has a **createDom** method which will generate
 the HTML DOM to be shown in the web page.
 * The **Correspondence** object defines a default child function `text`. So `rhoScript` and `english` are the
 first arguments passed to this function in each case.
 * `_title` starts with the "_" character, so it specifies a non-default function `title`. This function maps
-  to a Javascript **TitleAttribute** constructor, which constructs an object which sets an attribute **data-title**
-  on the parent object. (This is specified within a child element rather than a function argument, because a 
-  language title *could* contain non-identifier characters such as space characters, even though the two examples
-  shown here don't.)
+  to a Javascript **TitleAttribute** constructor, which constructs an object which sets a property **title**
+  on the parent **Correspondence** object, which gets output in the HTML as a child &lt;div&gt; element. 
+  (The title is specified within a child element rather than a function argument, because it can
+   contain non-identifier characters such as space characters.)
 * The `text` function maps to the Javascript **Text** constructor which accepts one argument of a CSS class name.
 * The default child function for a **Text** object is `sentence`, which maps to **Sentence**.
+* `languageTitle` is a non-default child function that maps to a **LanguageTitleAttribute** which sets
+  a **languageTitle** property on the parent **Text** object, which uses that value (if provided) to output
+  a child &lt;div&gt; element displaying the language title.
 * The **Sentence** constructor takes one **id** argument.
 * A **Sentence** object has a default child function `word`, which maps to the **Word** class, which accepts
   a single **id** argument in its constructor.
-* `a`, `b` and `i` map to Javascript constructors which define objects representing the corresponding HTML element
-  types.
+* `a` and `b` map to Javascript constructors which define objects representing the corresponding HTML element
+  types. (Also `i`, but that doesn't appear in this example.)
 * `a` maps to the **Link** class which has a child function `href` which maps to **HrefAttribute**, which sets
   the "href" attribute on the HTML link DOM element.
 * The text `\[[b x], [b y]\]]` includes a backslash-quoted "[" and a backslash-quoted "]", so that these characters
