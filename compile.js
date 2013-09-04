@@ -6,15 +6,7 @@ var spawn = require('child_process').spawn;
 
 var async = require('async');
 
-function CoffeeScriptSourceFile(dir, file, baseName) {
-  this.dir = dir;
-  this.file = file;
-  this.baseName = baseName;
-  this.coffeeFileName = path.join(dir, file);
-  this.javascriptFileName = path.join(dir, baseName + ".js");
-}
-
-function runCommand(callback, command, args, description) {
+function runCommand(command, args, description, callback) {
   var process = spawn(command, args, { stdio: 'inherit' });
   var $this = this;
   process.on('close', function (code) {
@@ -25,6 +17,14 @@ function runCommand(callback, command, args, description) {
       callback({message: description + " failed with status code " + code});
     }
   });
+}
+
+function CoffeeScriptSourceFile(dir, file, baseName) {
+  this.dir = dir;
+  this.file = file;
+  this.baseName = baseName;
+  this.coffeeFileName = path.join(dir, file);
+  this.javascriptFileName = path.join(dir, baseName + ".js");
 }
 
 CoffeeScriptSourceFile.prototype = {
@@ -63,8 +63,8 @@ CoffeeScriptSourceFile.prototype = {
   
   compile: function(callback) {
     console.log("compile, this = " + this);
-    runCommand(callback, "coffee", ["-c", this.coffeeFileName], 
-               "Compilation of " + this.coffeeFileName);
+    runCommand("coffee", ["-c", this.coffeeFileName], 
+               "Compilation of " + this.coffeeFileName, callback);
   }, 
   compiler: function() {
     var $this = this;
@@ -75,6 +75,7 @@ CoffeeScriptSourceFile.prototype = {
 };
 
 function findCoffeeFilesToCompile(dir) {
+  console.log("findCoffeeFilesToCompile, dir = " + inspect(dir));
   var files = fs.readdirSync(dir)
   var filesToCompile = []
   for (var i=0; i<files.length; i++) {
@@ -88,7 +89,7 @@ function findCoffeeFilesToCompile(dir) {
   return filesToCompile;
 }
 
-function compileCoffeeFilesInDirectories(callback, dirs) {
+function compileCoffeeFilesInDirectories(dirs, callback) {
   console.log("compileCoffeeFilesInDirectories " + inspect(dirs));
   for (var j=0; j<dirs.length; j++) {
     var dir = dirs[j];
@@ -104,23 +105,47 @@ function compileCoffeeFilesInDirectories(callback, dirs) {
   async.waterfall(compileTasks, callback);
 }
 
-function runFile(callback, file) {
+function runFile(file, callback) {
   console.log("Running " + file + " ...");
   var coffeeMatch = file.match(/^(.*)\.coffee$/);
   if (coffeeMatch) {
     file = coffeeMatch[1] + ".js";
     console.log("   (actually run " + file + " ...)");
   }
-  
+  runCommand("node", [file], "Execution of " + file, function(err, result) {
+    if (err) {
+      callback(err);
+    }
+    else {
+      return file;
+    }
+  });
 }
 
-function handleCompilationResult(err) {
+function handleCompileAndRunResult(err, fileThatWasRun) {
+  console.log("handleCompileAndRunResult ...");
   if (err) {
     console.log("ERROR: " + err.message);
   }
   else {
-    console.log("Compilation finished!");
+    if (fileThatWasRun) {
+      console.log("Finished compiling files and running " + fileThatWasRun + "!");
+    }
+    else {
+      console.log("Compilation finished!");
+    }
   }
 }
 
-compileCoffeeFilesInDirectories(handleCompilationResult, [__dirname]);
+function compileCoffeeFilesInDirectoriesAndRunFile(dirs, file, callback) {
+  console.log("compileCoffeeFilesInDirectoriesAndRunFile, dirs = " + inspect(dirs));
+  var tasks = [async.apply(compileCoffeeFilesInDirectories, dirs)];
+  if (file) {
+    var fileToRun = path.resolve(__dirname, file);
+    tasks.push(async.apply(runFile, fileToRun));
+  }
+  async.waterfall(tasks, callback);
+}
+  
+compileCoffeeFilesInDirectoriesAndRunFile([__dirname], "test2.coffee", 
+                                          handleCompileAndRunResult);
