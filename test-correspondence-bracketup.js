@@ -2,6 +2,7 @@ var utils = require("./utils.js");
 var assert = require("assert");
 var merge = utils.merge;
 var inspect = utils.inspect;
+var path = require("path");
 
 var fs = require('fs');
 var bracketup = require("./bracketup.js");
@@ -18,6 +19,7 @@ function compileSourceIntoDoms(sourceFileName) {
 }
 
 function readUtf8TextFile(fileName) {
+  fileName = path.resolve(__dirname, fileName);
   return fs.readFileSync(fileName, {encoding: "utf-8"});
 }
 
@@ -59,6 +61,17 @@ var correspondenceTests = {
                      assert.equal(err.message, 
                                   "No function class found for \"wrong\" in either " + 
                                   "parent class map or top-level class map");
+                     return true;
+                   });
+  }, 
+  testEndOfFileError: function() {
+    assert.throws( function() {
+      var compiledDoms = compileSourceIntoDoms("test/data/unfinished.bracketup");
+    }, 
+                   function(err) {
+                     assert.equal(err.sourceLinePosition.toString(), "test/data/unfinished.bracketup:12");
+                     assert.equal(err.message, 
+                                  "2 unbalanced '['s at end of file");
                      return true;
                    });
   }

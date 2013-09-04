@@ -1,0 +1,11 @@
+[correspondence [_title Queens Puzzle]
+ [_text,rhoscript [_languageTitle rhoScript]
+  [A [_word,1 8] [2 range]]
+  [B [1 permutations]]
+  [C ([1 with-index]]
+ ]
+ [english [_languageTitle English]
+  [_wrong,A For [2 the sequence of numbers from 0 to 1 less than] [1 8],]
+  [B consider [1 all possible permutations].]
+  [C For a given permutation, [1 specify X and Y co-ordinates for the 8 queens (i.e. an "arrangement") as an array of arrays
+of the form \[[b x], [b y]\], where [b x] is a number that increases from 0 to 7, and [b y] is the corresponding value in the permutation.]]
