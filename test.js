@@ -13,3 +13,7 @@
   myTest();
 
 }).call(this);
+
+/*
+//@ sourceMappingURL=test.map
+*/

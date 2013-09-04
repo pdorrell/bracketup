@@ -2,14 +2,21 @@
 (function() {
   var inspect, myTest, utils;
 
+  require('source-map-support').install();
+
   utils = require("./utils");
 
   inspect = utils.inspect;
 
   myTest = function() {
-    return console.log(inspect("Hello world number 2"));
+    console.log(inspect("Hello world number 2"));
+    throw new Error("Bad");
   };
 
   myTest();
 
 }).call(this);
+
+/*
+//@ sourceMappingURL=test2.map
+*/

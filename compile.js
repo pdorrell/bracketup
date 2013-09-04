@@ -63,7 +63,7 @@ CoffeeScriptSourceFile.prototype = {
   
   compile: function(callback) {
     console.log("  " + this.coffeeFileName + " ...");
-    runCommand("coffee", ["-c", this.coffeeFileName], 
+    runCommand("coffee", ["-c", "-m", this.coffeeFileName], 
                "Compilation of " + this.coffeeFileName, callback);
   }, 
   compiler: function() {
