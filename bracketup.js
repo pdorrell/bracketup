@@ -395,7 +395,7 @@
       }
       if (this.depth != 0) {
         throw new NodeParseException(this.depth + " unbalanced '['s at end of file", 
-                                     sourceFileName.endOfFilePosition(lines,  EndOfSourceFilePosition));
+                                     sourceFileName.endOfFilePosition(lines));
       }
     }
   };

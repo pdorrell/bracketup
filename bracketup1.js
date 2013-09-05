@@ -21,7 +21,7 @@
       return new SourceLine(this, string, lineNumber);
     };
 
-    SourceFileName.prototype.endOfFilePosition = function(lines, EndOfSourceFilePosition) {
+    SourceFileName.prototype.endOfFilePosition = function(lines) {
       var lastLine, numLines;
       numLines = lines.length;
       lastLine = numLines > 0 ? lines[numLines - 1] : null;
