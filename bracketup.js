@@ -10,18 +10,8 @@
   var EndOfLineNode = bracketup1.EndOfLineNode;
   var ElementNode = bracketup1.ElementNode;
   var CustomError = bracketup1.CustomError;
+  var CompileError = bracketup1.CompileError;
   
-  function CompileError(message, sourceLinePosition) {
-    CustomError.call(this, "CompileError", message);
-    this.sourceLinePosition = sourceLinePosition;
-  }
-  
-  CompileError.prototype = merge(CustomError.prototype, {
-    getMessageLine: function() {
-      return "Compile error: " + this.message;
-    }
-  });
-
   function NodeCompiler(topLevelClassMap) {
     this.topLevelClassMap = topLevelClassMap;
   }

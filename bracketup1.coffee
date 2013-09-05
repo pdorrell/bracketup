@@ -79,8 +79,15 @@ class CustomError
       console.log ""
       console.log @sourceLinePosition.logLineAndPosition().join("\n")
 
+class CompileError extends CustomError
+  constructor: (message, @sourceLinePosition) ->
+    super "CompileError", message
+  getMessageLine: ->
+    "Compile error: " + @message
+
 exports.SourceFileName = SourceFileName
 exports.TextNode = TextNode
 exports.EndOfLineNode = EndOfLineNode
 exports.ElementNode = ElementNode
 exports.CustomError = CustomError
+exports.CompileError = CompileError
