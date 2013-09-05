@@ -68,7 +68,19 @@ class ElementNode
   addToResult: (compiler, result) ->
     compiler.compileElementChild(result, this)
 
+class CustomError
+  constructor: (className, @message) ->
+    this.error = new Error(message);
+    this.stack = @error.stack.replace(/^Error:/g, className + ":")
+  logSourceError: ->
+    if @sourceLinePosition
+      console.log("")
+      console.log(this.getMessageLine())
+      console.log("")
+      console.log(this.sourceLinePosition.logLineAndPosition().join("\n"))
+
 exports.SourceFileName = SourceFileName
 exports.TextNode = TextNode
 exports.EndOfLineNode = EndOfLineNode
 exports.ElementNode = ElementNode
+exports.CustomError = CustomError

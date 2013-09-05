@@ -9,24 +9,8 @@
   var TextNode = bracketup1.TextNode;
   var EndOfLineNode = bracketup1.EndOfLineNode;
   var ElementNode = bracketup1.ElementNode;
+  var CustomError = bracketup1.CustomError;
   
-  function CustomError(className, message) {
-    this.message = message;
-    this.error = new Error(message);
-    this.stack = this.error.stack.replace(/^Error:/g, className + ":")
-  }
-  
-  CustomError.prototype = {
-    logSourceError: function() {
-      if (this.sourceLinePosition) {
-        console.log("");
-        console.log(this.getMessageLine());
-        console.log("");
-        console.log(this.sourceLinePosition.logLineAndPosition().join("\n"));
-      }
-    }
-  };
-
   function CompileError(message, sourceLinePosition) {
     CustomError.call(this, "CompileError", message);
     this.sourceLinePosition = sourceLinePosition;
