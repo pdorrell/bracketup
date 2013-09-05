@@ -47,7 +47,15 @@ class TextNode
   toString: ->
     "[TextNode " + inspect(@.string) + "]"
   addToResult: (compiler, result) ->
-    compiler.compileTextChild(result, @string);
+    compiler.compileTextChild(result, @string)
+
+class EndOfLineNode
+  constructor: (@sourceLinePosition) ->
+  toString: ->
+    "[EndOfLineNode]"
+  addToResult: (compiler, result) ->
+    compiler.compileEndOfLineChild(result)
 
 exports.SourceFileName = SourceFileName
 exports.TextNode = TextNode
+exports.EndOfLineNode = EndOfLineNode

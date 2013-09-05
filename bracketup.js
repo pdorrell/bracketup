@@ -7,20 +7,8 @@
   
   var SourceFileName = bracketup1.SourceFileName;
   var TextNode = bracketup1.TextNode;
+  var EndOfLineNode = bracketup1.EndOfLineNode;
   
-  function EndOfLineNode(sourceLinePosition) {
-    this.sourceLinePosition = sourceLinePosition;
-  }
-
-  EndOfLineNode.prototype = {
-    toString: function() {
-      return "[EndOfLineNode]";
-    }, 
-    addToResult: function(compiler, result) {
-      compiler.compileEndOfLineChild(result);
-    }
-  }
-
   function ElementNode(args, whitespace, sourceLinePosition) {
     this.args = args;
     this.whitespace = whitespace;
