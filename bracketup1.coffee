@@ -42,4 +42,12 @@ class SourceLinePosition
     line2 = repeatedString(" ", linePrefix.length + @position - 1) + "^"
     [line1, line2]
 
+class TextNode
+  constructor: (@string, @sourceLinePosition) ->
+  toString: ->
+    "[TextNode " + inspect(@.string) + "]"
+  addToResult: (compiler, result) ->
+    compiler.compileTextChild(result, @string);
+
 exports.SourceFileName = SourceFileName
+exports.TextNode = TextNode

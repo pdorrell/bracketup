@@ -6,21 +6,8 @@
   var bracketup1 = require("./bracketup1.js");
   
   var SourceFileName = bracketup1.SourceFileName;
+  var TextNode = bracketup1.TextNode;
   
-  function TextNode(string, sourceLinePosition) {
-    this.string = string;
-    this.sourceLinePosition = sourceLinePosition;
-  }
-
-  TextNode.prototype = {
-    toString: function() {
-      return "[TextNode " + inspect(this.string) + "]";
-    }, 
-    addToResult: function(compiler, result) {
-      compiler.compileTextChild(result, this.string);
-    }
-  };
-
   function EndOfLineNode(sourceLinePosition) {
     this.sourceLinePosition = sourceLinePosition;
   }
