@@ -6,18 +6,7 @@
   var bracketup1 = require("./bracketup1.js");
   
   var SourceFileName = bracketup1.SourceFileName;
-  
-  function EndOfSourceFilePosition(sourceFileName, numLines, lastLine) {
-    this.sourceFileName = sourceFileName;
-    this.numLines = numLines;
-    this.lastLine = lastLine;
-  };
-  
-  EndOfSourceFilePosition.prototype = {
-    toString: function() {
-      return this.sourceFileName + ":" + this.numLines;
-    }
-  };
+  var EndOfSourceFilePosition = bracketup1.EndOfSourceFilePosition;
   
   function SourceLine(sourceFileName, line, lineNumber) {
     this.sourceFileName = sourceFileName;

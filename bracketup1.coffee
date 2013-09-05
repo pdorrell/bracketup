@@ -17,4 +17,10 @@ class SourceFileName
     lastLine = if numLines > 0 then lines[numLines-1] else null
     new EndOfSourceFilePosition(this, numLines, lastLine)
 
+class EndOfSourceFilePosition
+  constructor: (@sourceFileName, @numLines, @lastLine) ->
+  toString: ->
+    @sourceFileName + ":" + @numLines;
+
 exports.SourceFileName = SourceFileName
+exports.EndOfSourceFilePosition = EndOfSourceFilePosition
