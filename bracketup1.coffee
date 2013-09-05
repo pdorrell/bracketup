@@ -9,7 +9,7 @@ class SourceFileName
   toString: ->
     @fileName
     
-  line: (string, lineNumber, SourceLine) ->
+  line: (string, lineNumber) ->
     new SourceLine(this, string, lineNumber)
     
   endOfFilePosition: (lines) ->
@@ -20,7 +20,26 @@ class SourceFileName
 class EndOfSourceFilePosition
   constructor: (@sourceFileName, @numLines, @lastLine) ->
   toString: ->
-    @sourceFileName + ":" + @numLines;
+    @sourceFileName + ":" + @numLines
+
+class SourceLine
+  constructor: (@sourceFileName, @line, @lineNumber) ->
+  toString: ->
+    @sourceFileName + ":" + @lineNumber
+  position: (linePosition) ->
+    new SourceLinePosition(this, linePosition)
+
+repeatedString = (string, numRepeats) ->
+  return (string for i in [0..numRepeats]).join("")
+
+class SourceLinePosition
+  constructor: (@sourceLine, @position) ->
+  toString: ->
+    @sourceLine + ":" + @position
+  logLineAndPosition: () ->
+    linePrefix = @toString() + ":"
+    line1 = linePrefix + @sourceLine.line
+    line2 = repeatedString(" ", linePrefix.length + @position - 1) + "^"
+    [line1, line2]
 
 exports.SourceFileName = SourceFileName
-exports.EndOfSourceFilePosition = EndOfSourceFilePosition

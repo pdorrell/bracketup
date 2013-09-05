@@ -6,47 +6,6 @@
   var bracketup1 = require("./bracketup1.js");
   
   var SourceFileName = bracketup1.SourceFileName;
-  var EndOfSourceFilePosition = bracketup1.EndOfSourceFilePosition;
-  
-  function SourceLine(sourceFileName, line, lineNumber) {
-    this.sourceFileName = sourceFileName;
-    this.line = line;
-    this.lineNumber = lineNumber;
-  }
-  
-  SourceLine.prototype = {
-    toString: function() {
-      return this.sourceFileName + ":" + this.lineNumber;
-    }, 
-    position: function(linePosition) {
-      return new SourceLinePosition(this, linePosition);
-    }
-  };
-  
-  function SourceLinePosition(sourceLine, position) {
-    this.sourceLine = sourceLine;
-    this.position = position;
-  }
-  
-  function repeatedString(string, numRepeats) {
-    var array = [];
-    for (var i=0; i<numRepeats; i++) {
-      array.push(string);
-    }
-    return array.join("");
-  }
-
-  SourceLinePosition.prototype = {
-    toString: function() {
-      return this.sourceLine + ":" + this.position;
-    }, 
-    logLineAndPosition: function() {
-      var linePrefix = this.toString() + ":";
-      var line1 = linePrefix + this.sourceLine.line;
-      var line2 = repeatedString(" ", linePrefix.length + this.position - 1) + "^";
-      return [line1, line2];
-    }
-  };
   
   function TextNode(string, sourceLinePosition) {
     this.string = string;
@@ -391,7 +350,7 @@
       var sourceFileName = new SourceFileName(sourceFileName);
       for (var i=0; i<lines.length; i++) {
         var line = lines[i];
-        this.scanLine(tokenReceiver, line, sourceFileName.line(line, i+1, SourceLine));
+        this.scanLine(tokenReceiver, line, sourceFileName.line(line, i+1));
       }
       if (this.depth != 0) {
         throw new NodeParseException(this.depth + " unbalanced '['s at end of file", 
