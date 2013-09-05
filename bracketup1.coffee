@@ -10,12 +10,12 @@ class SourceFileName
     @fileName
     
   line: (string, lineNumber) ->
-    new SourceLine(this, string, lineNumber)
+    new SourceLine this, string, lineNumber
     
   endOfFilePosition: (lines) ->
     numLines = lines.length
     lastLine = if numLines > 0 then lines[numLines-1] else null
-    new EndOfSourceFilePosition(this, numLines, lastLine)
+    new EndOfSourceFilePosition this, numLines, lastLine
 
 class EndOfSourceFilePosition
   constructor: (@sourceFileName, @numLines, @lastLine) ->
@@ -27,10 +27,10 @@ class SourceLine
   toString: ->
     @sourceFileName + ":" + @lineNumber
   position: (linePosition) ->
-    new SourceLinePosition(this, linePosition)
+    new SourceLinePosition this, linePosition
 
 repeatedString = (string, numRepeats) ->
-  return (string for i in [0..numRepeats]).join("")
+  return (string for i in [0..numRepeats]).join ""
 
 class SourceLinePosition
   constructor: (@sourceLine, @position) ->
@@ -47,21 +47,21 @@ class TextNode
   toString: ->
     "[TextNode " + inspect(@.string) + "]"
   addToResult: (compiler, result) ->
-    compiler.compileTextChild(result, @string)
+    compiler.compileTextChild result, @string
 
 class EndOfLineNode
   constructor: (@sourceLinePosition) ->
   toString: ->
     "[EndOfLineNode]"
   addToResult: (compiler, result) ->
-    compiler.compileEndOfLineChild(result)
+    compiler.compileEndOfLineChild result
 
 class ElementNode
   constructor: (@args, @whitespace, @sourceLinePosition) ->
     @children = []
   addChild: (child) ->
     child.parent = this
-    @children.push(child)
+    @children.push child
   toString: ->
     childStrings = (child.toString() for child in @children)
     "[ElementNode(" + @args.join(", ") + ") " + childStrings.join(", ") + "]"
@@ -70,14 +70,14 @@ class ElementNode
 
 class CustomError
   constructor: (className, @message) ->
-    this.error = new Error(message);
+    this.error = new Error message
     this.stack = @error.stack.replace(/^Error:/g, className + ":")
   logSourceError: ->
     if @sourceLinePosition
-      console.log("")
-      console.log(this.getMessageLine())
-      console.log("")
-      console.log(this.sourceLinePosition.logLineAndPosition().join("\n"))
+      console.log ""
+      console.log @getMessageLine()
+      console.log ""
+      console.log @sourceLinePosition.logLineAndPosition().join("\n")
 
 exports.SourceFileName = SourceFileName
 exports.TextNode = TextNode
