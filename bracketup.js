@@ -8,31 +8,8 @@
   var SourceFileName = bracketup1.SourceFileName;
   var TextNode = bracketup1.TextNode;
   var EndOfLineNode = bracketup1.EndOfLineNode;
+  var ElementNode = bracketup1.ElementNode;
   
-  function ElementNode(args, whitespace, sourceLinePosition) {
-    this.args = args;
-    this.whitespace = whitespace;
-    this.sourceLinePosition = sourceLinePosition;
-    this.children = [];
-  }
-
-  ElementNode.prototype = {
-    addChild: function(child) {
-      child.parent = this;
-      this.children.push(child);
-    }, 
-    toString: function() {
-      var childStrings = [];
-      for (var i=0; i<this.children.length; i++) {
-        childStrings.push(this.children[i].toString());
-      }
-      return "[ElementNode(" + this.args.join(", ") + ") " + childStrings.join(", ") + "]";
-    }, 
-    addToResult: function(compiler, result) {
-      compiler.compileElementChild(result, this);
-    }
-  };
-
   function CustomError(className, message) {
     this.message = message;
     this.error = new Error(message);

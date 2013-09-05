@@ -56,6 +56,19 @@ class EndOfLineNode
   addToResult: (compiler, result) ->
     compiler.compileEndOfLineChild(result)
 
+class ElementNode
+  constructor: (@args, @whitespace, @sourceLinePosition) ->
+    @children = []
+  addChild: (child) ->
+    child.parent = this
+    @children.push(child)
+  toString: ->
+    childStrings = (child.toString() for child in @children)
+    "[ElementNode(" + @args.join(", ") + ") " + childStrings.join(", ") + "]"
+  addToResult: (compiler, result) ->
+    compiler.compileElementChild(result, this)
+
 exports.SourceFileName = SourceFileName
 exports.TextNode = TextNode
 exports.EndOfLineNode = EndOfLineNode
+exports.ElementNode = ElementNode
