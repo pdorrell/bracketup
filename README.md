@@ -11,8 +11,10 @@ It has evolved from the application-specific
 markup language [https://github.com/pdorrell/correspondence-markup](correspondence-markup), 
 which is implemented in Ruby. 
 
-**Bracketup** has been implemented in Javascript, which allows it to run in the browser, avoiding
-any dependence on separate CMS or other server-side generation.
+**Bracketup** has been implemented in CoffeeScript (and therefore compiled into Javascript), 
+which allows it to run in the browser, avoiding any dependence on separate CMS or other server-side generation.
+(Given that Javascript and Coffeescript can freely call each other, any code you write to
+use **Bracketup** can be written in either language.)
 
 But, you can still run it server-side if you want to, for example using **Node**.
 
@@ -65,7 +67,9 @@ Interpretation
 --------------
 
 The syntax and markup structure given above does not specify any particular interpretation of the data.
-However the **Bracketup** Javascript code provided in this project does support a specify type of interpretation.
+However the **Bracketup** code provided in this project does support a specify type of interpretation.
+
+(Note: references to "Javascript" below can be understood as either Javascript or CoffeeScript in all cases.)
 
 Typically, an element will correspond to a Javascript object which is used to generate a DOM element
 in the browser. Most child elements will represent child DOM elements of the parent's DOM element.
@@ -162,7 +166,7 @@ first arguments passed to this function in each case.
 * The text `\[[b x], [b y]\]]` includes a backslash-quoted "[" and a backslash-quoted "]", so that these characters
   appear in the final output. (The inner "x" and "y" characters are displayed as bold in the final output.)
 
-### Bracketup Javascript Classes
+### Bracketup CoffeeScript Classes
 
 #### Base Classes
 
