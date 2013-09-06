@@ -399,13 +399,11 @@ class BaseAttribute
 
 
 class Bold extends BaseNode
-
   createInitialDom: (document) ->
     document.createNode("b")
 
 
 class Italic extends BaseNode
-
   createInitialDom: (document) ->
     document.createNode("i")
 
@@ -416,7 +414,6 @@ class HrefAttribute extends BaseAttribute
 
 
 class Link extends BaseNode
-
   classMap:
     href: HrefAttribute
   
@@ -427,6 +424,27 @@ class Link extends BaseNode
       dom.setAttribute("href", href)
     dom
 
+class BracketupCompiler
+  constructor: (topLevelClassMap) ->
+    @nodeCompiler = new NodeCompiler(topLevelClassMap)
+
+  compile: (source, sourceFileName) ->
+    bracketupScanner = new BracketupScanner()
+    nodeParser = new NodeParser()
+    bracketupScanner.scanSource(nodeParser, source, sourceFileName)
+    parsedRootElements = nodeParser.rootElements
+    compiledObjects = []
+    for rootElement in parsedRootElements
+      # console.log("Parsed root element " + rootElement)
+      correspondence = @nodeCompiler.compile(rootElement)
+      compiledObjects.push(correspondence)
+    compiledObjects
+  
+  compileDoms: (source, document, sourceFileName) ->
+    compiledDoms = []
+    compiledObjects = @compile(source, sourceFileName)
+    documentWrapper = new Document(document)
+    (compiledObject.createDom(documentWrapper) for compiledObject in compiledObjects)
 
 exports.CompileError = CompileError
 exports.NodeCompiler = NodeCompiler
@@ -441,3 +459,4 @@ exports.Bold = Bold
 exports.Italic = Italic
 exports.HrefAttribute = HrefAttribute
 exports.Link = Link
+exports.BracketupCompiler = BracketupCompiler

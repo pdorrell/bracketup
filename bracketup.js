@@ -18,37 +18,7 @@
   var Italic = bracketup1.Italic;
   var HrefAttribute = bracketup1.HrefAttribute;
   var Link = bracketup1.Link;
-  
-  function BracketupCompiler(topLevelClassMap) {
-    this.nodeCompiler = new NodeCompiler(topLevelClassMap);
-  }
-  
-  BracketupCompiler.prototype = {
-    compile: function(source, sourceFileName) {
-      var bracketupScanner = new BracketupScanner();
-      var nodeParser = new NodeParser();
-      bracketupScanner.scanSource(nodeParser, source, sourceFileName);
-      var parsedRootElements = nodeParser.rootElements;
-      var compiledObjects = [];
-      for (var i=0; i<parsedRootElements.length; i++) {
-        var rootElement = parsedRootElements[i];
-        //console.log("Parsed root element " + rootElement);
-        var correspondence = this.nodeCompiler.compile(rootElement);
-        compiledObjects.push(correspondence);
-      }
-      return compiledObjects;
-    }, 
-    
-    compileDoms: function(source, document, sourceFileName) {
-      var compiledDoms = [];
-      var compiledObjects = this.compile(source, sourceFileName);
-      var documentWrapper = new Document(document);
-      for (var i=0; i<compiledObjects.length; i++) {
-        compiledDoms.push(compiledObjects[i].createDom(documentWrapper));
-      }
-      return compiledDoms;
-    }
-  };
+  var BracketupCompiler = bracketup1.BracketupCompiler;
   
   exports.BracketupScanner = BracketupScanner;
   exports.NodeParser = NodeParser;
