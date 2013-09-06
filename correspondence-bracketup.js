@@ -47,17 +47,18 @@
     }
 
     Word.prototype.createInitialDom = function(document) {
-      var id;
+      var id, nodeOptions;
       id = this.id;
       if (id.match(/^[0-9]+$/)) {
         id = this.parent.id + id;
       }
-      return document.createNode("span", {
+      nodeOptions = {
         className: "item",
         attributes: {
           "data-id": id
         }
-      });
+      };
+      return document.createNode("span", nodeOptions);
     };
 
     return Word;
@@ -81,12 +82,14 @@
     Sentence.prototype.childIndent = "  ";
 
     Sentence.prototype.createInitialDom = function(document) {
-      return document.createNode("div", {
+      var nodeOptions;
+      nodeOptions = {
         className: "item-group",
         attributes: {
           "data-group-id": this.id
         }
-      });
+      };
+      return document.createNode("div", nodeOptions);
     };
 
     return Sentence;

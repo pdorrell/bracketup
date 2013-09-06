@@ -22,25 +22,40 @@ class Word extends BaseNode
     id = @id
     if id.match(/^[0-9]+$/)
       id = @parent.id + id
-    document.createNode("span", {className: "item", attributes: {"data-id": id}})
+    nodeOptions =
+      className: "item"
+      attributes:
+        "data-id": id
+    document.createNode("span", nodeOptions)
 
 class Sentence extends BaseNode
   constructor: (@id) ->
     super()
 
   defaultChildFunction: "word"
-  classMap: {word: Word}
+  
+  classMap:
+    word: Word
+    
   childIndent: "  "
   
   createInitialDom: (document) ->
-    document.createNode("div", {className: "item-group", attributes: {"data-group-id": @id}})
+    nodeOptions =
+      className: "item-group"
+      attributes:
+        "data-group-id": @id
+    document.createNode("div", nodeOptions)
 
 class Text extends BaseNode
   constructor: (@languageCssClass) ->
     super()
 
   defaultChildFunction: "sentence"
-  classMap: {sentence: Sentence, languageTitle: LanguageTitleAttribute}
+  
+  classMap:
+    sentence: Sentence
+    languageTitle: LanguageTitleAttribute
+    
   childIndent: "  "
   indentAllChildren: true
   ignoreWhiteSpaceText: true
