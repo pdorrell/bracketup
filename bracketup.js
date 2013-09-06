@@ -13,61 +13,7 @@
   var CompileError = bracketup1.CompileError;
   var NodeCompiler = bracketup1.NodeCompiler;
   var NodeParseException = bracketup1.NodeParseException;
-  
-  function NodeParser() {
-    this.nodesStack = [];
-    this.currentElementNode = null;
-    this.rootElements = [];
-  }
-
-  NodeParser.prototype = {
-    startItem: function(itemArguments, whitespace, sourceLinePosition) {
-      var elementNode = new ElementNode(itemArguments, whitespace, sourceLinePosition);
-      if (this.currentElementNode == null) {
-        this.rootElements.push(elementNode);
-      }    
-      else {
-        this.currentElementNode.addChild(elementNode);
-        this.nodesStack.push(this.currentElementNode);
-      }
-      this.currentElementNode = elementNode;
-    }, 
-    endItem: function(sourceLinePosition) {
-      if (this.currentElementNode != null) {
-        if (this.nodesStack.length > 0) {
-          this.currentElementNode = this.nodesStack.pop();
-        }
-        else {
-          this.currentElementNode = null;
-        }
-      }
-      else {
-        throw new NodeParseException("Unexpected end of element node", sourceLinePosition);
-      }
-    }, 
-    text: function(string, sourceLinePosition) {
-      if (this.currentElementNode != null) {
-        this.currentElementNode.addChild(new TextNode(string, sourceLinePosition));
-      }
-      else {
-        if (string.match("^\s*$")) {
-          //console.log("Ignoring whitespace outside of root element: " + inspect(string));
-        }
-        else {
-          throw new NodeParseException("Unexpected text outside of root element: " + inspect(string), 
-                                       sourceLinePosition);
-        }
-      }
-    }, 
-    endOfLine: function(sourceLinePosition) {
-      if (this.currentElementNode != null) {
-        this.currentElementNode.addChild(new EndOfLineNode(sourceLinePosition));
-      }
-      else {
-        //console.log("Ignoring end-of-line outside of root element");
-      }
-    }
-  };
+  var NodeParser = bracketup1.NodeParser;
   
   /** A class to receive output from BracketupScanner and display it nicely described and indented. */
   function TestTokenReceiver() {

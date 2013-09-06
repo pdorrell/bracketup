@@ -165,6 +165,47 @@ class NodeParseException extends CustomError
   getMessageLine: ->
     "Syntax error: " + @message
 
+class NodeParser
+  constructor: ->
+    @nodesStack = []
+    @currentElementNode = null
+    @rootElements = []
+
+  startItem: (itemArguments, whitespace, sourceLinePosition) ->
+    elementNode = new ElementNode(itemArguments, whitespace, sourceLinePosition)
+    if @currentElementNode == null
+      @rootElements.push(elementNode)
+    else
+      @currentElementNode.addChild(elementNode)
+      @nodesStack.push(@currentElementNode)
+    @currentElementNode = elementNode
+
+
+  endItem: (sourceLinePosition) ->
+    if @currentElementNode != null
+      if @nodesStack.length > 0
+        @currentElementNode = @nodesStack.pop()
+      else
+        @currentElementNode = null
+    else
+      throw new NodeParseException("Unexpected end of element node", sourceLinePosition)
+
+  text: (string, sourceLinePosition) ->
+    if @currentElementNode != null
+      @currentElementNode.addChild(new TextNode(string, sourceLinePosition))
+    else
+      if string.match("^\s*$")
+        #console.log("Ignoring whitespace outside of root element: " + inspect(string))
+      else
+        throw new NodeParseException("Unexpected text outside of root element: " + inspect(string), 
+                                     sourceLinePosition)
+
+  endOfLine: (sourceLinePosition) ->
+    if @currentElementNode != null
+      @currentElementNode.addChild(new EndOfLineNode(sourceLinePosition))
+    else
+      # console.log("Ignoring end-of-line outside of root element")
+
 exports.SourceFileName = SourceFileName
 exports.TextNode = TextNode
 exports.EndOfLineNode = EndOfLineNode
@@ -173,3 +214,4 @@ exports.CustomError = CustomError
 exports.CompileError = CompileError
 exports.NodeCompiler = NodeCompiler
 exports.NodeParseException = NodeParseException
+exports.NodeParser = NodeParser
