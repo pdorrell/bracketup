@@ -350,6 +350,35 @@ class BaseNode
     else
       null
 
+# A wrapper for a browser DOM with convenience methods for creating nodes
+class Document
+  constructor: (@document) ->
+
+  createNode: (tag, options) ->
+    if !options
+      options = {}
+    dom = @document.createElement(tag)
+    parent = options.parent
+    if parent
+      parent.appendChild(dom)
+    className = options.className
+    if className
+      dom.className = className
+    attributes = options.attributes
+    if attributes
+      for key, value of attributes
+        dom.setAttribute(key, value)
+    text = options.text
+    if text
+      dom.appendChild(@document.createTextNode(text))
+    dom
+
+  createTextNode: (text) ->
+    @document.createTextNode(text)
+
+  addTextNode: (dom, text) ->
+    dom.appendChild(@document.createTextNode(text))
+
 exports.CompileError = CompileError
 exports.NodeCompiler = NodeCompiler
 exports.NodeParser = NodeParser
@@ -357,3 +386,4 @@ exports.TestTokenReceiver = TestTokenReceiver
 exports.BracketupScanner = BracketupScanner
 exports.TextElement = TextElement
 exports.BaseNode = BaseNode
+exports.Document = Document

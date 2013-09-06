@@ -12,46 +12,8 @@
   var BracketupScanner = bracketup1.BracketupScanner;
   var TextElement = bracketup1.TextElement;
   var BaseNode = bracketup1.BaseNode;
+  var Document = bracketup1.Document;
   
-  // A wrapper for a browser DOM with easier method for creating nodes
-  function Document(document) {
-    this.document = document;
-  }
-
-  Document.prototype = {
-    createNode: function(tag, options) {
-      if(!options) {
-        options = {};
-      }
-      var dom = this.document.createElement(tag);
-      var parent = options.parent;
-      if (parent) {
-        parent.appendChild(dom);
-      }
-      var className = options.className;
-      if (className) {
-        dom.className = className;
-      }
-      var attributes = options.attributes;
-      if (attributes) {
-        for (name in attributes) {
-          dom.setAttribute(name, attributes[name]);
-        }
-      }
-      var text = options.text;
-      if (text) {
-        dom.appendChild(this.document.createTextNode(text));
-      }
-      return dom;
-    }, 
-    createTextNode: function(text) {
-      return this.document.createTextNode(text);
-    }, 
-    addTextNode: function(dom, text) {
-      dom.appendChild(this.document.createTextNode(text));
-    }
-  };
-
   function BaseAttribute(attributeName) {
     this.attributeName = attributeName;
     this.value = "";
