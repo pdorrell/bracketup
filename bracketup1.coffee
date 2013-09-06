@@ -30,7 +30,7 @@ class SourceLine
     new SourceLinePosition this, linePosition
 
 repeatedString = (string, numRepeats) ->
-  return (string for i in [0..numRepeats]).join ""
+  return (string for i in [1..numRepeats]).join ""
 
 class SourceLinePosition
   constructor: (@sourceLine, @position) ->
@@ -70,7 +70,7 @@ class ElementNode
 
 class CustomError
   constructor: (className, @message) ->
-    this.error = new Error message
+    this.error = new Error @message
     this.stack = @error.stack.replace(/^Error:/g, className + ":")
   logSourceError: ->
     if @sourceLinePosition
@@ -194,7 +194,7 @@ class NodeParser
     if @currentElementNode != null
       @currentElementNode.addChild(new TextNode(string, sourceLinePosition))
     else
-      if string.match("^\s*$")
+      if string.match(/^\s*$/)
         #console.log("Ignoring whitespace outside of root element: " + inspect(string))
       else
         throw new NodeParseException("Unexpected text outside of root element: " + inspect(string), 
@@ -230,6 +230,74 @@ class TestTokenReceiver
   endOfLine: (sourceLinePosition) ->
     console.log(@indent + "EOLN [" + sourceLinePosition + "]")
 
+class BracketupScanner
+  constructor: ->
+
+  regex: /(?:(\[)([A-Za-z0-9_\-,]*)([\s]*))|(\])|(\\(.))|([^[\]\\]+)/g
+  
+  sendAnyTexts: (tokenReceiver) ->
+    if @textPortions.length > 0
+      tokenReceiver.text(@textPortions.join(""), @textPortionsSourceLinePosition)
+      @textPortions = []
+
+  saveTextPortion: (textPortion, sourceLinePosition) ->
+    if @textPortions.length == 0
+      @textPortionsSourceLinePosition = sourceLinePosition
+    @textPortions.push(textPortion)
+
+  scanLine: (tokenReceiver, line, sourceLine) ->
+    scanningRegex = new RegExp(@regex.source, "g")
+    #console.log("Scanning " + inspect(line) + "\n  with " + scanningRegex + " ..."); 
+    matchedSubstrings = []
+    @textPortions = []
+    linePosition = 1
+    sourceLinePosition = sourceLine.position(linePosition)
+    while (match = scanningRegex.exec(line))
+      #console.log("  match = " + inspect(match))
+      matchedSubstring = match[0]
+      matchedSubstrings.push(matchedSubstring)
+      #console.log("==> " + inspect(match[0]))
+      if match[1]
+        @sendAnyTexts(tokenReceiver)
+        itemArguments = match[2].split(",")
+        whitespace = match[3]
+        tokenReceiver.startItem(itemArguments, whitespace, sourceLinePosition)
+        @depth++
+      else if match[4]
+        @sendAnyTexts(tokenReceiver)
+        if @depth <= 0
+          throw new NodeParseException("Unexpected ']'", sourceLinePosition)
+        tokenReceiver.endItem(sourceLinePosition)
+        @depth--
+      else if match[5]
+        @saveTextPortion(match[6], sourceLinePosition)
+      else if match[7]
+        @saveTextPortion(match[7], sourceLinePosition)
+      else
+        console.log("match = " + inspect(match))
+        throw new NodeParseException("No match found in lexer", sourceLinePosition)
+      linePosition += matchedSubstring.length
+      sourceLinePosition = sourceLine.position(linePosition)
+    @sendAnyTexts(tokenReceiver)
+    tokenReceiver.endOfLine(sourceLinePosition)
+
+    reconstitutedMatches = matchedSubstrings.join("")
+    if reconstitutedMatches != line
+      throw new NodeParseException("Reconstituted " + inspect(reconstitutedMatches) + 
+                                   "\n                  != " + inspect(line), sourceLinePosition)
+    # console.log("matched substrings = " + inspect(matchedSubstrings.join("")))
+  
+  scanSource: (tokenReceiver, source, sourceFileName) ->
+    @depth = 0
+    lines = source.split("\n")
+    sourceFileName = new SourceFileName(sourceFileName)
+    for i in [0...lines.length]
+      line = lines[i]
+      @scanLine(tokenReceiver, line, sourceFileName.line(line, i+1))
+    if @depth != 0
+      throw new NodeParseException(@depth + " unbalanced '['s at end of file", sourceFileName.endOfFilePosition(lines))
+
+
 exports.SourceFileName = SourceFileName
 exports.TextNode = TextNode
 exports.EndOfLineNode = EndOfLineNode
@@ -240,3 +308,4 @@ exports.NodeCompiler = NodeCompiler
 exports.NodeParseException = NodeParseException
 exports.NodeParser = NodeParser
 exports.TestTokenReceiver = TestTokenReceiver
+exports.BracketupScanner = BracketupScanner
