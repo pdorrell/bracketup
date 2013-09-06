@@ -11,71 +11,8 @@
   var TestTokenReceiver = bracketup1.TestTokenReceiver;
   var BracketupScanner = bracketup1.BracketupScanner;
   var TextElement = bracketup1.TextElement;
+  var BaseNode = bracketup1.BaseNode;
   
-  /** Base and generic classes for application-specific Bracketup interpreters */
-  
-  function BaseNode() {
-    this.children = [];
-    this.attributes = {};
-  }
-
-  BaseNode.prototype = {
-    classMap: {}, 
-    addChild: function(child) {
-      this.children.push(child);
-      child.parent = this;
-    }, 
-    addTextChild: function(string) {
-      if (!(this.ignoreWhiteSpaceText && string.match(/^\s*$/))) {
-        this.children.push(new TextElement(string));
-      }
-    }, 
-    
-    setIndentInsertString: function(parentIndentInsertString) {
-      if (this.childIndent) {
-        this.indentInsertString = parentIndentInsertString + this.childIndent;
-        for (var i=0; i<this.children.length; i++) {
-          var child = this.children[i];
-          if (child.setIndentInsertString) {
-            child.setIndentInsertString(this.indentInsertString);
-          }
-        }
-      }
-    }, 
-    addEndOfLineChild: function() {
-      if (this.endOfLineNode) {
-        this.children.push(this.endOfLineNode);
-      } 
-    }, 
-    setAttribute: function(attributeName, value) {
-      this.attributes[attributeName] = value;
-    }, 
-    createDom: function(document) {
-      if (this.createInitialDom) {
-        var dom = this.createInitialDom(document);
-        for (var i=0; i<this.children.length; i++) {
-          var child = this.children[i];
-          if (child.createDom) {
-            var childDom = child.createDom(document);
-            if (childDom) {
-              if (this.indentInsertString && (this.indentAllChildren || i == 0)) {
-                document.addTextNode(dom, this.indentInsertString);
-              }
-              dom.appendChild(childDom);
-            }
-          }
-        }
-        if (this.indentInsertString) {
-          document.addTextNode(dom, this.parent ? this.parent.indentInsertString : "\n");
-        }
-        return dom;
-      }
-      else {
-        return null;
-      }
-    }
-  };
-
   // A wrapper for a browser DOM with easier method for creating nodes
   function Document(document) {
     this.document = document;

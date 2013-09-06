@@ -303,9 +303,57 @@ class TextElement
   createDom: (document) ->
     document.createTextNode(@string)
 
+#Base and generic classes for application-specific Bracketup interpreters
+class BaseNode
+  constructor: ->
+    this.children = [];
+    this.attributes = {};
+
+  classMap: {}
+  
+  addChild: (child) ->
+    @children.push(child)
+    child.parent = this
+
+  addTextChild: (string) ->
+    if !(@ignoreWhiteSpaceText && string.match(/^\s*$/))
+      @children.push(new TextElement(string))
+  
+  setIndentInsertString: (parentIndentInsertString) ->
+    if @childIndent
+      @indentInsertString = parentIndentInsertString + @childIndent
+      for child in @children
+        if child.setIndentInsertString
+          child.setIndentInsertString(@indentInsertString)
+
+  addEndOfLineChild: () ->
+    if @endOfLineNode
+      @children.push(@endOfLineNode)
+
+  setAttribute: (attributeName, value) ->
+    @attributes[attributeName] = value
+
+  createDom: (document) ->
+    if @createInitialDom
+      dom = @createInitialDom(document)
+      for i in [0...@children.length]
+        child = @children[i]
+        if child.createDom
+          childDom = child.createDom(document)
+          if childDom
+            if @indentInsertString && (@indentAllChildren || i == 0)
+              document.addTextNode(dom, @indentInsertString)
+            dom.appendChild(childDom)
+      if @indentInsertString
+        document.addTextNode(dom, if @parent then @parent.indentInsertString else "\n")
+      dom
+    else
+      null
+
 exports.CompileError = CompileError
 exports.NodeCompiler = NodeCompiler
 exports.NodeParser = NodeParser
 exports.TestTokenReceiver = TestTokenReceiver
 exports.BracketupScanner = BracketupScanner
 exports.TextElement = TextElement
+exports.BaseNode = BaseNode
