@@ -446,12 +446,12 @@ class BracketupCompiler
     documentWrapper = new Document(document)
     (compiledObject.createDom(documentWrapper) for compiledObject in compiledObjects)
 
-exports.CompileError = CompileError
-exports.NodeCompiler = NodeCompiler
-exports.NodeParser = NodeParser
-exports.TestTokenReceiver = TestTokenReceiver
 exports.BracketupScanner = BracketupScanner
-exports.Document = Document
+exports.NodeParser = NodeParser
+exports.NodeCompiler = NodeCompiler
+exports.TestTokenReceiver = TestTokenReceiver
+exports.CompileError = CompileError
+  
 exports.TextElement = TextElement
 exports.BaseNode = BaseNode
 exports.BaseAttribute = BaseAttribute
@@ -459,4 +459,5 @@ exports.Bold = Bold
 exports.Italic = Italic
 exports.HrefAttribute = HrefAttribute
 exports.Link = Link
+
 exports.BracketupCompiler = BracketupCompiler

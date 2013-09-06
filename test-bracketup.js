@@ -3,7 +3,6 @@ var merge = utils.merge;
 var inspect = utils.inspect;
 
 var fs = require('fs');
-var bracketup1 = require("./bracketup1.js");
 var bracketup = require("./bracketup.js");
 
 console.log("bracketup = " + inspect(bracketup));
@@ -24,7 +23,7 @@ var testTokenReceiver = new bracketup.TestTokenReceiver();
 
 bracketupScanner.scanSource(testTokenReceiver, fileContents, testFileName);
 
-var nodeParser = new bracketup1.NodeParser();
+var nodeParser = new bracketup.NodeParser();
 bracketupScanner.scanSource(nodeParser, fileContents, testFileName);
 
 var rootElements = nodeParser.rootElements;
