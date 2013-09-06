@@ -5,14 +5,8 @@
   
   var bracketup1 = require("./bracketup1.js");
   
-  var SourceFileName = bracketup1.SourceFileName;
-  var TextNode = bracketup1.TextNode;
-  var EndOfLineNode = bracketup1.EndOfLineNode;
-  var ElementNode = bracketup1.ElementNode;
-  var CustomError = bracketup1.CustomError;
   var CompileError = bracketup1.CompileError;
   var NodeCompiler = bracketup1.NodeCompiler;
-  var NodeParseException = bracketup1.NodeParseException;
   var NodeParser = bracketup1.NodeParser;
   var TestTokenReceiver = bracketup1.TestTokenReceiver;
   var BracketupScanner = bracketup1.BracketupScanner;

@@ -298,14 +298,8 @@ class BracketupScanner
       throw new NodeParseException(@depth + " unbalanced '['s at end of file", sourceFileName.endOfFilePosition(lines))
 
 
-exports.SourceFileName = SourceFileName
-exports.TextNode = TextNode
-exports.EndOfLineNode = EndOfLineNode
-exports.ElementNode = ElementNode
-exports.CustomError = CustomError
 exports.CompileError = CompileError
 exports.NodeCompiler = NodeCompiler
-exports.NodeParseException = NodeParseException
 exports.NodeParser = NodeParser
 exports.TestTokenReceiver = TestTokenReceiver
 exports.BracketupScanner = BracketupScanner
