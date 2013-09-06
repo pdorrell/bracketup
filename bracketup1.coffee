@@ -306,8 +306,8 @@ class TextElement
 #Base and generic classes for application-specific Bracketup interpreters
 class BaseNode
   constructor: ->
-    this.children = [];
-    this.attributes = {};
+    @children = []
+    @attributes = {}
 
   classMap: {}
   
@@ -379,11 +379,65 @@ class Document
   addTextNode: (dom, text) ->
     dom.appendChild(@document.createTextNode(text))
 
+
+class BaseAttribute
+  constructor: (@attributeName) ->
+    @value = ""
+
+  addTextChild: (string) ->
+    @value = @value + string
+ 
+  addChild: (child) ->
+    throw new CompileError("Unexpected non-text element inside " + @attributeName + " attribute node", 
+                           child.sourceLinePosition)
+ 
+  addEndOfLineChild: ->
+    @addTextChild("\n")
+ 
+  addToParent: (parent) ->
+    parent.setAttribute(@attributeName, @value)
+
+
+class Bold extends BaseNode
+
+  createInitialDom: (document) ->
+    document.createNode("b")
+
+
+class Italic extends BaseNode
+
+  createInitialDom: (document) ->
+    document.createNode("i")
+
+
+class HrefAttribute extends BaseAttribute
+  constructor: ->
+    super("href")
+
+
+class Link extends BaseNode
+
+  classMap:
+    href: HrefAttribute
+  
+  createInitialDom: (document) ->
+    dom = document.createNode("a")
+    href = @attributes.href
+    if href
+      dom.setAttribute("href", href)
+    dom
+
+
 exports.CompileError = CompileError
 exports.NodeCompiler = NodeCompiler
 exports.NodeParser = NodeParser
 exports.TestTokenReceiver = TestTokenReceiver
 exports.BracketupScanner = BracketupScanner
+exports.Document = Document
 exports.TextElement = TextElement
 exports.BaseNode = BaseNode
-exports.Document = Document
+exports.BaseAttribute = BaseAttribute
+exports.Bold = Bold
+exports.Italic = Italic
+exports.HrefAttribute = HrefAttribute
+exports.Link = Link

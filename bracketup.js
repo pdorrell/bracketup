@@ -13,72 +13,12 @@
   var TextElement = bracketup1.TextElement;
   var BaseNode = bracketup1.BaseNode;
   var Document = bracketup1.Document;
+  var BaseAttribute = bracketup1.BaseAttribute;
+  var Bold = bracketup1.Bold;
+  var Italic = bracketup1.Italic;
+  var HrefAttribute = bracketup1.HrefAttribute;
+  var Link = bracketup1.Link;
   
-  function BaseAttribute(attributeName) {
-    this.attributeName = attributeName;
-    this.value = "";
-  }
-
-  BaseAttribute.prototype = {
-    addTextChild: function(string) {
-      this.value = this.value + string;
-    }, 
-    addChild: function(child) {
-      throw new CompileError("Unexpected non-text element inside " + this.attributeName + " attribute node", 
-                             child.sourceLinePosition);
-    }, 
-    addEndOfLineChild: function() {
-      this.addTextChild("\n");
-    }, 
-    addToParent: function(parent) {
-      parent.setAttribute(this.attributeName, this.value);
-    }
-  };
-
-  function Bold() {
-    BaseNode.call(this);
-  }
-
-  Bold.prototype = merge(BaseNode.prototype, {
-    createInitialDom: function(document) {
-      return document.createNode("b");
-    }
-  });
-
-  function Italic() {
-    BaseNode.call(this);
-  }
-
-  Italic.prototype = merge(BaseNode.prototype, {
-    createInitialDom: function(document) {
-      return document.createNode("b");
-    }
-  });
-
-  function HrefAttribute() {
-    BaseAttribute.call(this, "href");
-  }
-
-  HrefAttribute.prototype = merge(BaseAttribute.prototype, {
-  });
-
-  function Link() {
-    BaseNode.call(this);
-  }
-
-  Link.prototype = merge(BaseNode.prototype, {
-    classMap: {href: HrefAttribute}, 
-    
-    createInitialDom: function(document) {
-      var dom = document.createNode("a");
-      var href = this.attributes.href;
-      if (href) {
-        dom.setAttribute("href", href);
-      }
-      return dom;
-    }
-  });
-    
   function BracketupCompiler(topLevelClassMap) {
     this.nodeCompiler = new NodeCompiler(topLevelClassMap);
   }
