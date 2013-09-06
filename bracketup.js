@@ -10,19 +10,10 @@
   var NodeParser = bracketup1.NodeParser;
   var TestTokenReceiver = bracketup1.TestTokenReceiver;
   var BracketupScanner = bracketup1.BracketupScanner;
+  var TextElement = bracketup1.TextElement;
   
   /** Base and generic classes for application-specific Bracketup interpreters */
   
-  function TextElement(string) {
-    this.string = string;
-  }
-
-  TextElement.prototype = {
-    createDom: function(document) {
-      return document.createTextNode(this.string);
-    }
-  };
-
   function BaseNode() {
     this.children = [];
     this.attributes = {};

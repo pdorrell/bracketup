@@ -297,9 +297,15 @@ class BracketupScanner
     if @depth != 0
       throw new NodeParseException(@depth + " unbalanced '['s at end of file", sourceFileName.endOfFilePosition(lines))
 
+class TextElement
+  constructor: (@string) ->
+
+  createDom: (document) ->
+    document.createTextNode(@string)
 
 exports.CompileError = CompileError
 exports.NodeCompiler = NodeCompiler
 exports.NodeParser = NodeParser
 exports.TestTokenReceiver = TestTokenReceiver
 exports.BracketupScanner = BracketupScanner
+exports.TextElement = TextElement
