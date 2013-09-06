@@ -85,9 +85,83 @@ class CompileError extends CustomError
   getMessageLine: ->
     "Compile error: " + @message
 
+class NodeCompiler
+  constructor: (@topLevelClassMap) ->
+
+  createFromFunctionClass: (functionClass, constructorArgs, initialWhitespace,
+                            childNodes, sourceLinePosition) ->
+    object = Object.create(functionClass.prototype)
+    functionClass.apply(object, constructorArgs)
+    if object.prependWhitespace
+      object.prependWhitespace(initialWhitespace)
+    for childNode in childNodes
+      @compileChild(object, childNode)
+    object.sourceLinePosition = sourceLinePosition
+    object
+
+  compile: (rootElementNode) ->
+    elementArgs = rootElementNode.args;
+    if elementArgs.length == 0
+      throw new CompileError("No node function name given for root element", 
+                             rootElementNode.sourceLinePosition)
+    functionName = elementArgs[0]
+    if functionName.match(/^_/)
+      functionName = functionName.substring(1)
+    nodeFunctionClass = @topLevelClassMap[functionName]
+    if !nodeFunctionClass
+      throw new CompileError("Unknown top-level function for root element: " + functionName, 
+                             rootElementNode.sourceLinePosition)
+    rootObject = @createFromFunctionClass(nodeFunctionClass, elementArgs.slice(1), 
+                                          rootElementNode.whitespace, 
+                                          rootElementNode.children, 
+                                          rootElementNode.sourceLinePosition);
+    if rootObject.setIndentInsertString
+      rootObject.setIndentInsertString("\n");
+    rootObject
+
+  compileChild: (parentObject, childNode) ->
+    childNode.addToResult(this, parentObject)
+
+  compileTextChild: (parentObject, string) ->
+    parentObject.addTextChild(string)
+
+  compileEndOfLineChild: (parentObject) ->
+    parentObject.addEndOfLineChild()
+
+  compileElementChild: (parentObject, childNode) ->
+    elementArgs = childNode.args.slice(0);
+    if elementArgs.length>0 && elementArgs[0].match(/^_/)
+      elementArgs[0] = elementArgs[0].substring(1)
+    else
+      if parentObject.defaultChildFunction
+        elementArgs = [parentObject.defaultChildFunction].concat(elementArgs)
+    if elementArgs.length == 0
+      throw new CompileError("No function argument given and no default child function for parent element", 
+                             childNode.sourceLinePosition)
+    functionName = elementArgs[0]
+    elementArgs = elementArgs.slice(1)
+    childFunctionClass = null
+    if parentObject.classMap
+      childFunctionClass = parentObject.classMap[functionName]
+    if !childFunctionClass
+      childFunctionClass = this.topLevelClassMap[functionName]
+    if !childFunctionClass
+      throw new CompileError("No function class found for " + inspect(functionName) + 
+                             " in either parent class map or top-level class map", 
+                             childNode.sourceLinePosition)
+    childObject = this.createFromFunctionClass(childFunctionClass, elementArgs, 
+                                               childNode.whitespace, 
+                                               childNode.children, 
+                                               childNode.sourceLinePosition)
+    if childObject.addToParent
+      childObject.addToParent(parentObject)
+    else
+      parentObject.addChild(childObject)
+
 exports.SourceFileName = SourceFileName
 exports.TextNode = TextNode
 exports.EndOfLineNode = EndOfLineNode
 exports.ElementNode = ElementNode
 exports.CustomError = CustomError
 exports.CompileError = CompileError
+exports.NodeCompiler = NodeCompiler
