@@ -14,38 +14,8 @@
   var NodeCompiler = bracketup1.NodeCompiler;
   var NodeParseException = bracketup1.NodeParseException;
   var NodeParser = bracketup1.NodeParser;
+  var TestTokenReceiver = bracketup1.TestTokenReceiver;
   
-  /** A class to receive output from BracketupScanner and display it nicely described and indented. */
-  function TestTokenReceiver() {
-    this.indent = "";
-  }
-  
-  TestTokenReceiver.prototype = {
-    indentIncrement: "  ", 
-    
-    startItem: function(itemArguments, whitespace, sourceLinePosition) {
-      console.log(this.indent + "START " + inspect(itemArguments) + 
-                  "  (whitespace = " + inspect(whitespace) + ") [" + sourceLinePosition + "]");
-      this.indent = this.indent + this.indentIncrement;
-    }, 
-    endItem: function(sourceLinePosition) {
-      if (this.indent.length < this.indentIncrement.length) {
-        throw new CompileError("Unexpected end of item", sourceLinePosition);
-      }
-      this.indent = this.indent.substring(this.indentIncrement.length);
-      console.log(this.indent + "END [" + sourceLinePosition + "]");
-    }, 
-    text: function(string, sourceLinePosition) {
-      console.log(this.indent + "TEXT " + inspect(string) + " [" + sourceLinePosition + "]");
-    }, 
-    endOfLine: function(sourceLinePosition) {
-      console.log(this.indent + "EOLN [" + sourceLinePosition + "]");
-    }
-  };
-
-  var testLine = "[correspondence  [_title \\[Queens\\] Puzzle] " + 
-    "[_text,rhoscript [_title rhoScript] [A [_word,1 8] [2 range]]";
-
   function BracketupScanner() {
   }
 
