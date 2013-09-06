@@ -3,16 +3,19 @@ merge = utils.merge;
 inspect = utils.inspect;
 
 bracketup = require("./bracketup.js");
+BaseAttribute = bracketup.BaseAttribute
+BaseNode = bracketup.BaseNode
+BracketupCompiler = bracketup.BracketupCompiler
 
-class TitleAttribute extends bracketup.BaseAttribute
+class TitleAttribute extends BaseAttribute
   constructor: ->
     super("title")
 
-class LanguageTitleAttribute extends bracketup.BaseAttribute
+class LanguageTitleAttribute extends BaseAttribute
   constructor: ->
     super("languageTitle")
 
-class Word extends bracketup.BaseNode
+class Word extends BaseNode
   constructor: (@id) ->
     super()
 
@@ -22,7 +25,7 @@ class Word extends bracketup.BaseNode
       id = @parent.id + id
     document.createNode("span", {className: "item", attributes: {"data-id": id}})
 
-class Sentence extends bracketup.BaseNode
+class Sentence extends BaseNode
   constructor: (@id) ->
     super()
 
@@ -33,7 +36,7 @@ class Sentence extends bracketup.BaseNode
   createInitialDom: (document) ->
     document.createNode("div", {className: "item-group", attributes: {"data-group-id": @id}})
 
-class Text extends bracketup.BaseNode
+class Text extends BaseNode
   constructor: (@languageCssClass) ->
     super()
 
@@ -51,7 +54,7 @@ class Text extends bracketup.BaseNode
       document.createNode("div", {parent: div, className: "language", text: languageTitle})
     div
 
-class Correspondence extends bracketup.BaseNode
+class Correspondence extends BaseNode
   defaultChildFunction: "text"
   classMap: {text: Text, title: TitleAttribute}
   childIndent: "  "
@@ -72,6 +75,6 @@ correspondenceTopLevelFunctionMap =
   a: bracketup.Link
 
 correspondenceCompiler = 
-  new bracketup.BracketupCompiler(correspondenceTopLevelFunctionMap)
+  new BracketupCompiler(correspondenceTopLevelFunctionMap)
 
 exports.correspondenceCompiler = correspondenceCompiler
