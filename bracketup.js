@@ -12,18 +12,8 @@
   var CustomError = bracketup1.CustomError;
   var CompileError = bracketup1.CompileError;
   var NodeCompiler = bracketup1.NodeCompiler;
+  var NodeParseException = bracketup1.NodeParseException;
   
-  function NodeParseException(message, sourceLinePosition) {
-    CustomError.call(this, "NodeParseException", message);
-    this.sourceLinePosition = sourceLinePosition;
-  }
-  
-  NodeParseException.prototype = merge(CustomError.prototype, {
-    getMessageLine: function() {
-      return "Syntax error: " + this.message;
-    }
-  });
-
   function NodeParser() {
     this.nodesStack = [];
     this.currentElementNode = null;

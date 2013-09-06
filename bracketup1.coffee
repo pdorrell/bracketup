@@ -158,6 +158,13 @@ class NodeCompiler
     else
       parentObject.addChild(childObject)
 
+class NodeParseException extends CustomError
+  constructor: (message, @sourceLinePosition) ->
+    super("NodeParseException", message)
+
+  getMessageLine: ->
+    "Syntax error: " + @message
+
 exports.SourceFileName = SourceFileName
 exports.TextNode = TextNode
 exports.EndOfLineNode = EndOfLineNode
@@ -165,3 +172,4 @@ exports.ElementNode = ElementNode
 exports.CustomError = CustomError
 exports.CompileError = CompileError
 exports.NodeCompiler = NodeCompiler
+exports.NodeParseException = NodeParseException
