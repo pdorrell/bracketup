@@ -1,7 +1,7 @@
 <!DOCTYPE html">
 <html lang="en" >
 <head><meta charset="utf-8">
-<title>Bracketup: Correspondence rhoScript Example</title>
+<title>Bracketup & Correspondence: Parabolic envelope example from Choc </title>
   <link rel="stylesheet" type="text/css" href="../page.css" />
   <link rel="stylesheet" type="text/css" href="correspondence.css" />
   <link rel="stylesheet" type="text/css" href="correspondence-javascript.css" />
@@ -36,7 +36,7 @@ MODULE_SIMULATOR.startScript("correspondence-configuration.js");
 <!-- No endScript required for last script in sequence -->
 
 <body>
-<h1>Correspondence Example Using Bracketup, from Choc example</h1>
+<h1>Correspondence/Bracketup Example, from Choc Parabolic Envelope Example</h1>
 
 <div class="author">Author: <a href="http://thinkinghard.com">Philip Dorrell</a></div>
 
@@ -46,13 +46,15 @@ items in related structures.</p>
 <p><a href="../index.html">Bracketup</a> is a generic structured textual markup language
 (one that I have just invented).</p>
 
+<p>This example is based on the first Javascript example given at <a href="http://www.fullstack.io/choc/">http://www.fullstack.io/choc/</a>.</p>
+
 <p>Mouse over the translations to see the relationships between them.</p>
 
 <!-- The following script element is the actual source for this page. It is interpreted
 by the Javascript code to generate the DOM, in the HTML format required by the Correspondence framework.-->
 <noscript>There is content here in the page which cannot be viewed unless you have Javascript enabled.</noscript>
 <script type="text/correspondence-bracketup">
-[correspondence [_title Queens Puzzle]
+[correspondence [_title Parabolic envelope]
  [javascript [_languageTitle Javascript]
   [A [1 var] [2 shift] = [3 0];]
   [B [1 while] ([2 shift <= 200]) [3 {]]
@@ -63,7 +65,7 @@ by the Javascript code to generate the DOM, in the HTML format required by the C
  [english [_languageTitle English]
   [A Given a horizontal line of length 200, we will shift the left end across and the right end down. [1 Keep track of ] the [2 shift value], starting with a value of [3 zero].]
   [B [1 Repeatedly carry out steps] (where the shift will increase each step), [1 continuing while] [2 the shift value is 200 or less]. ([3 Start of step ...]]
-  [C Each step, [1 draw the line] with the left end with coord(0,0) [2 shifted rightwards] and the right end with coord(200,0) [3 shifted downwards].]
+  [C Each step, [1 draw the line] where the left end with coord(0,0) [2 is shifted rightwards] and the right end with coord(200,0) [3 is shifted downwards].]
   [D At the end of each step, [1 increase] [2 the shift] by [3 14] (ready for the next step).]
   [E [1 (End of each step)]]
  ]
