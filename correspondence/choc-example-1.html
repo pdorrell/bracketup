@@ -1,0 +1,76 @@
+<!DOCTYPE html">
+<html lang="en" >
+<head><meta charset="utf-8">
+<title>Bracketup: Correspondence rhoScript Example</title>
+  <link rel="stylesheet" type="text/css" href="../page.css" />
+  <link rel="stylesheet" type="text/css" href="correspondence.css" />
+  <link rel="stylesheet" type="text/css" href="correspondence-javascript.css" />
+  <link rel="stylesheet" type="text/css" href="correspondence-programming-output.css" />
+  <script language="javascript" type="text/javascript" src="lib/jquery-1.10.1.js"></script>
+  <script language="javascript" type="text/javascript" src="correspondence.js"></script>
+  <script language="javascript" type="text/javascript" src="module-simulator.js"></script>
+<script language="Javascript">
+MODULE_SIMULATOR.startScript("../utils.js");
+</script>
+
+  <script language="javascript" type="text/javascript" src="../utils.js"></script>
+<script language="Javascript">
+MODULE_SIMULATOR.endScript();
+
+MODULE_SIMULATOR.startScript("../bracketup.js");
+</script>
+  <script language="javascript" type="text/javascript" src="../bracketup.js"></script>
+<script language="Javascript">
+MODULE_SIMULATOR.endScript();
+
+MODULE_SIMULATOR.startScript("../correspondence-bracketup.js");
+</script>
+  <script language="javascript" type="text/javascript" src="../correspondence-bracketup.js"></script>
+<script language="Javascript">
+MODULE_SIMULATOR.endScript();
+
+MODULE_SIMULATOR.startScript("correspondence-configuration.js");
+</script>
+  <script language="javascript" type="text/javascript" src="correspondence-configuration.js"></script>
+</head>
+<!-- No endScript required for last script in sequence -->
+
+<body>
+<h1>Correspondence Example Using Bracketup, from Choc example</h1>
+
+<div class="author">Author: <a href="http://thinkinghard.com">Philip Dorrell</a></div>
+
+<p><a href="http://pdorrell.github.io/correspondence/">Correspondence</a> is a framework for interactively visualizing <i>correspondences</i> between
+items in related structures.</p>
+
+<p><a href="../index.html">Bracketup</a> is a generic structured textual markup language
+(one that I have just invented).</p>
+
+<p>Mouse over the translations to see the relationships between them.</p>
+
+<!-- The following script element is the actual source for this page. It is interpreted
+by the Javascript code to generate the DOM, in the HTML format required by the Correspondence framework.-->
+<noscript>There is content here in the page which cannot be viewed unless you have Javascript enabled.</noscript>
+<script type="text/correspondence-bracketup">
+[correspondence [_title Queens Puzzle]
+ [javascript [_languageTitle Javascript]
+  [A [1 var] [2 shift] = [3 0];]
+  [B [1 while] ([2 shift <= 200]) [3 {]]
+  [C   [1 pad.makeLine]([2 shift], 0, 200, [3 shift]);]
+  [D   [2 shift] [1 +=] [3 14]; ]
+  [E [1 }]]
+ ]
+ [english [_languageTitle English]
+  [A Given a horizontal line of length 200, we will shift the left end across and the right end down. [1 Keep track of ] the [2 shift value], starting with a value of [3 zero].]
+  [B [1 Repeatedly carry out steps] (where the shift will increase each step), [1 continuing while] [2 the shift value is 200 or less]. ([3 Start of step ...]]
+  [C Each step, [1 draw the line] with the left end with coord(0,0) [2 shifted rightwards] and the right end with coord(200,0) [3 shifted downwards].]
+  [D At the end of each step, [1 increase] [2 the shift] by [3 14] (ready for the next step).]
+  [E [1 (End of each step)]]
+ ]
+]
+</script>
+
+<div class="date">Last updated: 28 September 2013</div>
+
+</body>
+</html>

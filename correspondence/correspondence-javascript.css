@@ -1,0 +1,6 @@
+/* javaScript background & border */
+.javascript-structure {
+  border: 3px solid #405090;
+  background-color: #fbfbff; }
+  .javascript-structure .unhighlighted {
+    border: 1pt solid #fbfbff; }
