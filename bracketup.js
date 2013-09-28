@@ -403,7 +403,7 @@
   BracketupScanner = (function() {
     function BracketupScanner() {}
 
-    BracketupScanner.prototype.regex = /(?:(\[)([A-Za-z0-9_\-,]*)([\s]*))|(\])|(\\(.))|([^[\]\\]+)/g;
+    BracketupScanner.prototype.regex = /(?:(\[)([A-Za-z0-9_\-,]*)([\s]|))|(\])|(\\(.))|([^[\]\\]+)/g;
 
     BracketupScanner.prototype.sendAnyTexts = function(tokenReceiver) {
       if (this.textPortions.length > 0) {
@@ -507,6 +507,9 @@
 
     BaseNode.prototype.addTextChild = function(string) {
       if (!(this.ignoreWhiteSpaceText && string.match(/^\s*$/))) {
+        if (this.children.length === 0 && string.match(/^\s*$/)) {
+          string = string.replace(/[\s]/g, "\u00A0");
+        }
         return this.children.push(new TextElement(string));
       }
     };

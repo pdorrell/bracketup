@@ -43,7 +43,7 @@ class SourceLinePosition
 class TextNode
   constructor: (@string, @sourceLinePosition) ->
   toString: ->
-    "[TextNode " + inspect(@.string) + "]"
+    "[TextNode " + inspect(@string) + "]"
   addToResult: (compiler, result) ->
     compiler.compileTextChild result, @string
 
@@ -231,7 +231,7 @@ class TestTokenReceiver
 class BracketupScanner
   constructor: ->
 
-  regex: /(?:(\[)([A-Za-z0-9_\-,]*)([\s]*))|(\])|(\\(.))|([^[\]\\]+)/g
+  regex: /(?:(\[)([A-Za-z0-9_\-,]*)([\s]|))|(\])|(\\(.))|([^[\]\\]+)/g
   
   sendAnyTexts: (tokenReceiver) ->
     if @textPortions.length > 0
@@ -315,6 +315,8 @@ class BaseNode
 
   addTextChild: (string) ->
     if !(@ignoreWhiteSpaceText && string.match(/^\s*$/))
+      if @children.length == 0 && string.match(/^\s*$/)
+        string = string.replace(/[\s]/g, "\u00A0")
       @children.push(new TextElement(string))
   
   setIndentInsertString: (parentIndentInsertString) ->
