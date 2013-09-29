@@ -13,12 +13,10 @@ class SourceFileName
   endOfFilePosition: (lines) ->
     numLines = lines.length
     lastLine = if numLines > 0 then lines[numLines-1] else null
-    new EndOfSourceFilePosition this, numLines, lastLine
-
-class EndOfSourceFilePosition
-  constructor: (@sourceFileName, @numLines, @lastLine) ->
-  toString: ->
-    @sourceFileName + ":" + @numLines
+    if lastLine != null
+      @line(lastLine, numLines-1).position(lastLine.length+1)
+    else
+      @line("",0).position(1)
 
 class SourceLine
   constructor: (@sourceFileName, @line, @lineNumber) ->

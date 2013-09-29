@@ -71,7 +71,7 @@ var correspondenceTests = {
       var compiledDoms = compileSourceIntoDoms("test/data/unfinished.bracketup");
     }, 
                    function(err) {
-                     assert.equal(err.sourceLinePosition.toString(), "test/data/unfinished.bracketup:12");
+                     assert.equal(err.sourceLinePosition.toString(), "test/data/unfinished.bracketup:11:1");
                      assert.equal(err.message, 
                                   "2 unbalanced '['s at end of file");
                      return true;
