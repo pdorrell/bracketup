@@ -20,7 +20,7 @@ class Item extends BaseNode
         "data-id": id
     document.createNode("span", nodeOptions)
 
-class Sentence extends BaseNode
+class ItemGroup extends BaseNode
   constructor: (@id) ->
     super()
 
@@ -46,10 +46,10 @@ class Text extends BaseNode
   constructor: (@languageCssClass) ->
     super()
 
-  defaultChildFunction: "sentence"
+  defaultChildFunction: "itemGroup"
   
   classMap:
-    sentence: Sentence
+    itemGroup: ItemGroup
     languageTitle: LanguageTitleAttribute
     
   childIndent: "  "
