@@ -42,7 +42,7 @@ class LanguageTitleAttribute extends BaseAttribute
   constructor: ->
     super("languageTitle")
 
-class Text extends BaseNode
+class Structure extends BaseNode
   constructor: (@languageCssClass) ->
     super()
 
@@ -70,7 +70,7 @@ class TitleAttribute extends BaseAttribute
 
 class Correspondence extends BaseNode
   defaultChildFunction: "structure"
-  classMap: {structure: Text, title: TitleAttribute}
+  classMap: {structure: Structure, title: TitleAttribute}
   childIndent: "  "
   indentAllChildren: true
   ignoreWhiteSpaceText: true
