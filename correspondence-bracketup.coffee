@@ -24,10 +24,10 @@ class Sentence extends BaseNode
   constructor: (@id) ->
     super()
 
-  defaultChildFunction: "word"
+  defaultChildFunction: "item"
   
   classMap:
-    word: Word
+    item: Word
     
   childIndent: "  "
   

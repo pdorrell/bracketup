@@ -51,10 +51,10 @@
       Sentence.__super__.constructor.call(this);
     }
 
-    Sentence.prototype.defaultChildFunction = "word";
+    Sentence.prototype.defaultChildFunction = "item";
 
     Sentence.prototype.classMap = {
-      word: Word
+      item: Word
     };
 
     Sentence.prototype.childIndent = "  ";
