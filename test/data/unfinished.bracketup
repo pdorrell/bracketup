@@ -1,5 +1,5 @@
 [correspondence [_title Queens Puzzle]
- [_text,rhoscript [_languageTitle rhoScript]
+ [_structure,rhoscript [_languageTitle rhoScript]
   [A [_word,1 8] [2 range]]
   [B [1 permutations]]
   [C ([1 with-index]]

@@ -146,10 +146,10 @@
       return _ref;
     }
 
-    Correspondence.prototype.defaultChildFunction = "text";
+    Correspondence.prototype.defaultChildFunction = "structure";
 
     Correspondence.prototype.classMap = {
-      text: Text,
+      structure: Text,
       title: TitleAttribute
     };
 

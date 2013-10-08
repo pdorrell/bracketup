@@ -69,8 +69,8 @@ class TitleAttribute extends BaseAttribute
     super("title")
 
 class Correspondence extends BaseNode
-  defaultChildFunction: "text"
-  classMap: {text: Text, title: TitleAttribute}
+  defaultChildFunction: "structure"
+  classMap: {structure: Text, title: TitleAttribute}
   childIndent: "  "
   indentAllChildren: true
   ignoreWhiteSpaceText: true
