@@ -68,7 +68,7 @@ class TitleAttribute extends BaseAttribute
   constructor: ->
     super("title")
 
-class Correspondence extends BaseNode
+class StructureGroup extends BaseNode
   defaultChildFunction: "structure"
   classMap: {structure: Structure, title: TitleAttribute}
   childIndent: "  "
@@ -83,7 +83,7 @@ class Correspondence extends BaseNode
     div
 
 correspondenceTopLevelFunctionMap =
-  correspondence: Correspondence
+  structureGroup: StructureGroup
   b: bracketup.Bold
   i: bracketup.Italic
   a: bracketup.Link
