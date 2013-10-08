@@ -6,7 +6,7 @@ BaseAttribute = bracketup.BaseAttribute
 BaseNode = bracketup.BaseNode
 BracketupCompiler = bracketup.BracketupCompiler
 
-class Word extends BaseNode
+class Item extends BaseNode
   constructor: (@id) ->
     super()
 
@@ -27,7 +27,7 @@ class Sentence extends BaseNode
   defaultChildFunction: "item"
   
   classMap:
-    item: Word
+    item: Item
     
   childIndent: "  "
   
