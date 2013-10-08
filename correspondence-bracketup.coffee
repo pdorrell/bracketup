@@ -6,14 +6,6 @@ BaseAttribute = bracketup.BaseAttribute
 BaseNode = bracketup.BaseNode
 BracketupCompiler = bracketup.BracketupCompiler
 
-class TitleAttribute extends BaseAttribute
-  constructor: ->
-    super("title")
-
-class LanguageTitleAttribute extends BaseAttribute
-  constructor: ->
-    super("languageTitle")
-
 class Word extends BaseNode
   constructor: (@id) ->
     super()
@@ -46,6 +38,10 @@ class Sentence extends BaseNode
         "data-group-id": @id
     document.createNode("div", nodeOptions)
 
+class LanguageTitleAttribute extends BaseAttribute
+  constructor: ->
+    super("languageTitle")
+
 class Text extends BaseNode
   constructor: (@languageCssClass) ->
     super()
@@ -67,6 +63,10 @@ class Text extends BaseNode
     if languageTitle
       document.createNode("div", {parent: div, className: "language", text: languageTitle})
     div
+
+class TitleAttribute extends BaseAttribute
+  constructor: ->
+    super("title")
 
 class Correspondence extends BaseNode
   defaultChildFunction: "text"

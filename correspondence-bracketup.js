@@ -16,28 +16,6 @@
 
   BracketupCompiler = bracketup.BracketupCompiler;
 
-  TitleAttribute = (function(_super) {
-    __extends(TitleAttribute, _super);
-
-    function TitleAttribute() {
-      TitleAttribute.__super__.constructor.call(this, "title");
-    }
-
-    return TitleAttribute;
-
-  })(BaseAttribute);
-
-  LanguageTitleAttribute = (function(_super) {
-    __extends(LanguageTitleAttribute, _super);
-
-    function LanguageTitleAttribute() {
-      LanguageTitleAttribute.__super__.constructor.call(this, "languageTitle");
-    }
-
-    return LanguageTitleAttribute;
-
-  })(BaseAttribute);
-
   Word = (function(_super) {
     __extends(Word, _super);
 
@@ -96,6 +74,17 @@
 
   })(BaseNode);
 
+  LanguageTitleAttribute = (function(_super) {
+    __extends(LanguageTitleAttribute, _super);
+
+    function LanguageTitleAttribute() {
+      LanguageTitleAttribute.__super__.constructor.call(this, "languageTitle");
+    }
+
+    return LanguageTitleAttribute;
+
+  })(BaseAttribute);
+
   Text = (function(_super) {
     __extends(Text, _super);
 
@@ -137,6 +126,17 @@
     return Text;
 
   })(BaseNode);
+
+  TitleAttribute = (function(_super) {
+    __extends(TitleAttribute, _super);
+
+    function TitleAttribute() {
+      TitleAttribute.__super__.constructor.call(this, "title");
+    }
+
+    return TitleAttribute;
+
+  })(BaseAttribute);
 
   Correspondence = (function(_super) {
     __extends(Correspondence, _super);
