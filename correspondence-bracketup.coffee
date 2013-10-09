@@ -57,7 +57,7 @@ class Structure extends BaseNode
   ignoreWhiteSpaceText: true
   
   createInitialDom: (document) ->
-    className = if @languageCssClass then ("structure " + @languageCssClass + "-structure") else "structure"
+    className = if @languageCssClass then ("block " + @languageCssClass + "-block") else "block"
     div = document.createNode("div", {className: className})
     languageTitle = @attributes.languageTitle
     if languageTitle
@@ -69,8 +69,8 @@ class TitleAttribute extends BaseAttribute
     super("title")
 
 class StructureGroup extends BaseNode
-  defaultChildFunction: "structure"
-  classMap: {structure: Structure, title: TitleAttribute}
+  defaultChildFunction: "block"
+  classMap: {block: Structure, title: TitleAttribute}
   childIndent: "  "
   indentAllChildren: true
   ignoreWhiteSpaceText: true

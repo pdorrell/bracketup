@@ -108,7 +108,7 @@
 
     Structure.prototype.createInitialDom = function(document) {
       var className, div, languageTitle;
-      className = this.languageCssClass ? "structure " + this.languageCssClass + "-structure" : "structure";
+      className = this.languageCssClass ? "block " + this.languageCssClass + "-block" : "block";
       div = document.createNode("div", {
         className: className
       });
@@ -146,10 +146,10 @@
       return _ref;
     }
 
-    StructureGroup.prototype.defaultChildFunction = "structure";
+    StructureGroup.prototype.defaultChildFunction = "block";
 
     StructureGroup.prototype.classMap = {
-      structure: Structure,
+      block: Structure,
       title: TitleAttribute
     };
 

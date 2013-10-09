@@ -1,5 +1,5 @@
 [translation [_title Queens Puzzle]
- [_structure,rhoscript [_languageTitle rhoScript]
+ [_block,rhoscript [_languageTitle rhoScript]
   [A [_item,1 8] [2 range]]
   [B [1 permutations]]
   [C ([1 with-index]]
