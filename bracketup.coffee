@@ -335,9 +335,9 @@ class Document
     parent = options.parent
     if parent
       parent.appendChild(dom)
-    className = options.className
-    if className
-      dom.className = className
+    cssClassName = options.cssClassName
+    if cssClassName
+      dom.className = cssClassName
     attributes = options.attributes
     if attributes
       for key, value of attributes

@@ -534,7 +534,7 @@
     }
 
     Document.prototype.createNode = function(tag, options) {
-      var attributes, className, dom, key, parent, text, value;
+      var attributes, cssClassName, dom, key, parent, text, value;
       if (!options) {
         options = {};
       }
@@ -543,9 +543,9 @@
       if (parent) {
         parent.appendChild(dom);
       }
-      className = options.className;
-      if (className) {
-        dom.className = className;
+      cssClassName = options.cssClassName;
+      if (cssClassName) {
+        dom.className = cssClassName;
       }
       attributes = options.attributes;
       if (attributes) {
