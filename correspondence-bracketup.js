@@ -62,7 +62,7 @@
     ItemGroup.prototype.createInitialDom = function(document) {
       var nodeOptions;
       nodeOptions = {
-        className: "item-group",
+        className: "line",
         attributes: {
           "data-group-id": this.id
         }
@@ -93,10 +93,10 @@
       Structure.__super__.constructor.call(this);
     }
 
-    Structure.prototype.defaultChildFunction = "itemGroup";
+    Structure.prototype.defaultChildFunction = "line";
 
     Structure.prototype.classMap = {
-      itemGroup: ItemGroup,
+      line: ItemGroup,
       languageTitle: LanguageTitleAttribute
     };
 

@@ -33,7 +33,7 @@ class ItemGroup extends BaseNode
   
   createInitialDom: (document) ->
     nodeOptions =
-      className: "item-group"
+      className: "line"
       attributes:
         "data-group-id": @id
     document.createNode("div", nodeOptions)
@@ -46,10 +46,10 @@ class Structure extends BaseNode
   constructor: (@languageCssClass) ->
     super()
 
-  defaultChildFunction: "itemGroup"
+  defaultChildFunction: "line"
   
   classMap:
-    itemGroup: ItemGroup
+    line: ItemGroup
     languageTitle: LanguageTitleAttribute
     
   childIndent: "  "

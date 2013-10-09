@@ -1,7 +1,7 @@
 [translation [_title Queens Puzzle]
  [_block,rhoscript [_languageTitle rhoScript]
   [A [_item,1 8] [2 range]]
-  [B [1 permutations]]
+  [_line,B [1 permutations]]
   [C ([1 with-index]]
   [D ([1 sum]) [2 map]]
   [E [1 uniq]]
