@@ -168,7 +168,7 @@
       if (title) {
         document.createNode("div", {
           parent: div,
-          cssClassName: "description",
+          cssClassName: "title",
           text: title
         });
       }

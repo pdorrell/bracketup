@@ -535,7 +535,7 @@
     }
 
     Document.prototype.createNode = function(tag, options) {
-      var attributes, className, dom, key, parent, text, value;
+      var attributes, cssClassName, dom, key, parent, text, value;
       if (!options) {
         options = {};
       }
@@ -544,9 +544,9 @@
       if (parent) {
         parent.appendChild(dom);
       }
-      className = options.className;
-      if (className) {
-        dom.className = className;
+      cssClassName = options.cssClassName;
+      if (cssClassName) {
+        dom.className = cssClassName;
       }
       attributes = options.attributes;
       if (attributes) {
@@ -770,7 +770,7 @@
         id = this.parent.id + id;
       }
       nodeOptions = {
-        className: "item",
+        cssClassName: "item",
         attributes: {
           "data-id": id
         }
@@ -801,7 +801,7 @@
     Line.prototype.createInitialDom = function(document) {
       var nodeOptions;
       nodeOptions = {
-        className: "line",
+        cssClassName: "line",
         attributes: {
           "data-line-id": this.id
         }
@@ -846,16 +846,16 @@
     Block.prototype.ignoreWhiteSpaceText = true;
 
     Block.prototype.createInitialDom = function(document) {
-      var className, div, languageTitle;
-      className = this.languageCssClass ? "block " + this.languageCssClass + "-block" : "block";
+      var cssClassName, div, languageTitle;
+      cssClassName = this.languageCssClass ? "block " + this.languageCssClass + "-block" : "block";
       div = document.createNode("div", {
-        className: className
+        cssClassName: cssClassName
       });
       languageTitle = this.attributes.languageTitle;
       if (languageTitle) {
         document.createNode("div", {
           parent: div,
-          className: "language",
+          cssClassName: "language",
           text: languageTitle
         });
       }
@@ -901,13 +901,13 @@
     Translation.prototype.createInitialDom = function(document) {
       var div, title;
       div = document.createNode("div", {
-        className: "translation"
+        cssClassName: "translation"
       });
       title = this.attributes.title;
       if (title) {
         document.createNode("div", {
           parent: div,
-          className: "description",
+          cssClassName: "title",
           text: title
         });
       }

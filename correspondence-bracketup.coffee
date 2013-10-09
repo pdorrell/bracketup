@@ -101,12 +101,12 @@ class Translation extends BaseNode
   indentAllChildren: true
   ignoreWhiteSpaceText: true
 
-  # create DOM like <div class="translation"><div class="description">Hello and Goodbye</div></div>
+  # create DOM like <div class="translation"><div class="title">Hello and Goodbye</div></div>
   createInitialDom: (document) ->
     div = document.createNode("div", {cssClassName: "translation"})
     title = @attributes.title
     if title
-      document.createNode("div", {parent: div, cssClassName: "description", text: title})
+      document.createNode("div", {parent: div, cssClassName: "title", text: title})
     div
 
 # Function map, major node type is 'translation', but also allow 'b', 'i' and 'a' markup to occur anywhere within a translation
