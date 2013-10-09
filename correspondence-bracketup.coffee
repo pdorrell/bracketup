@@ -20,7 +20,7 @@ class Item extends BaseNode
         "data-id": id
     document.createNode("span", nodeOptions)
 
-class ItemGroup extends BaseNode
+class Line extends BaseNode
   constructor: (@id) ->
     super()
 
@@ -42,14 +42,14 @@ class LanguageTitleAttribute extends BaseAttribute
   constructor: ->
     super("languageTitle")
 
-class Structure extends BaseNode
+class Block extends BaseNode
   constructor: (@languageCssClass) ->
     super()
 
   defaultChildFunction: "line"
   
   classMap:
-    line: ItemGroup
+    line: Line
     languageTitle: LanguageTitleAttribute
     
   childIndent: "  "
@@ -68,9 +68,9 @@ class TitleAttribute extends BaseAttribute
   constructor: ->
     super("title")
 
-class StructureGroup extends BaseNode
+class Translation extends BaseNode
   defaultChildFunction: "block"
-  classMap: {block: Structure, title: TitleAttribute}
+  classMap: {block: Block, title: TitleAttribute}
   childIndent: "  "
   indentAllChildren: true
   ignoreWhiteSpaceText: true
@@ -83,7 +83,7 @@ class StructureGroup extends BaseNode
     div
 
 correspondenceTopLevelFunctionMap =
-  translation: StructureGroup
+  translation: Translation
   b: bracketup.Bold
   i: bracketup.Italic
   a: bracketup.Link
