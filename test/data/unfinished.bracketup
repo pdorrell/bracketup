@@ -1,4 +1,4 @@
-[structureGroup [_title Queens Puzzle]
+[translation [_title Queens Puzzle]
  [_structure,rhoscript [_languageTitle rhoScript]
   [A [_word,1 8] [2 range]]
   [B [1 permutations]]

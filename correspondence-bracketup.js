@@ -162,7 +162,7 @@
     StructureGroup.prototype.createInitialDom = function(document) {
       var div, title;
       div = document.createNode("div", {
-        className: "structure-group"
+        className: "translation"
       });
       title = this.attributes.title;
       if (title) {
@@ -180,7 +180,7 @@
   })(BaseNode);
 
   correspondenceTopLevelFunctionMap = {
-    structureGroup: StructureGroup,
+    translation: StructureGroup,
     b: bracketup.Bold,
     i: bracketup.Italic,
     a: bracketup.Link

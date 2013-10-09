@@ -76,14 +76,14 @@ class StructureGroup extends BaseNode
   ignoreWhiteSpaceText: true
   
   createInitialDom: (document) ->
-    div = document.createNode("div", {className: "structure-group"})
+    div = document.createNode("div", {className: "translation"})
     title = @attributes.title
     if title
       document.createNode("div", {parent: div, className: "description", text: title})
     div
 
 correspondenceTopLevelFunctionMap =
-  structureGroup: StructureGroup
+  translation: StructureGroup
   b: bracketup.Bold
   i: bracketup.Italic
   a: bracketup.Link
