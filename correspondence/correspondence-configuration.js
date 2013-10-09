@@ -60,23 +60,23 @@ function compileCorrespondenceSource(sourceElements) {
 }
   
 function initialiseInteraction() {
-  var structureGroups = new CORRESPONDENCE.StructureGroups($(".structure-group"));
+  var translations = new CORRESPONDENCE.Translations($(".translation"));
   
-  structureGroups.setupInterleaving();
+  translations.setupInterleaving();
 
   var showSiblings = true;
   var alwaysShowCousins = true;
   var ctrlKeyIsDown = false;
-  $(structureGroups).on("mouseEnterItem", 
-                        function(event, item) { 
-                          structureGroups.setSelected(item, showSiblings, 
-                                                      alwaysShowCousins || ctrlKeyIsDown); 
-                        });
+  $(translations).on("mouseEnterItem", 
+                     function(event, item) { 
+                       translations.setSelected(item, showSiblings, 
+                                                alwaysShowCousins || ctrlKeyIsDown); 
+                     });
   
   $(document).keydown(function(event) {
     if (event.which == 17) { // ctrl
       if (!alwaysShowCousins) {
-        structureGroups.showCousinsOfSelectedItem();
+        translations.showCousinsOfSelectedItem();
       }
       ctrlKeyIsDown = true;
     }
@@ -92,7 +92,7 @@ function initialiseInteraction() {
     }
   });
   
-  $(structureGroups).on("clickOutsideItems", 
-                        function(event) { structureGroups.clearCurrentSelection(); });
+  $(translations).on("clickOutsideItems", 
+                     function(event) { translations.clearCurrentSelection(); });
 }
 

@@ -22,51 +22,59 @@
     Copyright (2013) Philip Dorrell (thinkinghard.com)
     
 
-    Correspondence defines related items in different related structures that relate to each other.
+    Correspondence defines related items in different related blocks that relate to each other.
     
     Basic concepts
     --------------
     
-    Structure Group. A group of related structures, defined by a DOM element (e.g. <div>) with CSS class "structure-group".
+    Translation. A group of blocks, each of which expresses the same content in a different language. 
+       Defined by a DOM element (e.g. <div>) with CSS class "translation".
     
-    Structure. Defined by a DOM element (e.g. <div>) inside a structure group with CSS class "structure"
+    Block. Defined by a DOM element (e.g. <div>) inside a Translation with CSS class "block".
+       A block might be a paragraph, or a verse of a song, or a function definition in a programming language.
+       
+    Line. A sequence of items and other text which constitute part of a block.
+       A line could be a sentence, or an actual line within a paragraph, or a line of a song, or a line of code in a program.
+       Sometimes a line might be displayed as two or more actual lines on the page. A line is defined by a DOM element
+       inside a Block with an ID attribute "data-line-id". (Division of Blocks into Lines is optional.)
     
-    Item. Defined by a DOM element inside a structure with an ID attribute "data-id".
+    Item. Defined by a DOM element inside a Block (and maybe inside a Line inside a Block) with an ID attribute "data-id".
     
-    Within a structure, items with the same ID are considered "siblings".
+    Within a Block, Items with the same ID are considered "siblings".
+       A single Item with a unique ID, or a group of Items with the same ID, constitute a "unit of meaning" that can be translated.
     
-    Within a structure group, items with the same ID but not in the same structure are considered "cousins".
+    Within a translation, Items with the same ID but not in the same block are considered "cousins".
     
-    There is no relationship between items in different structure groups - i.e. any structure group should be regarded
-    as independent of any other structure group.
+    There is no relationship between Items in different translations - i.e. any translation should be regarded
+    as independent of any other translation.
     
     The default user interaction is as follows:
     
-    * At any one time, there is at most one "selected" item.
-    * When the user mouses over an item, that item becomes "selected", and any current selected item gets de-selected.
-    * When an item is selected, the state of it's siblings and cousins changes:
+    * At any one time, there is at most one "selected" Item.
+    * When the user mouses over an Item, that Item becomes "selected", and any current selected Item gets de-selected.
+    * When an Item is selected, the state of it's siblings and cousins changes:
     * Siblings enter a "match" state.
     * Cousins enter a "match" state. (The default interaction does not treat siblings different from cousins, 
     but alternative interactions could treat them differently.)
-    * In the default interaction, an item remains selected until another item is selected (i.e. it is not deselected when 
-    the user mouses out of the item).
-    * The current selected item can also be de-selected by clicking anywhere outside an item.
-    * Associated siblings and cousins are un-match when the selected item becomes de-selected.
+    * In the default interaction, an Item remains selected until another Item is selected (i.e. it is not deselected when 
+    the user mouses out of the Item).
+    * The current selected Item can also be de-selected by clicking anywhere outside an Item.
+    * Associated siblings and cousins are un-match when the selected Item becomes de-selected.
     
-    The "match" and "selected" states are managed by changing an item's CSS classes. This happens as follows:
-    * An item has a "primary" CSS class, which is the first CSS class in it's "class" attribute (if any).
+    The "match" and "selected" states are managed by changing an Item's CSS classes. This happens as follows:
+    * An Item has a "primary" CSS class, which is the first CSS class in it's "class" attribute (if any).
     * In a given state, a CSS class for the state is added, and, if there is a primary CSS class, a CSS class is 
     added consisting of the primary class joined to the state class by a hyphen.
     * When exiting a state, the added CSS classes are removed.
     
-    For example, an item with no primary CSS class entering the "selected" state would have the 
+    For example, an Item with no primary CSS class entering the "selected" state would have the 
     CSS class "selected" added.
 
-    And an item with primary CSS class "word" entereing the "match" state would add 
+    And an Item with primary CSS class "word" entereing the "match" state would add 
     two CSS classes: "match" and "word-match". (Note that dues to CSS application 
     rules, any properties in "word-match" will over-ride any identical properties in "match", 
     and both those classes will override any properties in the primary class, or
-    in any other CSS classes that the item has in its initial state.)
+    in any other CSS classes that the Item has in its initial state.)
     
 */
 
@@ -90,7 +98,7 @@ var CORRESPONDENCE = {};
     
   /** From the specified data attribute, insert item into a map of items, indexed by each of
       the item's IDs.
-      Associated items in a structure group have the same IDs, so each item is held in an array of items
+      Associated items in a translation have the same IDs, so each item is held in an array of items
       with the same ID.
   */
   function indexItemByItemIds(itemsMap, item) {
@@ -158,28 +166,28 @@ var CORRESPONDENCE = {};
     
   };
   
-  function StructureGroup(structureGroup) {
-    this.structureGroup = structureGroup;
-    this.initializeStructures(this.structureGroup);
+  function Translation(translation) {
+    this.translation = translation;
+    this.initializeBlocks(this.translation);
   }
   
   var interleaveCheckboxId = 0;
   
-  StructureGroup.prototype = {
+  Translation.prototype = {
     
     setupInterleavingIfRelevant: function() {
-      var structuresSelector = $(this.structureGroup).find(".structure");
-      if(structuresSelector.length >= 1) {
-        var firstStructure = structuresSelector[0];
-        var firstStructureItemGroupsSelector = $(firstStructure).find(".item-group");
-        if (firstStructureItemGroupsSelector.length > 1) {
-          this.setupInterleaving(structuresSelector, firstStructureItemGroupsSelector)
+      var blocksSelector = $(this.translation).find(".block");
+      if(blocksSelector.length >= 1) {
+        var firstBlock = blocksSelector[0];
+        var firstBlockLinesSelector = $(firstBlock).find(".line");
+        if (firstBlockLinesSelector.length > 1) {
+          this.setupInterleaving(blocksSelector, firstBlockLinesSelector)
         }
       }
     }, 
     
-    setupInterleaving: function(structuresSelector, firstStructureItemGroupsSelector) {
-      structuresSelector.detach();
+    setupInterleaving: function(blocksSelector, firstBlockLinesSelector) {
+      blocksSelector.detach();
       this.interleavingSetupErrors = [];
       interleaveCheckboxId++;
       var checkboxId = "interleave_" + interleaveCheckboxId;
@@ -188,16 +196,16 @@ var CORRESPONDENCE = {};
       var labelDiv = $('<div class="interleaving-control-wrapper"></div>');
       labelDiv.append(label);
       label.prepend(checkbox);
-      $(this.structureGroup).append(labelDiv);
-      $(this.structureGroup).css("padding-top", 0);
+      $(this.translation).append(labelDiv);
+      $(this.translation).css("padding-top", 0);
       var $this = this;
-      var structuresWrapperDiv = $('<div class="structures-wrapper"></div>');
-      structuresSelector.each(function(index, structureElement) {
-        $(structuresWrapperDiv).append(structureElement);
+      var blocksWrapperDiv = $('<div class="blocks-wrapper"></div>');
+      blocksSelector.each(function(index, blockElement) {
+        $(blocksWrapperDiv).append(blockElement);
       });
-      this.structuresWrapperDiv = structuresWrapperDiv;
-      $(this.structureGroup).append(structuresWrapperDiv);
-      this.setupInterleavingData(structuresSelector, firstStructureItemGroupsSelector);
+      this.blocksWrapperDiv = blocksWrapperDiv;
+      $(this.translation).append(blocksWrapperDiv);
+      this.setupInterleavingData(blocksSelector, firstBlockLinesSelector);
       if (this.interleavingSetupErrors.length == 0) {
         checkbox.on("change", function(event) {
           if(this.checked) {
@@ -215,160 +223,160 @@ var CORRESPONDENCE = {};
       alert("ERROR: " + message);
     }, 
     
-    setupInterleavingData: function(structuresSelector, firstStructureItemGroupsSelector) {
-      this.saveLanguageAnnotations(structuresSelector);
-      this.setupInterleavingGroupIds(firstStructureItemGroupsSelector);
-      this.setupInterleavingGroupIdMaps(structuresSelector);
+    setupInterleavingData: function(blocksSelector, firstBlockLinesSelector) {
+      this.saveLanguageAnnotations(blocksSelector);
+      this.setupInterleavingLineIds(firstBlockLinesSelector);
+      this.setupInterleavingLineIdMaps(blocksSelector);
     }, 
     
-    saveLanguageAnnotations: function(structuresSelector) {
-      this.languageAnnotations = new Array(structuresSelector.length);
-      for (var i=0; i<structuresSelector.length; i++) {
-        var structure = structuresSelector[i];
-        this.languageAnnotations[i] = $(structure).find(".language");
+    saveLanguageAnnotations: function(blocksSelector) {
+      this.languageAnnotations = new Array(blocksSelector.length);
+      for (var i=0; i<blocksSelector.length; i++) {
+        var block = blocksSelector[i];
+        this.languageAnnotations[i] = $(block).find(".language");
       }
     }, 
     
-    setupInterleavingGroupIds: function(firstStructureItemGroupsSelector) {
-      this.numGroupIds = firstStructureItemGroupsSelector.length;
-      this.groupIds = new Array(this.numGroupIds);
-      for (var i=0; i<this.numGroupIds; i++) {
-        var groupId = $(firstStructureItemGroupsSelector[i]).data("group-id");
-        if(groupId == undefined) {
-            $this.error((index+1) + "th item group in 1st structure has no group ID");
+    setupInterleavingLineIds: function(firstBlockLinesSelector) {
+      this.numLineIds = firstBlockLinesSelector.length;
+      this.lineIds = new Array(this.numLineIds);
+      for (var i=0; i<this.numLineIds; i++) {
+        var lineId = $(firstBlockLinesSelector[i]).data("line-id");
+        if(lineId == undefined) {
+            $this.error((index+1) + "th line in 1st block has no line ID");
         }
-        this.groupIds[i] = groupId;
+        this.lineIds[i] = lineId;
       }
     }, 
       
     
-    setupInterleavingGroupIdMaps: function(structuresSelector) {
-      this.numStructures = structuresSelector.length;
-      var itemGroupMaps = new Array(this.numStructures);
-      this.itemGroupMaps = itemGroupMaps;
-      var structureClassAttributes = new Array(this.numStructures);
-      this.structureClassAttributes = structureClassAttributes;
+    setupInterleavingLineIdMaps: function(blocksSelector) {
+      this.numBlocks = blocksSelector.length;
+      var lineMaps = new Array(this.numBlocks);
+      this.lineMaps = lineMaps;
+      var blockClassAttributes = new Array(this.numBlocks);
+      this.blockClassAttributes = blockClassAttributes;
       var $this = this;
-      for (var i=0; i<this.numStructures; i++) {
-        var structure = structuresSelector[i];
-        this.structureClassAttributes[i] = $(structure).attr("class");
-        itemGroupMaps[i] = {};
-        for (var j=0; j<this.numGroupIds; j++) {
-          itemGroupMaps[i][this.groupIds[j]] = null;
+      for (var i=0; i<this.numBlocks; i++) {
+        var block = blocksSelector[i];
+        this.blockClassAttributes[i] = $(block).attr("class");
+        lineMaps[i] = {};
+        for (var j=0; j<this.numLineIds; j++) {
+          lineMaps[i][this.lineIds[j]] = null;
         }
-        $(structure).find(".item-group").each(function(index, itemGroup) {
-          var groupId = $(itemGroup).data("group-id");
-          if(groupId == undefined) {
-            $this.error((index+1) + "th item group in " + (i+1) + "th structure has no group ID");
+        $(block).find(".line").each(function(index, line) {
+          var lineId = $(line).data("line-id");
+          if(lineId == undefined) {
+            $this.error((index+1) + "th line in " + (i+1) + "th block has no line ID");
           }
-          if (!$.inArray(groupId, this.groupIds)) {
-            $this.error((index+1) + "th item group in " + (i+1) + "th structure has group ID " + groupId + 
-                        " which does not exist in first structure");
+          if (!$.inArray(lineId, this.lineIds)) {
+            $this.error((index+1) + "th line in " + (i+1) + "th block has line ID " + lineId + 
+                        " which does not exist in first block");
           }
-          if (itemGroupMaps[i][groupId]) {
-            $this.error((index+1) + "th item group in " + (i+1) + 
-                        "th structure has two item groups with group ID " + groupId);
+          if (lineMaps[i][lineId]) {
+            $this.error((index+1) + "th line in " + (i+1) + 
+                        "th block has two lines with line ID " + lineId);
           }
-          itemGroupMaps[i][groupId] = itemGroup;
+          lineMaps[i][lineId] = line;
         });
       }
     }, 
     
     interleave: function() {
-      $(this.structuresWrapperDiv).find(".structure").detach();
-      var structuresWrapperDiv = this.structuresWrapperDiv;
-      for (var i=0; i<this.numGroupIds; i++) {
-        var groupId = this.groupIds[i];
-        var interleavedGroupDiv = $('<div class="interleaved-group"></div>');
-        for (var j=0; j<this.numStructures; j++) {
-          var itemGroup = this.itemGroupMaps[j][groupId];
-          if (itemGroup != null) {
-            var structureDiv = $('<div></div>');
-            var $structureDiv = $(structureDiv);
-            $structureDiv.attr("class", this.structureClassAttributes[j]);
+      $(this.blocksWrapperDiv).find(".block").detach();
+      var blocksWrapperDiv = this.blocksWrapperDiv;
+      for (var i=0; i<this.numLineIds; i++) {
+        var lineId = this.lineIds[i];
+        var interleavedBlockDiv = $('<div class="interleaved-block"></div>');
+        for (var j=0; j<this.numBlocks; j++) {
+          var line = this.lineMaps[j][lineId];
+          if (line != null) {
+            var blockDiv = $('<div></div>');
+            var $blockDiv = $(blockDiv);
+            $blockDiv.attr("class", this.blockClassAttributes[j]);
             if(i == 0) {
               for (var k=0; k<this.languageAnnotations[j].length; k++) {
-                $structureDiv.append(this.languageAnnotations[j][k]);
+                $blockDiv.append(this.languageAnnotations[j][k]);
               }
             }
-            $structureDiv.append(itemGroup);
-            $(interleavedGroupDiv).append(structureDiv);
+            $blockDiv.append(line);
+            $(interleavedBlockDiv).append(blockDiv);
           }
         }
-        $(structuresWrapperDiv).append(interleavedGroupDiv);
+        $(blocksWrapperDiv).append(interleavedBlockDiv);
       }
     }, 
     
     uninterleave: function() {
-      $(this.structuresWrapperDiv).find(".interleaved-group").detach();
-      for (var i=0; i<this.numStructures; i++) {
-        var structureDiv = $('<div></div>');
-        var $structureDiv = $(structureDiv);
-        $structureDiv.attr("class", this.structureClassAttributes[i]);
+      $(this.blocksWrapperDiv).find(".interleaved-block").detach();
+      for (var i=0; i<this.numBlocks; i++) {
+        var blockDiv = $('<div></div>');
+        var $blockDiv = $(blockDiv);
+        $blockDiv.attr("class", this.blockClassAttributes[i]);
         for (var k=0; k<this.languageAnnotations[i].length; k++) {
-          $structureDiv.append(this.languageAnnotations[i][k]);
+          $blockDiv.append(this.languageAnnotations[i][k]);
         }
-        $(this.structuresWrapperDiv).append(structureDiv);
-        for (var j=0; j<this.numGroupIds; j++) {
-          var groupId = this.groupIds[j];
-          var itemGroup = this.itemGroupMaps[i][groupId];
-          if (itemGroup != null) {
-            $structureDiv.append(itemGroup);
+        $(this.blocksWrapperDiv).append(blockDiv);
+        for (var j=0; j<this.numLineIds; j++) {
+          var lineId = this.lineIds[j];
+          var line = this.lineMaps[i][lineId];
+          if (line != null) {
+            $blockDiv.append(line);
           }
         }
       }
     }, 
     
-    /** Initialise the structures and items in a given structure group. */
-    initializeStructures: function() {
-      // set "structureId" data value, and add each item to indexItemByItemId, initialize "siblings" & "cousins" data values
-      var itemsByItemId = {}; // the items map for all items in this structure group
-      this.addStructureItemClassToItems();
+    /** Initialise the blocks and items in a given translation. */
+    initializeBlocks: function() {
+      // set "blockId" data value, and add each item to indexItemByItemId, initialize "siblings" & "cousins" data values
+      var itemsByItemId = {}; // the items map for all items in this translation
+      this.addBlockItemClassToItems();
       this.indexItemsByTheirId(itemsByItemId);
       this.linkSiblingsAndCousins(itemsByItemId);
     }, 
     
     /** Items are identified by "data-id" attribute, so they don't actually have any 
-        specific CSS class. This method specifically adds in the "structure-item" class. */
-    addStructureItemClassToItems: function () {
-      $(this.structureGroup).find(".structure").each( // for each structure in this structure group
-        function(index, structure) {
-          $(structure).find("[data-id]").each( // for each item in the structure
+        specific CSS class. This method specifically adds in the "block-item" class. */
+    addBlockItemClassToItems: function () {
+      $(this.translation).find(".block").each( // for each block in this translation
+        function(index, block) {
+          $(block).find("[data-id]").each( // for each item in the block
             function(index, item) {
               var $item = $(item);
-              $item.addClass("structure-item unhighlighted");
+              $item.addClass("block-item unhighlighted");
             });
         });
     }, 
       
     indexItemsByTheirId: function (itemsByItemId) {
-      $(this.structureGroup).find(".structure").each( // for each structure in this structure group
-        function(index, structure) {
-          var structureId = index;
-          $(structure).find("[data-id]").each( // for each item in the structure
+      $(this.translation).find(".block").each( // for each block in this translation
+        function(index, block) {
+          var blockId = index;
+          $(block).find("[data-id]").each( // for each item in the block
             function(index, item) {
               var $item = $(item);
               var itemIdAttribute = $item.data("id");
-              $item.data("structureId", structureId); // pointer to parent structure
+              $item.data("blockId", blockId); // pointer to parent block
               $item.data("itemIds", parseItemIds(itemIdAttribute));
               $item.data("selectedStyleTarget", 
                          createStyleTarget(item, "selected", 
                                            "unhighlighted")); // style target for this item to become selected
               $item.data("siblings", []); // list of sibling style targets (yet to be populated)
               $item.data("cousins", []); // list of cousin style targets (yet to be populated)
-              indexItemByItemIds(itemsByItemId, $item); // index this item within it's structure group
+              indexItemByItemIds(itemsByItemId, $item); // index this item within it's translation
             });
         });
     }, 
     
     linkSiblingsAndCousins: function (itemsByItemId) {
-      /* For each item in structure group, determine which other items are siblings (in the same structure) 
-         or cousins (in a different structure) with the same id, and create the relevant style targets. */
-      $(this.structureGroup).find("[data-id]").each( // for each item in the structure group
+      /* For each item in translation, determine which other items are siblings (in the same block) 
+         or cousins (in a different block) with the same id, and create the relevant style targets. */
+      $(this.translation).find("[data-id]").each( // for each item in the translation
         function(index, item) {
           var $item = $(item);
           var itemIds = $item.data("itemIds");
-          var structureId = $item.data("structureId"); // structure ID of this item
+          var blockId = $item.data("blockId"); // block ID of this item
           var siblings = $item.data("siblings");
           var cousins = $item.data("cousins");
           var itemsFound = [];
@@ -380,10 +388,10 @@ var CORRESPONDENCE = {};
               if (itemsFound.indexOf(otherItem) == -1) { // don't include items that we've already included
                 itemsFound.push(otherItem);
                 if (item != otherItem) {
-                  var otherItemStructureId = $(otherItem).data("structureId"); // structure ID of the other item
+                  var otherItemBlockId = $(otherItem).data("blockId"); // block ID of the other item
                   var otherItemIds = $(otherItem).data("itemIds");
                   var matchStyleClass = matchIsPartial(itemIds, otherItemIds) ? "partial-match" : "match";
-                  if (structureId == otherItemStructureId) {
+                  if (blockId == otherItemBlockId) {
                     siblings.push(createStyleTarget(otherItem, matchStyleClass, "unhighlighted"));
                   }
                   else {
@@ -397,22 +405,22 @@ var CORRESPONDENCE = {};
     }
   }
 
-  /* Object representing all Structure Groups on a web page.
-     Structure Groups are mostly independent of each other, except
-     there is only one currently selected item in any structure group.
+  /* Object representing all Translations on a web page.
+     Translations are mostly independent of each other, except
+     there is only one currently selected item in any translation.
    */
-  function StructureGroups(selector) {
+  function Translations(selector) {
     this.elementSelection = new ElementSelection();
     this.selector = selector;
     var $this = this;
     
-    this.structureGroups = []
-    var $structureGroups = this.structureGroups;
+    this.translations = []
+    var $translations = this.translations;
 
-    // For each structure group DOM element, initialize the corresponding structure group
+    // For each translation DOM element, initialize the corresponding translation
     selector.each(
-      function(index, structureGroup) {
-        $structureGroups.push(new StructureGroup(structureGroup));
+      function(index, translation) {
+        $translations.push(new Translation(translation));
       });
     
     // Event triggered when mouse enters an item
@@ -438,11 +446,11 @@ var CORRESPONDENCE = {};
       });
   }
 
-  StructureGroups.prototype = {
+  Translations.prototype = {
     
     setupInterleaving: function() {
-      for (var i=0; i<this.structureGroups.length; i++) {
-        this.structureGroups[i].setupInterleavingIfRelevant();
+      for (var i=0; i<this.translations.length; i++) {
+        this.translations[i].setupInterleavingIfRelevant();
       }
     }, 
     
@@ -500,6 +508,6 @@ var CORRESPONDENCE = {};
   }
 
   // export public classes
-  lib.StructureGroups = StructureGroups;
+  lib.Translations = Translations;
   
 })(CORRESPONDENCE);

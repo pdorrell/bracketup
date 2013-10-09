@@ -1,8 +1,8 @@
 /* rhoScript background & border */
-.rhoscript-structure {
+.rhoscript-block {
   border: 3px solid #405090;
   background-color: #fbfbff; }
-  .rhoscript-structure .unhighlighted {
+  .rhoscript-block .unhighlighted {
     border: 1pt solid #fbfbff; }
-  .rhoscript-structure .item-group {
+  .rhoscript-block .line {
     display: inline-block; }

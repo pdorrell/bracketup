@@ -1,7 +1,7 @@
 /* javaScript background & border */
-.javascript-structure {
+.javascript-block {
   font-family: "Lucida Console", Monaco, monospace;
   border: 3px solid #405090;
   background-color: #fbfbff; }
-  .javascript-structure .unhighlighted {
+  .javascript-block .unhighlighted {
     border: 1pt solid #fbfbff; }
