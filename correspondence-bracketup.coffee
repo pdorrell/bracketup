@@ -35,7 +35,7 @@ class ItemGroup extends BaseNode
     nodeOptions =
       className: "line"
       attributes:
-        "data-group-id": @id
+        "data-line-id": @id
     document.createNode("div", nodeOptions)
 
 class LanguageTitleAttribute extends BaseAttribute

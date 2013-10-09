@@ -1,71 +1,71 @@
 <div class="translation"><div class="description">Queens Puzzle</div>
   <div class="block rhoscript-block"><div class="language">rhoScript</div>
-    <div class="line" data-group-id="A">
+    <div class="line" data-line-id="A">
       <span class="item" data-id="A1">8</span> <span class="item" data-id="A2">range</span>
     </div>
-    <div class="line" data-group-id="B">
+    <div class="line" data-line-id="B">
       <span class="item" data-id="B1">permutations</span>
     </div>
-    <div class="line" data-group-id="C">
+    <div class="line" data-line-id="C">
       (<span class="item" data-id="C1">with-index</span>
     </div>
-    <div class="line" data-group-id="D">
+    <div class="line" data-line-id="D">
       (<span class="item" data-id="D1">sum</span>) <span class="item" data-id="D2">map</span>
     </div>
-    <div class="line" data-group-id="E">
+    <div class="line" data-line-id="E">
       <span class="item" data-id="E1">uniq</span>
     </div>
-    <div class="line" data-group-id="F">
+    <div class="line" data-line-id="F">
       <span class="item" data-id="F1">arg-a</span> <span class="item" data-id="F2">with-index</span>
     </div>
-    <div class="line" data-group-id="G">
+    <div class="line" data-line-id="G">
       (<span class="item" data-id="G1">*exploding</span> <span class="item" data-id="G2">subtract</span>) <span class="item" data-id="G3">map</span>
     </div>
-    <div class="line" data-group-id="H">
+    <div class="line" data-line-id="H">
       <span class="item" data-id="H1">uniq</span>
     </div>
-    <div class="line" data-group-id="I">
+    <div class="line" data-line-id="I">
       <span class="item" data-id="I1">concatenate</span>
     </div>
-    <div class="line" data-group-id="J">
+    <div class="line" data-line-id="J">
       <span class="item" data-id="J1">length</span>)
     </div>
-    <div class="line" data-group-id="K">
+    <div class="line" data-line-id="K">
       <span class="item" data-id="K1">keep-maxes-by</span>
     </div>
   </div>
   <div class="block english-block"><div class="language">English</div>
-    <div class="line" data-group-id="A">
+    <div class="line" data-line-id="A">
       For <span class="item" data-id="A2">the sequence of numbers from 0 to 1 less than</span> <span class="item" data-id="A1">8</span>,
     </div>
-    <div class="line" data-group-id="B">
+    <div class="line" data-line-id="B">
       consider <span class="item" data-id="B1">all possible permutations</span>.
     </div>
-    <div class="line" data-group-id="C">
+    <div class="line" data-line-id="C">
       For a given permutation, <span class="item" data-id="C1">specify X and Y co-ordinates for the 8 queens (i.e. an "arrangement") as an array of arraysof the form [<b>x</b>, <b>y</b>], where <b>x</b> is a number that increases from 0 to 7, and <b>y</b> is the corresponding value in the permutation.</span>
     </div>
-    <div class="line" data-group-id="D">
+    <div class="line" data-line-id="D">
       <span class="item" data-id="D2">For each position of a queen in an arrangement</span>, <span class="item" data-id="D1">add the <b>x</b> and <b>y</b> coordinates</span> to identify which diagonal in the <span class="item" data-id="b">x=-y</span> direction the queen is on.
     </div>
-    <div class="line" data-group-id="E">
+    <div class="line" data-line-id="E">
       <span class="item" data-id="E1">Keep only the unique IDs of those occupied diagonals.</span>
     </div>
-    <div class="line" data-group-id="F">
+    <div class="line" data-line-id="F">
       <span class="item" data-id="F1">Again, for each permutation</span>, <span class="item" data-id="F2">convert it into an arrangement as a list of [<b>x</b>, <b>y</b>] coordinate pairs</span>.
     </div>
-    <div class="line" data-group-id="G">
+    <div class="line" data-line-id="G">
       <span class="item" data-id="G3">For each coordinate pair within the arrangement</span>, <span class="item" data-id="G2">subtract the Y coordinate from the X coordinate</span> <span class="item" data-id="G1">(having extracted the two coordinates from the array representing the coordinate pair to use as arguments to the <b>subtract</b> function)</span>, to determine the ID of the diagonal in the <b>x=y</b> direction.
     </div>
-    <div class="line" data-group-id="H">
+    <div class="line" data-line-id="H">
       <span class="item" data-id="H1">Keep only the unique IDs of those diagonals.</span>
     </div>
-    <div class="line" data-group-id="I">
+    <div class="line" data-line-id="I">
       <span class="item" data-id="I1">Join the two lists of diagonal IDs together.</span>
     </div>
-    <div class="line" data-group-id="J">
+    <div class="line" data-line-id="J">
       <span class="item" data-id="J1">Count how many diagonal IDs are in the joined list.</span>
     </div>
-    <div class="line" data-group-id="K">
+    <div class="line" data-line-id="K">
       <span class="item" data-id="K1">Having done that for each <a href="http://en.wikipedia.org/Permutation">permutation</a>, keep those permutations that have the maximum number of diagonals occupied.</span>
     </div>
   </div>

@@ -64,7 +64,7 @@
       nodeOptions = {
         className: "line",
         attributes: {
-          "data-group-id": this.id
+          "data-line-id": this.id
         }
       };
       return document.createNode("div", nodeOptions);
