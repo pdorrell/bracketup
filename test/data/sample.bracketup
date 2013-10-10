@@ -20,7 +20,7 @@ of the form \[[b x], [b y]\], where [b x] is a number that increases from 0 to 7
   [D [2 For each position of a queen in an arrangement], [1 add the [b x] and [b y] coordinates] to identify which diagonal in the [b x=-y] direction the queen is on.]
   [E [1 Keep only the unique IDs of those occupied diagonals.]]
   [F [1 Again, for each permutation], [2 convert it into an arrangement as a list of \[[b x], [b y]\] coordinate pairs].]
-  [G [3 For each coordinate pair within the arrangement], [2 subtract the Y coordinate from the X coordinate] [1 (having extracted the two coordinates from the array representing the coordinate pair to use as arguments to the [b subtract] function)], to determine the ID of the diagonal in the [_b x=y] direction.]
+  [G [3 For each coordinate pair within the arrangement], [2 subtract the Y coordinate from the X coordinate] [1 (having extracted the two coordinates from the array representing the coordinate pair to use as arguments to the [b subtract] function)], to determine the ID of the diagonal in the [_span,direction [_b x=y]] direction.]
   [H [1 Keep only the unique IDs of those diagonals.]]
   [I [1 Join the two lists of diagonal IDs together.]]
   [J [1 Count how many diagonal IDs are in the joined list.]]

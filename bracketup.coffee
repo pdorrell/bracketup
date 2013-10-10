@@ -85,11 +85,13 @@ class NodeCompiler
   constructor: (@topLevelClassMap) ->
 
   createFromFunctionClass: (functionClass, constructorArgs, initialWhitespace,
+                            parentObject,
                             childNodes, sourceLinePosition) ->
     object = Object.create(functionClass.prototype)
     functionClass.apply(object, constructorArgs)
     if object.prependWhitespace
       object.prependWhitespace(initialWhitespace)
+    object.parent=parentObject
     for childNode in childNodes
       @compileChild(object, childNode)
     object.sourceLinePosition = sourceLinePosition
@@ -108,7 +110,7 @@ class NodeCompiler
       throw new CompileError("Unknown top-level function for root element: " + functionName, 
                              rootElementNode.sourceLinePosition)
     rootObject = @createFromFunctionClass(nodeFunctionClass, elementArgs.slice(1), 
-                                          rootElementNode.whitespace, 
+                                          rootElementNode.whitespace, null,
                                           rootElementNode.children, 
                                           rootElementNode.sourceLinePosition);
     if rootObject.setIndentInsertString
@@ -148,7 +150,8 @@ class NodeCompiler
                              " in either parent class map or top-level class map", 
                              childNode.sourceLinePosition)
     childObject = this.createFromFunctionClass(childFunctionClass, elementArgs, 
-                                               childNode.whitespace, 
+                                               childNode.whitespace,
+                                               parentObject,
                                                childNode.children, 
                                                childNode.sourceLinePosition)
     if childObject.addToParent
@@ -290,7 +293,6 @@ class BaseNode
 
   addChild: (child) ->
     @children.push(child)
-    child.parent = this
 
   addTextChild: (string) ->
     if !(@ignoreWhiteSpaceText && string.match(/^\s*$/))
@@ -378,12 +380,24 @@ class BaseAttribute
 
 class MarkupNode extends BaseNode
 
-class Bold extends MarkupNode
+# Parsing of child nodes of a WrapperMarkupNode is determined
+# by it's parent
+class WrapperMarkupNode extends MarkupNode
+  getSemanticParentOfChild: () ->
+    @parent.getSemanticParentOfChild()
+
+class Bold extends WrapperMarkupNode
   createInitialDom: (document) ->
     document.createNode("b")
 
+class Span extends WrapperMarkupNode
+  constructor: (@cssClassName) ->
+    super()
 
-class Italic extends MarkupNode
+  createInitialDom: (document) ->
+    span = document.createNode("span", {cssClassName: @cssClassName})
+
+class Italic extends WrapperMarkupNode
   createInitialDom: (document) ->
     document.createNode("i")
 
@@ -438,5 +452,6 @@ exports.Bold = Bold
 exports.Italic = Italic
 exports.HrefAttribute = HrefAttribute
 exports.Link = Link
+exports.Span = Span
 
 exports.BracketupCompiler = BracketupCompiler

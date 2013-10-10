@@ -115,6 +115,7 @@ correspondenceTopLevelFunctionMap =
   b: bracketup.Bold
   i: bracketup.Italic
   a: bracketup.Link
+  span: bracketup.Span
 
 # The Correspondence-Bracketup compiler, to be exported
 correspondenceCompiler = 

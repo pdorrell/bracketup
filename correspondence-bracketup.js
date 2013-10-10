@@ -183,7 +183,8 @@
     translation: Translation,
     b: bracketup.Bold,
     i: bracketup.Italic,
-    a: bracketup.Link
+    a: bracketup.Link,
+    span: bracketup.Span
   };
 
   correspondenceCompiler = new BracketupCompiler(correspondenceTopLevelFunctionMap);
