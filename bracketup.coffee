@@ -375,13 +375,14 @@ class BaseAttribute
   addToParent: (parent) ->
     parent.setAttribute(@attributeName, @value)
 
+class MarkupNode extends BaseNode
 
-class Bold extends BaseNode
+class Bold extends MarkupNode
   createInitialDom: (document) ->
     document.createNode("b")
 
 
-class Italic extends BaseNode
+class Italic extends MarkupNode
   createInitialDom: (document) ->
     document.createNode("i")
 
@@ -391,7 +392,7 @@ class HrefAttribute extends BaseAttribute
     super("href")
 
 
-class Link extends BaseNode
+class Link extends MarkupNode
   classMap:
     href: HrefAttribute
   
