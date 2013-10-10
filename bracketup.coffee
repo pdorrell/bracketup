@@ -137,8 +137,9 @@ class NodeCompiler
     functionName = elementArgs[0]
     elementArgs = elementArgs.slice(1)
     childFunctionClass = null
-    if parentObject.classMap
-      childFunctionClass = parentObject.classMap[functionName]
+    parentClassMap = parentObject.getClassMap()
+    if parentClassMap
+      childFunctionClass = parentClassMap[functionName]
     if !childFunctionClass
       childFunctionClass = this.topLevelClassMap[functionName]
     if !childFunctionClass
@@ -282,6 +283,9 @@ class BaseNode
     @attributes = {}
 
   classMap: {}
+
+  getClassMap: () ->
+    @classMap
   
   addChild: (child) ->
     @children.push(child)

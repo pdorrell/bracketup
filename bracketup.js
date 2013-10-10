@@ -250,7 +250,7 @@
     };
 
     NodeCompiler.prototype.compileElementChild = function(parentObject, childNode) {
-      var childFunctionClass, childObject, elementArgs, functionName;
+      var childFunctionClass, childObject, elementArgs, functionName, parentClassMap;
       elementArgs = childNode.args.slice(0);
       if (elementArgs.length > 0 && elementArgs[0].match(/^_/)) {
         elementArgs[0] = elementArgs[0].substring(1);
@@ -265,8 +265,9 @@
       functionName = elementArgs[0];
       elementArgs = elementArgs.slice(1);
       childFunctionClass = null;
-      if (parentObject.classMap) {
-        childFunctionClass = parentObject.classMap[functionName];
+      parentClassMap = parentObject.getClassMap();
+      if (parentClassMap) {
+        childFunctionClass = parentClassMap[functionName];
       }
       if (!childFunctionClass) {
         childFunctionClass = this.topLevelClassMap[functionName];
@@ -456,6 +457,10 @@
     }
 
     BaseNode.prototype.classMap = {};
+
+    BaseNode.prototype.getClassMap = function() {
+      return this.classMap;
+    };
 
     BaseNode.prototype.addChild = function(child) {
       this.children.push(child);
