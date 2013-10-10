@@ -125,19 +125,20 @@ class NodeCompiler
     parentObject.addEndOfLineChild()
 
   compileElementChild: (parentObject, childNode) ->
+    semanticParent = parentObject.getSemanticParentOfChild()
     elementArgs = childNode.args.slice(0);
     if elementArgs.length>0 && elementArgs[0].match(/^_/)
       elementArgs[0] = elementArgs[0].substring(1)
     else
-      if parentObject.defaultChildFunction
-        elementArgs = [parentObject.defaultChildFunction].concat(elementArgs)
+      if semanticParent.defaultChildFunction
+        elementArgs = [semanticParent.defaultChildFunction].concat(elementArgs)
     if elementArgs.length == 0
       throw new CompileError("No function argument given and no default child function for parent element", 
                              childNode.sourceLinePosition)
     functionName = elementArgs[0]
     elementArgs = elementArgs.slice(1)
     childFunctionClass = null
-    parentClassMap = parentObject.getClassMap()
+    parentClassMap = semanticParent.classMap
     if parentClassMap
       childFunctionClass = parentClassMap[functionName]
     if !childFunctionClass
@@ -284,9 +285,9 @@ class BaseNode
 
   classMap: {}
 
-  getClassMap: () ->
-    @classMap
-  
+  getSemanticParentOfChild: ()->
+    this
+
   addChild: (child) ->
     @children.push(child)
     child.parent = this

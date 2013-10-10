@@ -250,13 +250,14 @@
     };
 
     NodeCompiler.prototype.compileElementChild = function(parentObject, childNode) {
-      var childFunctionClass, childObject, elementArgs, functionName, parentClassMap;
+      var childFunctionClass, childObject, elementArgs, functionName, parentClassMap, semanticParent;
+      semanticParent = parentObject.getSemanticParentOfChild();
       elementArgs = childNode.args.slice(0);
       if (elementArgs.length > 0 && elementArgs[0].match(/^_/)) {
         elementArgs[0] = elementArgs[0].substring(1);
       } else {
-        if (parentObject.defaultChildFunction) {
-          elementArgs = [parentObject.defaultChildFunction].concat(elementArgs);
+        if (semanticParent.defaultChildFunction) {
+          elementArgs = [semanticParent.defaultChildFunction].concat(elementArgs);
         }
       }
       if (elementArgs.length === 0) {
@@ -265,7 +266,7 @@
       functionName = elementArgs[0];
       elementArgs = elementArgs.slice(1);
       childFunctionClass = null;
-      parentClassMap = parentObject.getClassMap();
+      parentClassMap = semanticParent.classMap;
       if (parentClassMap) {
         childFunctionClass = parentClassMap[functionName];
       }
@@ -458,8 +459,8 @@
 
     BaseNode.prototype.classMap = {};
 
-    BaseNode.prototype.getClassMap = function() {
-      return this.classMap;
+    BaseNode.prototype.getSemanticParentOfChild = function() {
+      return this;
     };
 
     BaseNode.prototype.addChild = function(child) {
