@@ -291,6 +291,10 @@ class BaseNode
   getSemanticParentOfChild: ()->
     this
 
+  getSemanticParent: ()->
+    if @parent
+      @parent.getSemanticParentOfChild()
+
   addChild: (child) ->
     @children.push(child)
 

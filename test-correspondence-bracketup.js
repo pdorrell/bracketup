@@ -25,6 +25,14 @@ function readUtf8TextFile(fileName) {
   return fs.readFileSync(fileName, {encoding: "utf-8"});
 }
 
+function assertEqualStrings(string1, string2) {
+  if (string1 != string2) {
+    console.log(inspect(string1));
+    console.log(inspect(string2));
+    assert.equal(string1, string2);
+  }
+}
+
 var correspondenceTests = {
   testCompilation: function() {
     try {
@@ -34,7 +42,7 @@ var correspondenceTests = {
       var correspondenceDomHtml = correspondenceDom.outerHTML;
       
       var expectedOutput = readUtf8TextFile("test/data/sample-bracket.output.html");
-      assert.equal(expectedOutput, correspondenceDomHtml);
+      assertEqualStrings(expectedOutput, correspondenceDomHtml);
     }
     catch (error) {
       if (error.logSourceError) {

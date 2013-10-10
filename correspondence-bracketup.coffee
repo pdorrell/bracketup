@@ -17,7 +17,7 @@ class Item extends BaseNode
   createInitialDom: (document) ->
     id = @id
     if id.match(/^[0-9]+$/) # if ID is purely numeric
-      id = @parent.id + id  # prefix with ID of parent (Line)
+      id = @getSemanticParent().id + id  # prefix with ID of parent (Line)
     nodeOptions =
       cssClassName: "item"
       attributes:

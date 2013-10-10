@@ -28,7 +28,7 @@
       var id, nodeOptions;
       id = this.id;
       if (id.match(/^[0-9]+$/)) {
-        id = this.parent.id + id;
+        id = this.getSemanticParent().id + id;
       }
       nodeOptions = {
         cssClassName: "item",

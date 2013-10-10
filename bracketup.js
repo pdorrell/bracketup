@@ -464,6 +464,12 @@
       return this;
     };
 
+    BaseNode.prototype.getSemanticParent = function() {
+      if (this.parent) {
+        return this.parent.getSemanticParentOfChild();
+      }
+    };
+
     BaseNode.prototype.addChild = function(child) {
       return this.children.push(child);
     };
