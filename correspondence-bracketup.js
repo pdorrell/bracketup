@@ -182,6 +182,7 @@
     b: bracketup.Bold,
     i: bracketup.Italic,
     a: bracketup.Link,
+    ndash: bracketup.NDash,
     span: bracketup.Span
   };
 

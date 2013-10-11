@@ -23,7 +23,7 @@ of the form \[[b x], [b y]\], where [b x] is a number that increases from 0 to 7
   [G [3 For each coordinate pair within the arrangement], [2 subtract the Y coordinate from the X coordinate] [1 (having extracted the two coordinates from the array representing the coordinate pair to use as arguments to the [b subtract] function)], to determine the ID of the diagonal in the [_span,direction [_b x=y]] direction.]
   [H [1 Keep only the unique IDs of those diagonals.]]
   [I [1 Join the two lists of diagonal IDs together.]]
-  [J [1 Count how many diagonal IDs are in the joined list.]]
+  [J [1 Count how many diagonal IDs are in the joined list] [_ndash] this will be how many diagonals are covered.]
   [K [1 Having done that for each [a [href http://en.wikipedia.org/Permutation]permutation], keep those permutations that have the maximum number of diagonals occupied.]]
  ]
 ]

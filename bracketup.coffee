@@ -402,12 +402,15 @@ class Span extends WrapperMarkupNode
     super()
 
   createInitialDom: (document) ->
-    span = document.createNode("span", {cssClassName: @cssClassName})
+    document.createNode("span", {cssClassName: @cssClassName})
 
 class Italic extends WrapperMarkupNode
   createInitialDom: (document) ->
     document.createNode("i")
 
+class NDash extends MarkupNode
+  createInitialDom: (document) ->
+    document.createTextNode("\u2013")
 
 class HrefAttribute extends BaseAttribute
   constructor: ->
@@ -460,5 +463,6 @@ exports.Italic = Italic
 exports.HrefAttribute = HrefAttribute
 exports.Link = Link
 exports.Span = Span
+exports.NDash = NDash
 
 exports.BracketupCompiler = BracketupCompiler
