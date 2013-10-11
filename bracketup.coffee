@@ -369,6 +369,9 @@ class BaseAttribute
   constructor: (@attributeName) ->
     @value = ""
 
+  getSemanticParentOfChild: ()->
+    this
+
   addTextChild: (string) ->
     @value = @value + string
  

@@ -85,18 +85,18 @@ class Block extends BaseNode
       document.createNode("div", {parent: div, cssClassName: "language", text: languageTitle})
     div
 
-# A child element of a Translation that sets the 'title' property of the Translation
+# A child element of a Translation which is the Title
 # Example [_title The Ides of March]
-class TitleAttribute extends BaseAttribute
-  constructor: ->
-    super("title")
+class TranslationTitle extends BaseNode
+  createInitialDom: (document) ->
+    document.createNode("div", {cssClassName: "title"})
 
 # A Translation is a group of Block's where each Block represents the same content in a different language.
 # Example: [[_title Hello and Goodbye] [english [A [1 Hello] [2 World]] [B [1 Goodbye]]] [spanish [A [1 Hola] [2 Mundo]] [B [1 Adios]]]]
 #  (note, for brevity I have omitted 'languageTitle' attributes from that example)
 class Translation extends BaseNode
   defaultChildFunction: "block"
-  classMap: {block: Block, title: TitleAttribute}
+  classMap: {block: Block, title: TranslationTitle}
   childIndent: "  "
   indentAllChildren: true
   ignoreWhiteSpaceText: true
@@ -104,10 +104,6 @@ class Translation extends BaseNode
   # create DOM like <div class="translation"><div class="title">Hello and Goodbye</div></div>
   createInitialDom: (document) ->
     div = document.createNode("div", {cssClassName: "translation"})
-    title = @attributes.title
-    if title
-      document.createNode("div", {parent: div, cssClassName: "title", text: title})
-    div
 
 # Function map, major node type is 'translation', but also allow 'b', 'i' and 'a' markup to occur anywhere within a translation
 correspondenceTopLevelFunctionMap =

@@ -591,6 +591,10 @@
       this.value = "";
     }
 
+    BaseAttribute.prototype.getSemanticParentOfChild = function() {
+      return this;
+    };
+
     BaseAttribute.prototype.addTextChild = function(string) {
       return this.value = this.value + string;
     };

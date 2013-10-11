@@ -1,4 +1,4 @@
-[translation [_title Queens Puzzle]
+[translation [_title Queens [b Puzzle]]
  [_block,rhoscript [_languageTitle rhoScript]
   [A [_item,1 8] [2 range]]
   [_line,B [1 permutations]]
