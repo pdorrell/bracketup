@@ -1,1 +1,1 @@
-browserify correspondence-configuration.js > correspondence-configuration-browserified.js
+browserify correspondence-configuration.js > correspondence-bracketup-browserified.js
