@@ -44,8 +44,10 @@ function compileCorrespondenceSource(sourceElements) {
         " Correspondence script element" + 
         (id ? " (id = " + id + ")" : "");
       var compiledDoms = correspondenceCompiler.compileDoms(correspondenceSource, document, sourceFileName);
+      var translationsDom = $("<div class='translations'/>");
+      sourceElementSelector.after(translationsDom);
       for (var i=0; i<compiledDoms.length; i++) {
-        sourceElementSelector.after(compiledDoms[i]);
+        translationsDom.append(compiledDoms[i]);
       }
     }
     catch (error) {
