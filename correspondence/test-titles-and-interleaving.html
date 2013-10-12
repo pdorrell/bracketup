@@ -1,11 +1,9 @@
 <!DOCTYPE html">
 <html lang="en" >
 <head><meta charset="utf-8">
-<title>Bracketup & Correspondence: Parabolic envelope example from Choc </title>
+<title>Test for Titles and Interleaving Checkbox</title>
   <link rel="stylesheet" type="text/css" href="../page.css" />
   <link rel="stylesheet" type="text/css" href="correspondence.css" />
-  <link rel="stylesheet" type="text/css" href="correspondence-javascript.css" />
-  <link rel="stylesheet" type="text/css" href="correspondence-programming-output.css" />
   <script language="javascript" type="text/javascript" src="lib/jquery-1.10.1.js"></script>
   <script language="javascript" type="text/javascript" src="correspondence.js"></script>
   <script language="javascript" type="text/javascript" src="module-simulator.js"></script>
@@ -36,17 +34,9 @@ MODULE_SIMULATOR.startScript("correspondence-configuration.js");
 <!-- No endScript required for last script in sequence -->
 
 <body>
-<h1>Correspondence/Bracketup Example, from Choc Parabolic Envelope Example</h1>
+<h1>Test for Titles and Interleaving Checkbox</h1>
 
 <div class="author">Author: <a href="http://thinkinghard.com">Philip Dorrell</a></div>
-
-<p><a href="http://pdorrell.github.io/correspondence/">Correspondence</a> is a framework for interactively visualizing <i>correspondences</i> between
-items in related structures.</p>
-
-<p><a href="../index.html">Bracketup</a> is a generic structured textual markup language
-(one that I have just invented).</p>
-
-<p>This example is based on the first Javascript example given at <a href="http://www.fullstack.io/choc/">http://www.fullstack.io/choc/</a>.</p>
 
 <p>Mouse over the translations to see the relationships between them.</p>
 
@@ -72,9 +62,32 @@ by the Javascript code to generate the DOM, in the HTML format required by the C
   [A [2 Hola]]
  ]
 ]
+
+[translation [_title Hello]
+ [english [_languageTitle English]
+  [A [1 Hello]]
+  [B [1 Goodbye]]
+ ]
+ [spanish [_languageTitle Spanish]
+  [A [1 Hola]]
+  [B [1 Adios]]
+ ]
+]
+
+[translation
+ [english [_languageTitle English]
+  [A [1 Hello]]
+  [B [1 Goodbye]]
+ ]
+ [spanish [_languageTitle Spanish]
+  [A [1 Hola]]
+  [B [1 Adios]]
+ ]
+]
+
 </script>
 
-<div class="date">Last updated: 28 September 2013</div>
+<div class="date">Last updated: 12 October 2013</div>
 
 </body>
 </html>
