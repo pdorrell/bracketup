@@ -1,0 +1,12 @@
+/* rhoScript background & border */
+.rhoscript-block {
+    border: 3px solid #405090;
+    background-color: #fbfbff;
+    .unhighlighted {
+	border: 1pt solid #fbfbff; 
+    }
+    .line {
+	display: inline-block; 
+    }
+}
+
