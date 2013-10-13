@@ -209,20 +209,15 @@ class RecordedLineOfTokens
   isEmpty: ->
     @openBracketStack.length == 0
   addToken: (token) ->
-    console.log("  add token " + inspect(token.text) + " numOpens = " + token.numOpens)
     @tokens.push(token)
     @depthAtEnd += token.numOpens
     if token.numOpens == 1
-      console.log("    push open")
       @openBracketStack.push(token)
     else if token.numOpens == -1
       if @openBracketStack.length > 0
-        console.log("   balance ")
         matchingStart = @openBracketStack.pop()
         matchingStart.balanced = true
-        console.log("      matchingStart = " + matchingStart)
         token.balanced = true
-        console.log("      token = " + token)
 
   createDom: (document) ->
     dom = document.createNode("div", {cssClassName: "line"})

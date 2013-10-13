@@ -125,5 +125,5 @@
   .bracketup-error .error-message {
     color: red; }
   .bracketup-error .parsed-tokens .line .unbalanced {
-    color: green;
+    color: #005000;
     background-color: yellow; }

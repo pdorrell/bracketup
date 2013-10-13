@@ -400,7 +400,6 @@
       this.depthAtEnd = this.depth;
       this.openBracketStack = [];
       this.tokens = [];
-      console.log("Start line");
     }
 
     RecordedLineOfTokens.prototype.isEmpty = function() {
@@ -409,20 +408,15 @@
 
     RecordedLineOfTokens.prototype.addToken = function(token) {
       var matchingStart;
-      console.log("  add token " + inspect(token.text) + " numOpens = " + token.numOpens);
       this.tokens.push(token);
       this.depthAtEnd += token.numOpens;
       if (token.numOpens === 1) {
-        console.log("    push open");
         return this.openBracketStack.push(token);
       } else if (token.numOpens === -1) {
         if (this.openBracketStack.length > 0) {
-          console.log("   balance ");
           matchingStart = this.openBracketStack.pop();
           matchingStart.balanced = true;
-          console.log("      matchingStart = " + matchingStart);
-          token.balanced = true;
-          return console.log("      token = " + token);
+          return token.balanced = true;
         }
       }
     };
