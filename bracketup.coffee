@@ -209,13 +209,16 @@ class RecordedLineOfTokens
     @depthAtEnd = @depth
     @openBracketStack = []
     @tokens = []
+    @nonWhitespaceEncountered
   isEmpty: ->
     @openBracketStack.length == 0
   addToken: (token) ->
+    if !token.text.match(/^\s*$/)
+      @nonWhitespaceEncountered = true
+    if !@nonWhitespaceEncountered
+      token.text = "" # hide whitespace at beginning of lines (indent is shown separately)
     @tokens.push(token)
     @depthAtEnd += token.numOpens
-    console.log("adding token " + token)
-    console.log("  @depthAtEnd = " + @depthAtEnd)
     if @depthAtEnd < 0
       token.unexpected = true
     if token.numOpens == 1
@@ -228,8 +231,9 @@ class RecordedLineOfTokens
 
   createDom: (document) ->
     dom = document.createNode("div", {cssClassName: "line"})
-    for i in [0...@depth]
-      document.createNode("div", {parent: dom, cssClassName: "depth-indent", text: " "})
+    if @depth > 0
+      for i in [0...@depth]
+        document.createNode("div", {parent: dom, cssClassName: "depth-indent", text: "..."})
     for token in @tokens
       dom.appendChild(token.createDom(document))
     dom
@@ -385,7 +389,7 @@ class BracketupScanner
         tokenReceiver.recordEnd(matchedSubstring)
         @sendAnyTexts(tokenReceiver)
         if @depth <= 0 && tokenReceiver.checkDepth
-          throw new BracketParseException("Unexpected ']'", sourceLinePosition)
+          throw new BracketParseException("One or more unexpected ']'s", sourceLinePosition)
         tokenReceiver.endItem(sourceLinePosition)
         @depth--
       else if match[5]

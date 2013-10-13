@@ -403,6 +403,7 @@
       this.depthAtEnd = this.depth;
       this.openBracketStack = [];
       this.tokens = [];
+      this.nonWhitespaceEncountered;
     }
 
     RecordedLineOfTokens.prototype.isEmpty = function() {
@@ -411,10 +412,14 @@
 
     RecordedLineOfTokens.prototype.addToken = function(token) {
       var matchingStart;
+      if (!token.text.match(/^\s*$/)) {
+        this.nonWhitespaceEncountered = true;
+      }
+      if (!this.nonWhitespaceEncountered) {
+        token.text = "";
+      }
       this.tokens.push(token);
       this.depthAtEnd += token.numOpens;
-      console.log("adding token " + token);
-      console.log("  @depthAtEnd = " + this.depthAtEnd);
       if (this.depthAtEnd < 0) {
         token.unexpected = true;
       }
@@ -434,12 +439,14 @@
       dom = document.createNode("div", {
         cssClassName: "line"
       });
-      for (i = _i = 0, _ref = this.depth; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
-        document.createNode("div", {
-          parent: dom,
-          cssClassName: "depth-indent",
-          text: " "
-        });
+      if (this.depth > 0) {
+        for (i = _i = 0, _ref = this.depth; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+          document.createNode("div", {
+            parent: dom,
+            cssClassName: "depth-indent",
+            text: "..."
+          });
+        }
       }
       _ref1 = this.tokens;
       for (_j = 0, _len = _ref1.length; _j < _len; _j++) {
@@ -678,7 +685,7 @@
           tokenReceiver.recordEnd(matchedSubstring);
           this.sendAnyTexts(tokenReceiver);
           if (this.depth <= 0 && tokenReceiver.checkDepth) {
-            throw new BracketParseException("Unexpected ']'", sourceLinePosition);
+            throw new BracketParseException("One or more unexpected ']'s", sourceLinePosition);
           }
           tokenReceiver.endItem(sourceLinePosition);
           this.depth--;
