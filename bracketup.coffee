@@ -190,9 +190,16 @@ class NodeParseException extends CustomError
 
 class RecordedToken
   constructor: (@text, @type, @numOpens = 0) ->
-    @balanced = false
+    @balanced = @numOpens == 0
+  cssClassName: ->
+    if @balanced
+      @type
+    else
+      @type + " unbalanced"
   createDom: (document) ->
-    document.createNode("span", {cssClassName: @type, text: @text})
+    document.createNode("span", {cssClassName: @cssClassName(), text: @text})
+  toString: ->
+    "{" + @type + " " + @text + " # " + @balanced + "}"
 
 class RecordedLineOfTokens
   constructor: (@depth) ->
@@ -202,15 +209,20 @@ class RecordedLineOfTokens
   isEmpty: ->
     @openBracketStack.length == 0
   addToken: (token) ->
+    console.log("  add token " + inspect(token.text) + " numOpens = " + token.numOpens)
     @tokens.push(token)
     @depthAtEnd += token.numOpens
     if token.numOpens == 1
+      console.log("    push open")
       @openBracketStack.push(token)
     else if token.numOpens == -1
       if @openBracketStack.length > 0
-        matchingStart = @openBracketStack.pop
+        console.log("   balance ")
+        matchingStart = @openBracketStack.pop()
         matchingStart.balanced = true
+        console.log("      matchingStart = " + matchingStart)
         token.balanced = true
+        console.log("      token = " + token)
 
   createDom: (document) ->
     dom = document.createNode("div", {cssClassName: "line"})

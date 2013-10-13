@@ -124,3 +124,6 @@
     line-height: 2em; }
   .bracketup-error .error-message {
     color: red; }
+  .bracketup-error .parsed-tokens .line .unbalanced {
+    color: green;
+    background-color: yellow; }

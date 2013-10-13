@@ -368,14 +368,26 @@
       this.text = text;
       this.type = type;
       this.numOpens = numOpens != null ? numOpens : 0;
-      this.balanced = false;
+      this.balanced = this.numOpens === 0;
     }
+
+    RecordedToken.prototype.cssClassName = function() {
+      if (this.balanced) {
+        return this.type;
+      } else {
+        return this.type + " unbalanced";
+      }
+    };
 
     RecordedToken.prototype.createDom = function(document) {
       return document.createNode("span", {
-        cssClassName: this.type,
+        cssClassName: this.cssClassName(),
         text: this.text
       });
+    };
+
+    RecordedToken.prototype.toString = function() {
+      return "{" + this.type + " " + this.text + " # " + this.balanced + "}";
     };
 
     return RecordedToken;
@@ -388,6 +400,7 @@
       this.depthAtEnd = this.depth;
       this.openBracketStack = [];
       this.tokens = [];
+      console.log("Start line");
     }
 
     RecordedLineOfTokens.prototype.isEmpty = function() {
@@ -396,15 +409,20 @@
 
     RecordedLineOfTokens.prototype.addToken = function(token) {
       var matchingStart;
+      console.log("  add token " + inspect(token.text) + " numOpens = " + token.numOpens);
       this.tokens.push(token);
       this.depthAtEnd += token.numOpens;
       if (token.numOpens === 1) {
+        console.log("    push open");
         return this.openBracketStack.push(token);
       } else if (token.numOpens === -1) {
         if (this.openBracketStack.length > 0) {
-          matchingStart = this.openBracketStack.pop;
+          console.log("   balance ");
+          matchingStart = this.openBracketStack.pop();
           matchingStart.balanced = true;
-          return token.balanced = true;
+          console.log("      matchingStart = " + matchingStart);
+          token.balanced = true;
+          return console.log("      token = " + token);
         }
       }
     };
@@ -645,7 +663,6 @@
       linePosition = 1;
       sourceLinePosition = sourceLine.position(linePosition);
       while ((match = scanningRegex.exec(line))) {
-        console.log("  match = " + inspect(match));
         matchedSubstring = match[0];
         matchedSubstrings.push(matchedSubstring);
         if (match[1]) {

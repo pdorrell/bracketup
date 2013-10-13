@@ -164,4 +164,12 @@ $default_block_background: white;
     .error-message {
 	color: red;
     }
+    .parsed-tokens {
+	.line {
+	    .unbalanced {
+		color: green;
+		background-color: yellow;
+	    }
+	}
+    }
 }
