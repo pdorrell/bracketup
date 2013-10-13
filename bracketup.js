@@ -101,20 +101,16 @@
         line = lines[i];
         if (i + 1 === this.sourceLine.lineNumber) {
           dom.appendChild(document.createNode("div", {
-            className: "error-line",
+            cssClassName: "error-line",
             text: line
           }));
-          dom.appendChild(document.createNode("div", {
-            className: "error-pointer",
-            text: this.errorPointerLine(0)
-          }));
           _results.push(dom.appendChild(document.createNode("div", {
-            className: "error-message",
-            text: message
+            cssClassName: "error-pointer",
+            text: this.errorPointerLine(0)
           })));
         } else {
           _results.push(dom.appendChild(document.createNode("div", {
-            className: "line",
+            cssClassName: "line",
             text: line
           })));
         }
@@ -214,10 +210,19 @@
     };
 
     CustomError.prototype.errorInfoDom = function() {
-      var dom;
+      var dom, messageDom, messageTextDom;
       dom = this.document.createNode("div", {
-        cssClassName: "bracketup-error",
-        text: "Compilation Error: " + this.message
+        cssClassName: "bracketup-error"
+      });
+      messageDom = this.document.createNode("div", {
+        parent: dom,
+        cssClassName: "message",
+        text: "Compilation Error: "
+      });
+      messageTextDom = this.document.createNode("span", {
+        parent: messageDom,
+        cssClassName: "message-text",
+        text: this.message
       });
       if (this.sourceLinePosition) {
         this.sourceLinePosition.addErrorInfo(this.document, dom, this.message);

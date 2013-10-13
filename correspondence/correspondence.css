@@ -100,3 +100,27 @@
         margin-top: 0; }
       .blocks-wrapper .interleaved-block .block:last-child {
         margin-bottom: 0; }
+
+.bracketup-error {
+  border: solid 1pt red;
+  margin: 0.3em;
+  padding: 1em; }
+  .bracketup-error .message {
+    font-family: Arial, Helvetic, sans-serif;
+    font-size: 1.3em;
+    margin: 0 0 0.4em 0; }
+    .bracketup-error .message .message-text {
+      font-weight: bold;
+      color: red; }
+  .bracketup-error .line, .bracketup-error .error-line, .bracketup-error .error-pointer {
+    font-family: "Lucida Console", Monaco, monospace;
+    white-space: pre; }
+  .bracketup-error .line {
+    color: #000060; }
+  .bracketup-error .error-pointer, .bracketup-error .error-line {
+    color: red;
+    background-color: #fff0f0; }
+  .bracketup-error .error-line {
+    line-height: 2em; }
+  .bracketup-error .error-message {
+    color: red; }
