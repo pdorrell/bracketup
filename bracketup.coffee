@@ -32,11 +32,23 @@ class SourceLinePosition
   constructor: (@sourceLine, @position) ->
   toString: ->
     @sourceLine + ":" + @position
+  errorPointerLine: (indent=0) ->
+    repeatedString(" ", indent + @position - 1) + "^"
   logLineAndPosition: () ->
     linePrefix = @toString() + ":"
     line1 = linePrefix + @sourceLine.line
-    line2 = repeatedString(" ", linePrefix.length + @position - 1) + "^"
+    line2 = @errorPointerLine(linePrefix.length)
     [line1, line2]
+  addErrorInfo: (document, dom, message) ->
+    lines = @sourceLine.sourceFileInfo.lines
+    for i in [0...lines.length]
+      line = lines[i]
+      if (i+1 == @sourceLine.lineNumber)
+        dom.appendChild(document.createNode("div", {className: "error-line", text: line}))
+        dom.appendChild(document.createNode("div", {className: "error-pointer", text: @errorPointerLine(0)}))
+        dom.appendChild(document.createNode("div", {className: "error-message", text: message}))
+      else
+        dom.appendChild(document.createNode("div", {className: "line", text: line}))
 
 class TextNode
   constructor: (@string, @sourceLinePosition) ->
@@ -75,7 +87,10 @@ class CustomError
       console.log ""
       console.log @sourceLinePosition.logLineAndPosition().join("\n")
   errorInfoDom: ->
-    @document.createNode("div", {text: "There was an error here: " + @message})
+    dom = @document.createNode("div", {cssClassName: "bracketup-error", text: "Compilation Error: " + @message})
+    if @sourceLinePosition
+      @sourceLinePosition.addErrorInfo(@document, dom, @message)
+    dom
 
 class CompileError extends CustomError
   constructor: (message, @sourceLinePosition) ->

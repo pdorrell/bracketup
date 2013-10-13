@@ -78,12 +78,48 @@
       return this.sourceLine + ":" + this.position;
     };
 
+    SourceLinePosition.prototype.errorPointerLine = function(indent) {
+      if (indent == null) {
+        indent = 0;
+      }
+      return repeatedString(" ", indent + this.position - 1) + "^";
+    };
+
     SourceLinePosition.prototype.logLineAndPosition = function() {
       var line1, line2, linePrefix;
       linePrefix = this.toString() + ":";
       line1 = linePrefix + this.sourceLine.line;
-      line2 = repeatedString(" ", linePrefix.length + this.position - 1) + "^";
+      line2 = this.errorPointerLine(linePrefix.length);
       return [line1, line2];
+    };
+
+    SourceLinePosition.prototype.addErrorInfo = function(document, dom, message) {
+      var i, line, lines, _i, _ref, _results;
+      lines = this.sourceLine.sourceFileInfo.lines;
+      _results = [];
+      for (i = _i = 0, _ref = lines.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+        line = lines[i];
+        if (i + 1 === this.sourceLine.lineNumber) {
+          dom.appendChild(document.createNode("div", {
+            className: "error-line",
+            text: line
+          }));
+          dom.appendChild(document.createNode("div", {
+            className: "error-pointer",
+            text: this.errorPointerLine(0)
+          }));
+          _results.push(dom.appendChild(document.createNode("div", {
+            className: "error-message",
+            text: message
+          })));
+        } else {
+          _results.push(dom.appendChild(document.createNode("div", {
+            className: "line",
+            text: line
+          })));
+        }
+      }
+      return _results;
     };
 
     return SourceLinePosition;
@@ -178,9 +214,15 @@
     };
 
     CustomError.prototype.errorInfoDom = function() {
-      return this.document.createNode("div", {
-        text: "There was an error here: " + this.message
+      var dom;
+      dom = this.document.createNode("div", {
+        cssClassName: "bracketup-error",
+        text: "Compilation Error: " + this.message
       });
+      if (this.sourceLinePosition) {
+        this.sourceLinePosition.addErrorInfo(this.document, dom, this.message);
+      }
+      return dom;
     };
 
     return CustomError;
