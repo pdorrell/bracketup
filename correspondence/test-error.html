@@ -38,9 +38,9 @@ MODULE_SIMULATOR.startScript("correspondence-configuration.js");
 
 <div class="author">Author: <a href="http://thinkinghard.com">Philip Dorrell</a></div>
 
-<p>This page demonstrates how Correspondence-Bracketup compilation error messages are displayed in the browser.</p>
+<p>This page demonstrates how <a href="../index.html">Bracketup</a> compilation error messages are displayed in the browser.</p>
 
-<h2>First and Second Translations</h2>
+<h2>Error Example with a Mis-Spelt Function Name</h2>
 
 <!-- The following script element is the actual source for this page. It is interpreted
 by the Javascript code to generate the DOM, in the HTML format required by the Correspondence framework.-->
@@ -57,7 +57,7 @@ by the Javascript code to generate the DOM, in the HTML format required by the C
 ]
 
 [translation
- [english [_languageTitl English]
+ [english [_longuageTitle English]
   [A [1 Hello]]
  ]
  [spanish [_languageTitle Spanish]
@@ -67,40 +67,48 @@ by the Javascript code to generate the DOM, in the HTML format required by the C
 </script>
 
 <p>(Note: the pointer is pointing at the "[", because the error message is currently associated with the 
-lexed token consisting of "[_languageTitl ".)</p>
+lexed token consisting of "[_longuageTitle ".)</p>
 
-<h2>Third Translation</h2>
+<h2>Error Example with Too Many Closing Brackets</h2>
+
+<p>This example has extra closing brackets. But the error location is not the actual location of the closing
+brackets that need to be deleted, so I have to find a better way to show the opening and closing of brackets
+to help the page developer find the cause of the error.</p>
 
 <noscript>There is content here in the page which cannot be viewed unless you have Javascript enabled.</noscript>
 <script type="text/correspondence-bracketup">
 
 [translation [_title Hello]
  [english [_languageTitle English]
-  [A [1 Hello] [2 World]]
+  [A [1 Hello] [2 World]]]
   [B [1 Goodbye]]
  ]
- [spanish [_languageTitle Spanish]
+ [spanish [_languageTitle Spanish]]
   [A [1 Hola]]
   [B [1 Adios]]
  ]
 ]
 </script>
 
-<h2>Fourth Translation</h2>
+<h2>Error Example with Not Enough Closing Brackets</h2>
+
+<p>This example has a missing closing bracket. But the error location is not the actual location of the closing
+bracket that needs to be inserted, so, as with the previous example,
+I have to find a better way to show the opening and closing of brackets
+to help the page developer find the cause of the error.</p>
 
 <noscript>There is content here in the page which cannot be viewed unless you have Javascript enabled.</noscript>
 <script type="text/correspondence-bracketup">
 [translation
  [english [_languageTitle English]
   [A [1 Hello]]
-  [B [1 Goodbye]]
+  [B [1 Goodbye]
  ]
  [spanish [_languageTitle Spanish]
   [A [1 Hola]]
   [B [1 Adios]]
  ]
 ]
-
 </script>
 
 <div class="date">Last updated: 12 October 2013</div>
