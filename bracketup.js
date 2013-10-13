@@ -9,8 +9,9 @@
   inspect = utils.inspect;
 
   SourceFileInfo = (function() {
-    function SourceFileInfo(fileName) {
+    function SourceFileInfo(fileName, lines) {
       this.fileName = fileName;
+      this.lines = lines;
     }
 
     SourceFileInfo.prototype.toString = function() {
@@ -21,10 +22,10 @@
       return new SourceLine(this, string, lineNumber);
     };
 
-    SourceFileInfo.prototype.endOfFilePosition = function(lines) {
+    SourceFileInfo.prototype.endOfFilePosition = function() {
       var lastLine, numLines;
-      numLines = lines.length;
-      lastLine = numLines > 0 ? lines[numLines - 1] : null;
+      numLines = this.lines.length;
+      lastLine = numLines > 0 ? this.lines[numLines - 1] : null;
       if (lastLine !== null) {
         return this.line(lastLine, numLines - 1).position(lastLine.length + 1);
       } else {
@@ -431,13 +432,13 @@
       var i, line, lines, sourceFileInfo, _i, _ref;
       this.depth = 0;
       lines = source.split("\n");
-      sourceFileInfo = new SourceFileInfo(sourceFileName);
+      sourceFileInfo = new SourceFileInfo(sourceFileName, lines);
       for (i = _i = 0, _ref = lines.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
         line = lines[i];
         this.scanLine(tokenReceiver, line, sourceFileInfo.line(line, i + 1));
       }
       if (this.depth !== 0) {
-        throw new NodeParseException(this.depth + " unbalanced '['s at end of file", sourceFileInfo.endOfFilePosition(lines));
+        throw new NodeParseException(this.depth + " unbalanced '['s at end of file", sourceFileInfo.endOfFilePosition());
       }
     };
 

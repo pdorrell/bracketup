@@ -2,7 +2,7 @@ utils = require("./utils.js")
 inspect = utils.inspect
 
 class SourceFileInfo
-  constructor: (@fileName) ->
+  constructor: (@fileName, @lines) ->
     
   toString: ->
     @fileName
@@ -10,9 +10,9 @@ class SourceFileInfo
   line: (string, lineNumber) ->
     new SourceLine this, string, lineNumber
     
-  endOfFilePosition: (lines) ->
-    numLines = lines.length
-    lastLine = if numLines > 0 then lines[numLines-1] else null
+  endOfFilePosition: () ->
+    numLines = @lines.length
+    lastLine = if numLines > 0 then @lines[numLines-1] else null
     if lastLine != null
       @line(lastLine, numLines-1).position(lastLine.length+1)
     else
@@ -269,12 +269,12 @@ class BracketupScanner
   scanSource: (tokenReceiver, source, sourceFileName) ->
     @depth = 0
     lines = source.split("\n")
-    sourceFileInfo = new SourceFileInfo(sourceFileName)
+    sourceFileInfo = new SourceFileInfo(sourceFileName, lines)
     for i in [0...lines.length]
       line = lines[i]
       @scanLine(tokenReceiver, line, sourceFileInfo.line(line, i+1))
     if @depth != 0
-      throw new NodeParseException(@depth + " unbalanced '['s at end of file", sourceFileInfo.endOfFilePosition(lines))
+      throw new NodeParseException(@depth + " unbalanced '['s at end of file", sourceFileInfo.endOfFilePosition())
 
 class TextElement
   constructor: (@string) ->
