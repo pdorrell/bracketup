@@ -187,15 +187,29 @@ class NodeParseException extends CustomError
   getMessageLine: ->
     "Syntax error: " + @message
 
+class ReparsedBracketup
+  constructor: ->
+    @lines = []
+    @depth = 0
+
 class BracketParseException extends NodeParseException
   constructor: (message, @sourceLinePosition) ->
     super(message, @sourceLinePosition)
+  addSourceCodeErrorInfo: (dom) ->
+    if @sourceLinePosition
+      linesDom=@document.createNode("div", {text: "a bracket parse exception"})
+      dom.appendChild linesDom
 
 class NodeParser
   constructor: ->
     @nodesStack = []
     @currentElementNode = null
     @rootElements = []
+
+  recordStart: (token) -> {}
+  recordEnd: (token) -> {}
+  recordQuotedCharacter: (token) -> {}
+  recordText: (token) -> {}
 
   startItem: (itemArguments, whitespace, sourceLinePosition) ->
     elementNode = new ElementNode(itemArguments, whitespace, sourceLinePosition)
@@ -260,20 +274,24 @@ class BracketupScanner
       matchedSubstrings.push(matchedSubstring)
       #console.log("==> " + inspect(match[0]))
       if match[1]
+        tokenReceiver.recordStart(match[1])
         @sendAnyTexts(tokenReceiver)
         itemArguments = match[2].split(",")
         whitespace = match[3]
         tokenReceiver.startItem(itemArguments, whitespace, sourceLinePosition)
         @depth++
       else if match[4]
+        tokenReceiver.recordEnd(match[4])
         @sendAnyTexts(tokenReceiver)
         if @depth <= 0
           throw new BracketParseException("Unexpected ']'", sourceLinePosition)
         tokenReceiver.endItem(sourceLinePosition)
         @depth--
       else if match[5]
+        tokenReceiver.recordQuotedCharacter(match[5])
         @saveTextPortion(match[6], sourceLinePosition)
       else if match[7]
+        tokenReceiver.recordText(match[7])
         @saveTextPortion(match[7], sourceLinePosition)
       else
         console.log("match = " + inspect(match))
