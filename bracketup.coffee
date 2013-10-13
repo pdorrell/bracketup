@@ -187,10 +187,71 @@ class NodeParseException extends CustomError
   getMessageLine: ->
     "Syntax error: " + @message
 
-class ReparsedBracketup
+class RecordedToken
+  constructor: (@text, @type, @numOpens = 0) ->
+    @balanced = false
+
+class RecordedLineOfTokens
+  constructor: (@depth) ->
+    @depthAtEnd = @depth
+    @openBracketStack = []
+    @tokens = []
+  isEmpty: ->
+    @openBracketStack.length == 0
+  addToken: (token) ->
+    @tokens.push(token)
+    @depthAtEnd += token.numOpens
+    if token.numOpens == 1
+      @openBracketStack.push(token)
+    else if token.numOpens == -1
+      if @openBracketStack.length > 0
+        matchingStart = @openBracketStack.pop
+        matchingStart.balanced = true
+        token.balanced = true
+        
+  
+
+# An object that records token parsed (to help with tracing missing "[" or "]" errors)
+class RecordedTokens
   constructor: ->
     @lines = []
     @depth = 0
+    @openBracketStack = []
+    @currentLine = new RecordedLineOfTokens()
+    @depths = [0]
+
+  addTokenToCurrentLine: (recordedToken) ->
+    @currentLine.push(recordedToken)
+
+  recordStart: (tokenString) ->
+    recordedToken = new RecordedToken(tokenString, "open", 1)
+    @addTokenToCurrentLine(recordedToken)
+
+  recordEnd: (tokenString) ->
+    recordedToken = new RecordedToken(tokenString, "close", -1)
+    @addTokenToCurrentLine(recordedToken)
+    
+  recordQuotedCharacter: (tokenString) ->
+    recordedToken = new RecordedToken(tokenString, "quoted")
+    @addTokenToCurrentLine(recordedToken)
+
+  recordText: (tokenString) ->
+    recordedToken = new RecordedToken(tokenString, "text")
+    @addTokenToCurrentLine(recordedToken)
+
+  startItem: (itemArguments, whitespace, sourceLinePosition) -> {}  
+  endItem: (sourceLinePosition) -> {}
+  text: (string, sourceLinePosition) -> {}
+  
+  endOfLine: (sourceLinePosition) ->
+    @depth = @currentLine.depthAtEnd
+    @lines.push(@currentLine)
+    @currentLine = new RecordedLineOfTokens(@depth)
+
+  endOfSource: ->
+    @depth = @currentLine.depthAtEnd
+    if !@currentLine.isEmpty
+      @lines.push(@currentLine)
 
 class BracketParseException extends NodeParseException
   constructor: (message, @sourceLinePosition) ->
@@ -206,10 +267,10 @@ class NodeParser
     @currentElementNode = null
     @rootElements = []
 
-  recordStart: (token) -> {}
-  recordEnd: (token) -> {}
-  recordQuotedCharacter: (token) -> {}
-  recordText: (token) -> {}
+  recordStart: (tokenString) -> {}
+  recordEnd: (tokenString) -> {}
+  recordQuotedCharacter: (tokenString) -> {}
+  recordText: (tokenString) -> {}
 
   startItem: (itemArguments, whitespace, sourceLinePosition) ->
     elementNode = new ElementNode(itemArguments, whitespace, sourceLinePosition)
@@ -246,6 +307,8 @@ class NodeParser
     else
       # console.log("Ignoring end-of-line outside of root element")
 
+  endOfSource: -> {}
+  
 class BracketupScanner
   constructor: ->
 
@@ -314,6 +377,7 @@ class BracketupScanner
     for i in [0...lines.length]
       line = lines[i]
       @scanLine(tokenReceiver, line, sourceFileInfo.line(line, i+1))
+    tokenReceiver.endOfSource
     if @depth != 0
       onUnbalancedAtEnd(@depth, sourceFileInfo)
 
