@@ -283,7 +283,7 @@ class BracketupScanner
                                    "\n                  != " + inspect(line), sourceLinePosition)
     # console.log("matched substrings = " + inspect(matchedSubstrings.join("")))
   
-  scanSource: (tokenReceiver, source, sourceFileName) ->
+  scanSource: (tokenReceiver, source, sourceFileName, onUnbalancedAtEnd) ->
     @depth = 0
     lines = source.split("\n")
     sourceFileInfo = new SourceFileInfo(sourceFileName, lines)
@@ -291,7 +291,7 @@ class BracketupScanner
       line = lines[i]
       @scanLine(tokenReceiver, line, sourceFileInfo.line(line, i+1))
     if @depth != 0
-      throw new NodeParseException(@depth + " unbalanced '['s at end of file", sourceFileInfo.endOfFilePosition())
+      onUnbalancedAtEnd(@depth, sourceFileInfo)
 
 class TextElement
   constructor: (@string) ->
@@ -454,7 +454,10 @@ class BracketupCompiler
   compile: (source, sourceFileInfo) ->
     bracketupScanner = new BracketupScanner()
     nodeParser = new NodeParser()
-    bracketupScanner.scanSource(nodeParser, source, sourceFileInfo)
+    bracketupScanner.scanSource(nodeParser, source, sourceFileInfo,
+      (depth, sourceFileInfo) ->
+        throw new NodeParseException(depth + " unbalanced '['s at end of file", sourceFileInfo.endOfFilePosition()))
+        
     parsedRootElements = nodeParser.rootElements
     compiledObjects = []
     for rootElement in parsedRootElements

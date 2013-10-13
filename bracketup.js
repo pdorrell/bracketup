@@ -475,7 +475,7 @@
       }
     };
 
-    BracketupScanner.prototype.scanSource = function(tokenReceiver, source, sourceFileName) {
+    BracketupScanner.prototype.scanSource = function(tokenReceiver, source, sourceFileName, onUnbalancedAtEnd) {
       var i, line, lines, sourceFileInfo, _i, _ref;
       this.depth = 0;
       lines = source.split("\n");
@@ -485,7 +485,7 @@
         this.scanLine(tokenReceiver, line, sourceFileInfo.line(line, i + 1));
       }
       if (this.depth !== 0) {
-        throw new NodeParseException(this.depth + " unbalanced '['s at end of file", sourceFileInfo.endOfFilePosition());
+        return onUnbalancedAtEnd(this.depth, sourceFileInfo);
       }
     };
 
@@ -809,7 +809,9 @@
       var bracketupScanner, compiledObjects, correspondence, nodeParser, parsedRootElements, rootElement, _i, _len;
       bracketupScanner = new BracketupScanner();
       nodeParser = new NodeParser();
-      bracketupScanner.scanSource(nodeParser, source, sourceFileInfo);
+      bracketupScanner.scanSource(nodeParser, source, sourceFileInfo, function(depth, sourceFileInfo) {
+        throw new NodeParseException(depth + " unbalanced '['s at end of file", sourceFileInfo.endOfFilePosition());
+      });
       parsedRootElements = nodeParser.rootElements;
       compiledObjects = [];
       for (_i = 0, _len = parsedRootElements.length; _i < _len; _i++) {
