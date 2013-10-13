@@ -74,6 +74,8 @@ class CustomError
       console.log @getMessageLine()
       console.log ""
       console.log @sourceLinePosition.logLineAndPosition().join("\n")
+  errorInfoDom: ->
+    @document.createNode("div", {text: "There was an error here: " + @message})
 
 class CompileError extends CustomError
   constructor: (message, @sourceLinePosition) ->
@@ -446,9 +448,14 @@ class BracketupCompiler
   
   compileDoms: (source, document, sourceFileName) ->
     compiledDoms = []
-    compiledObjects = @compile(source, sourceFileName)
     documentWrapper = new Document(document)
-    (compiledObject.createDom(documentWrapper) for compiledObject in compiledObjects)
+    try
+      compiledObjects = @compile(source, sourceFileName)
+      (compiledObject.createDom(documentWrapper) for compiledObject in compiledObjects)
+    catch error
+      if error instanceof CustomError
+        error.document = documentWrapper
+      throw error
 
 exports.BracketupScanner = BracketupScanner
 exports.NodeParser = NodeParser
@@ -465,4 +472,5 @@ exports.Link = Link
 exports.Span = Span
 exports.NDash = NDash
 
+exports.CustomError = CustomError
 exports.BracketupCompiler = BracketupCompiler

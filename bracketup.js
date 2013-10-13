@@ -176,6 +176,12 @@
       }
     };
 
+    CustomError.prototype.errorInfoDom = function() {
+      return this.document.createNode("div", {
+        text: "There was an error here: " + this.message
+      });
+    };
+
     return CustomError;
 
   })();
@@ -767,16 +773,24 @@
     };
 
     BracketupCompiler.prototype.compileDoms = function(source, document, sourceFileName) {
-      var compiledDoms, compiledObject, compiledObjects, documentWrapper, _i, _len, _results;
+      var compiledDoms, compiledObject, compiledObjects, documentWrapper, error, _i, _len, _results;
       compiledDoms = [];
-      compiledObjects = this.compile(source, sourceFileName);
       documentWrapper = new Document(document);
-      _results = [];
-      for (_i = 0, _len = compiledObjects.length; _i < _len; _i++) {
-        compiledObject = compiledObjects[_i];
-        _results.push(compiledObject.createDom(documentWrapper));
+      try {
+        compiledObjects = this.compile(source, sourceFileName);
+        _results = [];
+        for (_i = 0, _len = compiledObjects.length; _i < _len; _i++) {
+          compiledObject = compiledObjects[_i];
+          _results.push(compiledObject.createDom(documentWrapper));
+        }
+        return _results;
+      } catch (_error) {
+        error = _error;
+        if (error instanceof CustomError) {
+          error.document = documentWrapper;
+        }
+        throw error;
       }
-      return _results;
     };
 
     return BracketupCompiler;
@@ -808,6 +822,8 @@
   exports.Span = Span;
 
   exports.NDash = NDash;
+
+  exports.CustomError = CustomError;
 
   exports.BracketupCompiler = BracketupCompiler;
 

@@ -37,6 +37,8 @@ function compileCorrespondenceSource(sourceElements) {
   sourceElements.each(function(index, sourceElement) {
     var sourceElementSelector = $(sourceElement);
     var correspondenceSource = sourceElementSelector.html();
+    var translationsDom = $("<div class='translations'/>");
+    sourceElementSelector.after(translationsDom);
     try {
       var scriptNumber = index+1;
       var id = sourceElementSelector.attr("id");
@@ -44,19 +46,20 @@ function compileCorrespondenceSource(sourceElements) {
         " Correspondence script element" + 
         (id ? " (id = " + id + ")" : "");
       var compiledDoms = correspondenceCompiler.compileDoms(correspondenceSource, document, sourceFileName);
-      var translationsDom = $("<div class='translations'/>");
-      sourceElementSelector.after(translationsDom);
       for (var i=0; i<compiledDoms.length; i++) {
         translationsDom.append(compiledDoms[i]);
       }
     }
     catch (error) {
-      alert("Error compiling Correspondence source: \"" + error.message + "\"\n\n" + 
-            "See browser console for further details.");
-      if (error.logSourceError) {
+      if (error instanceof bracketup.CustomError) {
         error.logSourceError();
+        translationsDom.append(error.errorInfoDom());
       }
-      throw error;
+      else {
+        alert("Unexpected error compiling Correspondence source: \"" + error.message + "\"\n\n" + 
+              "See browser console for further details.");
+        throw error;
+      }
     }
   });
 }

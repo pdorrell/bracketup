@@ -40,21 +40,14 @@ MODULE_SIMULATOR.startScript("correspondence-configuration.js");
 
 <p>Mouse over the translations to see the relationships between them.</p>
 
+<h2>First Group of Translations</h2>
+
 <!-- The following script element is the actual source for this page. It is interpreted
 by the Javascript code to generate the DOM, in the HTML format required by the Correspondence framework.-->
 <noscript>There is content here in the page which cannot be viewed unless you have Javascript enabled.</noscript>
 <script type="text/correspondence-bracketup">
 
 [translation [_title Hello]
- [english [_languageTitle English]
-  [A [1 Hello]]
- ]
- [spanish [_languageTitle Spanish]
-  [A [2 Hola]]
- ]
-]
-
-[translation
  [english [_languageTitle English]
   [A [1 Hello] [_unknown World]]
  ]
@@ -63,9 +56,24 @@ by the Javascript code to generate the DOM, in the HTML format required by the C
  ]
 ]
 
-[translation [_title Hello]
+[translation
  [english [_languageTitle English]
   [A [1 Hello]]
+ ]
+ [spanish [_languageTitle Spanish]
+  [A [2 Hola]]
+ ]
+]
+</script>
+
+<h2>Second Group of Translations</h2>
+
+<noscript>There is content here in the page which cannot be viewed unless you have Javascript enabled.</noscript>
+<script type="text/correspondence-bracketup">
+
+[translation [_title Hello]
+ [english [_languageTitle English]
+  [A [1 Hello] [2 World]]
   [B [1 Goodbye]]
  ]
  [spanish [_languageTitle Spanish]
