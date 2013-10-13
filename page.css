@@ -19,6 +19,12 @@ h2 {
   font: 2em Arial, Helvetic, sans-serif;
   margin: 1em 0 0.4em 0; }
 
+h3 {
+  color: #000070;
+  font: 1.2em Arial, Helvetic, sans-serif;
+  font-weight: bold;
+  margin: 1em 0 0.4em 0; }
+
 body {
   color: #404040;
   margin: 0.4em 2em; }

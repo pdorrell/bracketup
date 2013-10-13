@@ -164,23 +164,31 @@ $default_block_background: white;
     .error-message {
 	color: red;
     }
-    .parsed-tokens {
-	.line {
-	    .depth-indent {
-		display: inline-block;
-		width: 2em;
-		background-color: #b0b0ff;
-		color: #808080;
-		margin: 0.2em 0.2em;
-	    }
-	    .unbalanced {
-		color: #005000;
-		background-color: yellow;
-	    }
-	    .unexpected {
-		color: red;
-		background-color: #ffa0a0;
-	    }
+}
+
+.example {
+    font-size: 0.8em;
+    display: inline-block;
+    font-family: $code_font_family;
+    white-space: pre;
+}	    
+
+.parsed-tokens {
+    .line {
+	.depth-indent {
+	    display: inline-block;
+	    width: 2em;
+	    background-color: #b0b0ff;
+	    color: #808080;
+	    margin: 0.2em 0.2em;
+	}
+	.unbalanced {
+	    color: #005000;
+	    background-color: yellow;
+	}
+	.unexpected {
+	    color: red;
+	    background-color: #ffa0a0;
 	}
     }
 }

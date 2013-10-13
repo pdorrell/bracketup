@@ -69,11 +69,26 @@ by the Javascript code to generate the DOM, in the HTML format required by the C
 <p>(Note: the pointer is pointing at the "[", because the error message is currently associated with the 
 lexed token consisting of "[_longuageTitle ".)</p>
 
-<h2>Error Example with Too Many Closing Brackets</h2>
+<h2>Error Examples With Too Many or Too Few Closing Brackets</h2>
+
+<p>Errors with closing brackets can be hard to trace, because the point where the error becomes apparent
+may be much later than the point where the mistake was made.</p>
+
+<p>To help with tracing such errors, if a "too many" or "too few" closing brackets error occurs, the
+source code is shown with the following information:</p>
+
+<ul>
+ <li>Current bracket depth at start of line (which should be zero at the first line, and at the end of any completed
+<b>translation</b> block), e.g. <div class="parsed-tokens example"><div class="line"><div class="depth-indent">...</div><div class="depth-indent">...</div></div></div></li>
+ <li>All start and end tokens which are not balanced on the same line, e.g. <div class="parsed-tokens example"><div class="line"><div class="open unbalanced">[translation</div></div></div></li>
+ <li>All unexpected closing brackets, e.g. <div class="parsed-tokens example"><div class="line"><div class="close unexpected">]</div></div></div></li>
+</ul>
+
+<h3>Error Example with Too Many Closing Brackets</h3>
 
 <p>This example has extra closing brackets. But the error location is not the actual location of the closing
-brackets that need to be deleted, so I have to find a better way to show the opening and closing of brackets
-to help the page developer find the cause of the error.</p>
+brackets that need to be deleted. (There is a surplus bracket at the end of "Hello World" line,
+and another one after the word "Spanish".)</p>
 
 <noscript>There is content here in the page which cannot be viewed unless you have Javascript enabled.</noscript>
 <script type="text/correspondence-bracketup">
@@ -90,12 +105,10 @@ to help the page developer find the cause of the error.</p>
 ]
 </script>
 
-<h2>Error Example with Not Enough Closing Brackets</h2>
+<h3>Error Example with Not Enough Closing Brackets</h3>
 
 <p>This example has a missing closing bracket. But the error location is not the actual location of the closing
-bracket that needs to be inserted, so, as with the previous example,
-I have to find a better way to show the opening and closing of brackets
-to help the page developer find the cause of the error.</p>
+bracket that needs to be inserted. (There is a closing bracket missing after "Goodbye".)</p>
 
 <noscript>There is content here in the page which cannot be viewed unless you have Javascript enabled.</noscript>
 <script type="text/correspondence-bracketup">
