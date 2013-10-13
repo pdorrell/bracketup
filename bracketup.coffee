@@ -185,6 +185,10 @@ class NodeParseException extends CustomError
   getMessageLine: ->
     "Syntax error: " + @message
 
+class BracketParseException extends NodeParseException
+  constructor: (message, @sourceLinePosition) ->
+    super(message, @sourceLinePosition)
+
 class NodeParser
   constructor: ->
     @nodesStack = []
@@ -262,7 +266,7 @@ class BracketupScanner
       else if match[4]
         @sendAnyTexts(tokenReceiver)
         if @depth <= 0
-          throw new NodeParseException("Unexpected ']'", sourceLinePosition)
+          throw new BracketParseException("Unexpected ']'", sourceLinePosition)
         tokenReceiver.endItem(sourceLinePosition)
         @depth--
       else if match[5]
@@ -456,7 +460,8 @@ class BracketupCompiler
     nodeParser = new NodeParser()
     bracketupScanner.scanSource(nodeParser, source, sourceFileInfo,
       (depth, sourceFileInfo) ->
-        throw new NodeParseException(depth + " unbalanced '['s at end of file", sourceFileInfo.endOfFilePosition()))
+        throw new BracketParseException(depth + " unbalanced '['s at end of file",
+                                        sourceFileInfo.endOfFilePosition()))
         
     parsedRootElements = nodeParser.rootElements
     compiledObjects = []
