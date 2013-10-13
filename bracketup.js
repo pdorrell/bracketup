@@ -369,10 +369,13 @@
       this.type = type;
       this.numOpens = numOpens != null ? numOpens : 0;
       this.balanced = this.numOpens === 0;
+      this.unexpected = false;
     }
 
     RecordedToken.prototype.cssClassName = function() {
-      if (this.balanced) {
+      if (this.unexpected) {
+        return this.type + " unexpected";
+      } else if (this.balanced) {
         return this.type;
       } else {
         return this.type + " unbalanced";
@@ -410,6 +413,11 @@
       var matchingStart;
       this.tokens.push(token);
       this.depthAtEnd += token.numOpens;
+      console.log("adding token " + token);
+      console.log("  @depthAtEnd = " + this.depthAtEnd);
+      if (this.depthAtEnd < 0) {
+        token.unexpected = true;
+      }
       if (token.numOpens === 1) {
         return this.openBracketStack.push(token);
       } else if (token.numOpens === -1) {
@@ -430,7 +438,7 @@
         document.createNode("div", {
           parent: dom,
           cssClassName: "depth-indent",
-          text: "#"
+          text: " "
         });
       }
       _ref1 = this.tokens;
@@ -450,7 +458,7 @@
       this.lines = [];
       this.depth = 0;
       this.openBracketStack = [];
-      this.currentLine = new RecordedLineOfTokens();
+      this.currentLine = new RecordedLineOfTokens(this.depth);
       this.depths = [0];
     }
 

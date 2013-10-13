@@ -124,6 +124,14 @@
     line-height: 2em; }
   .bracketup-error .error-message {
     color: red; }
+  .bracketup-error .parsed-tokens .line .depth-indent {
+    display: inline-block;
+    width: 2em;
+    background-color: #a0a0ff;
+    margin: 0.2em 0.2em; }
   .bracketup-error .parsed-tokens .line .unbalanced {
     color: #005000;
     background-color: yellow; }
+  .bracketup-error .parsed-tokens .line .unexpected {
+    color: red;
+    background-color: #ffa0a0; }

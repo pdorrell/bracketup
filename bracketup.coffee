@@ -191,8 +191,11 @@ class NodeParseException extends CustomError
 class RecordedToken
   constructor: (@text, @type, @numOpens = 0) ->
     @balanced = @numOpens == 0
+    @unexpected = false
   cssClassName: ->
-    if @balanced
+    if @unexpected
+      @type + " unexpected"
+    else if @balanced
       @type
     else
       @type + " unbalanced"
@@ -211,6 +214,10 @@ class RecordedLineOfTokens
   addToken: (token) ->
     @tokens.push(token)
     @depthAtEnd += token.numOpens
+    console.log("adding token " + token)
+    console.log("  @depthAtEnd = " + @depthAtEnd)
+    if @depthAtEnd < 0
+      token.unexpected = true
     if token.numOpens == 1
       @openBracketStack.push(token)
     else if token.numOpens == -1
@@ -222,7 +229,7 @@ class RecordedLineOfTokens
   createDom: (document) ->
     dom = document.createNode("div", {cssClassName: "line"})
     for i in [0...@depth]
-      document.createNode("div", {parent: dom, cssClassName: "depth-indent", text: "#"})
+      document.createNode("div", {parent: dom, cssClassName: "depth-indent", text: " "})
     for token in @tokens
       dom.appendChild(token.createDom(document))
     dom
@@ -233,7 +240,7 @@ class RecordedTokens
     @lines = []
     @depth = 0
     @openBracketStack = []
-    @currentLine = new RecordedLineOfTokens()
+    @currentLine = new RecordedLineOfTokens(@depth)
     @depths = [0]
 
   checkDepth: false

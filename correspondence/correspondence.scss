@@ -166,9 +166,19 @@ $default_block_background: white;
     }
     .parsed-tokens {
 	.line {
+	    .depth-indent {
+		display: inline-block;
+		width: 2em;
+		background-color: #a0a0ff;
+		margin: 0.2em 0.2em;
+	    }
 	    .unbalanced {
 		color: #005000;
 		background-color: yellow;
+	    }
+	    .unexpected {
+		color: red;
+		background-color: #ffa0a0;
 	    }
 	}
     }
