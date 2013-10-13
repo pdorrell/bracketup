@@ -57,7 +57,7 @@ var correspondenceTests = {
     }, 
                    function(err) {
                      assert.equal(err.sourceLinePosition.toString(), "test/data/sample.bad.bracketup:8:19");
-                     assert.equal(err.message, "Unexpected ']'");
+                     assertEqualStrings(err.message, "Unexpected ']'");
                      return true;
                    });
   }, 

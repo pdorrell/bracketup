@@ -371,6 +371,13 @@
       this.balanced = false;
     }
 
+    RecordedToken.prototype.createDom = function(document) {
+      return document.createNode("span", {
+        cssClassName: this.type,
+        text: this.text
+      });
+    };
+
     return RecordedToken;
 
   })();
@@ -402,6 +409,26 @@
       }
     };
 
+    RecordedLineOfTokens.prototype.createDom = function(document) {
+      var dom, i, token, _i, _j, _len, _ref, _ref1;
+      dom = document.createNode("div", {
+        cssClassName: "line"
+      });
+      for (i = _i = 0, _ref = this.depth; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+        document.createNode("div", {
+          parent: dom,
+          cssClassName: "depth-indent",
+          text: "#"
+        });
+      }
+      _ref1 = this.tokens;
+      for (_j = 0, _len = _ref1.length; _j < _len; _j++) {
+        token = _ref1[_j];
+        dom.appendChild(token.createDom(document));
+      }
+      return dom;
+    };
+
     return RecordedLineOfTokens;
 
   })();
@@ -415,8 +442,10 @@
       this.depths = [0];
     }
 
+    RecordedTokens.prototype.checkDepth = false;
+
     RecordedTokens.prototype.addTokenToCurrentLine = function(recordedToken) {
-      return this.currentLine.push(recordedToken);
+      return this.currentLine.addToken(recordedToken);
     };
 
     RecordedTokens.prototype.recordStart = function(tokenString) {
@@ -468,6 +497,19 @@
       }
     };
 
+    RecordedTokens.prototype.createDom = function(document) {
+      var dom, line, _i, _len, _ref;
+      dom = document.createNode("div", {
+        cssClassName: "parsed-tokens"
+      });
+      _ref = this.lines;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        line = _ref[_i];
+        dom.appendChild(line.createDom(document));
+      }
+      return dom;
+    };
+
     return RecordedTokens;
 
   })();
@@ -481,12 +523,17 @@
     }
 
     BracketParseException.prototype.addSourceCodeErrorInfo = function(dom) {
-      var linesDom;
+      var bracketupScanner, fileName, linesDom, recordedTokens, sourceLines;
+      linesDom = this.document.createNode("div", {
+        text: "a bracket parse exception"
+      });
       if (this.sourceLinePosition) {
-        linesDom = this.document.createNode("div", {
-          text: "a bracket parse exception"
-        });
-        return dom.appendChild(linesDom);
+        sourceLines = this.sourceLinePosition.sourceLine.sourceFileInfo.lines;
+        fileName = this.sourceLinePosition.sourceLine.sourceFileInfo.fileName;
+        bracketupScanner = new BracketupScanner;
+        recordedTokens = new RecordedTokens;
+        bracketupScanner.scanSourceLines(recordedTokens, sourceLines, fileName);
+        return dom.appendChild(recordedTokens.createDom(this.document));
       }
     };
 
@@ -500,6 +547,8 @@
       this.currentElementNode = null;
       this.rootElements = [];
     }
+
+    NodeParser.prototype.checkDepth = true;
 
     NodeParser.prototype.recordStart = function(tokenString) {
       return {};
@@ -596,28 +645,29 @@
       linePosition = 1;
       sourceLinePosition = sourceLine.position(linePosition);
       while ((match = scanningRegex.exec(line))) {
+        console.log("  match = " + inspect(match));
         matchedSubstring = match[0];
         matchedSubstrings.push(matchedSubstring);
         if (match[1]) {
-          tokenReceiver.recordStart(match[1]);
+          tokenReceiver.recordStart(matchedSubstring);
           this.sendAnyTexts(tokenReceiver);
           itemArguments = match[2].split(",");
           whitespace = match[3];
           tokenReceiver.startItem(itemArguments, whitespace, sourceLinePosition);
           this.depth++;
         } else if (match[4]) {
-          tokenReceiver.recordEnd(match[4]);
+          tokenReceiver.recordEnd(matchedSubstring);
           this.sendAnyTexts(tokenReceiver);
-          if (this.depth <= 0) {
+          if (this.depth <= 0 && tokenReceiver.checkDepth) {
             throw new BracketParseException("Unexpected ']'", sourceLinePosition);
           }
           tokenReceiver.endItem(sourceLinePosition);
           this.depth--;
         } else if (match[5]) {
-          tokenReceiver.recordQuotedCharacter(match[5]);
+          tokenReceiver.recordQuotedCharacter(matchedSubstring);
           this.saveTextPortion(match[6], sourceLinePosition);
         } else if (match[7]) {
-          tokenReceiver.recordText(match[7]);
+          tokenReceiver.recordText(matchedSubstring);
           this.saveTextPortion(match[7], sourceLinePosition);
         } else {
           console.log("match = " + inspect(match));
@@ -635,16 +685,24 @@
     };
 
     BracketupScanner.prototype.scanSource = function(tokenReceiver, source, sourceFileName, onUnbalancedAtEnd) {
-      var i, line, lines, sourceFileInfo, _i, _ref;
-      this.depth = 0;
+      var lines;
+      if (onUnbalancedAtEnd == null) {
+        onUnbalancedAtEnd = null;
+      }
       lines = source.split("\n");
+      return this.scanSourceLines(tokenReceiver, lines, sourceFileName, onUnbalancedAtEnd);
+    };
+
+    BracketupScanner.prototype.scanSourceLines = function(tokenReceiver, lines, sourceFileName, onUnbalancedAtEnd) {
+      var i, line, sourceFileInfo, _i, _ref;
+      this.depth = 0;
       sourceFileInfo = new SourceFileInfo(sourceFileName, lines);
       for (i = _i = 0, _ref = lines.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
         line = lines[i];
         this.scanLine(tokenReceiver, line, sourceFileInfo.line(line, i + 1));
       }
       tokenReceiver.endOfSource;
-      if (this.depth !== 0) {
+      if (this.depth !== 0 && onUnbalancedAtEnd) {
         return onUnbalancedAtEnd(this.depth, sourceFileInfo);
       }
     };

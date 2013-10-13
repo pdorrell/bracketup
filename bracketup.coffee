@@ -89,6 +89,7 @@ class CustomError
   addSourceCodeErrorInfo: (dom) ->
     if @sourceLinePosition
       @sourceLinePosition.addErrorInfo(@document, dom, @message)
+      
   errorInfoDom: ->
     dom = @document.createNode("div", {cssClassName: "bracketup-error"})
     messageDom = @document.createNode("div", {parent: dom, cssClassName: "message", text: "Compilation Error: "})
@@ -190,6 +191,8 @@ class NodeParseException extends CustomError
 class RecordedToken
   constructor: (@text, @type, @numOpens = 0) ->
     @balanced = false
+  createDom: (document) ->
+    document.createNode("span", {cssClassName: @type, text: @text})
 
 class RecordedLineOfTokens
   constructor: (@depth) ->
@@ -208,10 +211,16 @@ class RecordedLineOfTokens
         matchingStart = @openBracketStack.pop
         matchingStart.balanced = true
         token.balanced = true
-        
-  
 
-# An object that records token parsed (to help with tracing missing "[" or "]" errors)
+  createDom: (document) ->
+    dom = document.createNode("div", {cssClassName: "line"})
+    for i in [0...@depth]
+      document.createNode("div", {parent: dom, cssClassName: "depth-indent", text: "#"})
+    for token in @tokens
+      dom.appendChild(token.createDom(document))
+    dom
+
+# An object that records tokens parsed (to help with tracing missing "[" or "]" errors)
 class RecordedTokens
   constructor: ->
     @lines = []
@@ -220,8 +229,10 @@ class RecordedTokens
     @currentLine = new RecordedLineOfTokens()
     @depths = [0]
 
+  checkDepth: false
+
   addTokenToCurrentLine: (recordedToken) ->
-    @currentLine.push(recordedToken)
+    @currentLine.addToken(recordedToken)
 
   recordStart: (tokenString) ->
     recordedToken = new RecordedToken(tokenString, "open", 1)
@@ -253,19 +264,32 @@ class RecordedTokens
     if !@currentLine.isEmpty
       @lines.push(@currentLine)
 
+  createDom: (document) ->
+    dom = document.createNode("div", {cssClassName: "parsed-tokens"})
+    for line in @lines
+      dom.appendChild(line.createDom(document))
+    dom
+
 class BracketParseException extends NodeParseException
   constructor: (message, @sourceLinePosition) ->
     super(message, @sourceLinePosition)
   addSourceCodeErrorInfo: (dom) ->
+    linesDom = @document.createNode("div", {text: "a bracket parse exception"})
     if @sourceLinePosition
-      linesDom=@document.createNode("div", {text: "a bracket parse exception"})
-      dom.appendChild linesDom
+      sourceLines = @sourceLinePosition.sourceLine.sourceFileInfo.lines
+      fileName = @sourceLinePosition.sourceLine.sourceFileInfo.fileName
+      bracketupScanner = new BracketupScanner
+      recordedTokens = new RecordedTokens
+      bracketupScanner.scanSourceLines(recordedTokens, sourceLines, fileName)
+      dom.appendChild(recordedTokens.createDom(@document))
 
 class NodeParser
   constructor: ->
     @nodesStack = []
     @currentElementNode = null
     @rootElements = []
+
+  checkDepth: true
 
   recordStart: (tokenString) -> {}
   recordEnd: (tokenString) -> {}
@@ -332,29 +356,29 @@ class BracketupScanner
     linePosition = 1
     sourceLinePosition = sourceLine.position(linePosition)
     while (match = scanningRegex.exec(line))
-      #console.log("  match = " + inspect(match))
+      # console.log("  match = " + inspect(match))
       matchedSubstring = match[0]
       matchedSubstrings.push(matchedSubstring)
       #console.log("==> " + inspect(match[0]))
       if match[1]
-        tokenReceiver.recordStart(match[1])
+        tokenReceiver.recordStart(matchedSubstring)
         @sendAnyTexts(tokenReceiver)
         itemArguments = match[2].split(",")
         whitespace = match[3]
         tokenReceiver.startItem(itemArguments, whitespace, sourceLinePosition)
         @depth++
       else if match[4]
-        tokenReceiver.recordEnd(match[4])
+        tokenReceiver.recordEnd(matchedSubstring)
         @sendAnyTexts(tokenReceiver)
-        if @depth <= 0
+        if @depth <= 0 && tokenReceiver.checkDepth
           throw new BracketParseException("Unexpected ']'", sourceLinePosition)
         tokenReceiver.endItem(sourceLinePosition)
         @depth--
       else if match[5]
-        tokenReceiver.recordQuotedCharacter(match[5])
+        tokenReceiver.recordQuotedCharacter(matchedSubstring)
         @saveTextPortion(match[6], sourceLinePosition)
       else if match[7]
-        tokenReceiver.recordText(match[7])
+        tokenReceiver.recordText(matchedSubstring)
         @saveTextPortion(match[7], sourceLinePosition)
       else
         console.log("match = " + inspect(match))
@@ -370,15 +394,18 @@ class BracketupScanner
                                    "\n                  != " + inspect(line), sourceLinePosition)
     # console.log("matched substrings = " + inspect(matchedSubstrings.join("")))
   
-  scanSource: (tokenReceiver, source, sourceFileName, onUnbalancedAtEnd) ->
-    @depth = 0
+  scanSource: (tokenReceiver, source, sourceFileName, onUnbalancedAtEnd = null) ->
     lines = source.split("\n")
+    @scanSourceLines(tokenReceiver, lines, sourceFileName, onUnbalancedAtEnd)
+
+  scanSourceLines: (tokenReceiver, lines, sourceFileName, onUnbalancedAtEnd) ->
+    @depth = 0
     sourceFileInfo = new SourceFileInfo(sourceFileName, lines)
     for i in [0...lines.length]
       line = lines[i]
       @scanLine(tokenReceiver, line, sourceFileInfo.line(line, i+1))
     tokenReceiver.endOfSource
-    if @depth != 0
+    if @depth != 0 && onUnbalancedAtEnd
       onUnbalancedAtEnd(@depth, sourceFileInfo)
 
 class TextElement
