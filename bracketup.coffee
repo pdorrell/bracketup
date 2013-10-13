@@ -1,7 +1,7 @@
 utils = require("./utils.js")
 inspect = utils.inspect
 
-class SourceFileName
+class SourceFileInfo
   constructor: (@fileName) ->
     
   toString: ->
@@ -19,9 +19,9 @@ class SourceFileName
       @line("",0).position(1)
 
 class SourceLine
-  constructor: (@sourceFileName, @line, @lineNumber) ->
+  constructor: (@sourceFileInfo, @line, @lineNumber) ->
   toString: ->
-    @sourceFileName + ":" + @lineNumber
+    @sourceFileInfo + ":" + @lineNumber
   position: (linePosition) ->
     new SourceLinePosition this, linePosition
 
@@ -269,12 +269,12 @@ class BracketupScanner
   scanSource: (tokenReceiver, source, sourceFileName) ->
     @depth = 0
     lines = source.split("\n")
-    sourceFileName = new SourceFileName(sourceFileName)
+    sourceFileInfo = new SourceFileInfo(sourceFileName)
     for i in [0...lines.length]
       line = lines[i]
-      @scanLine(tokenReceiver, line, sourceFileName.line(line, i+1))
+      @scanLine(tokenReceiver, line, sourceFileInfo.line(line, i+1))
     if @depth != 0
-      throw new NodeParseException(@depth + " unbalanced '['s at end of file", sourceFileName.endOfFilePosition(lines))
+      throw new NodeParseException(@depth + " unbalanced '['s at end of file", sourceFileInfo.endOfFilePosition(lines))
 
 class TextElement
   constructor: (@string) ->
@@ -434,10 +434,10 @@ class BracketupCompiler
   constructor: (topLevelClassMap) ->
     @nodeCompiler = new NodeCompiler(topLevelClassMap)
 
-  compile: (source, sourceFileName) ->
+  compile: (source, sourceFileInfo) ->
     bracketupScanner = new BracketupScanner()
     nodeParser = new NodeParser()
-    bracketupScanner.scanSource(nodeParser, source, sourceFileName)
+    bracketupScanner.scanSource(nodeParser, source, sourceFileInfo)
     parsedRootElements = nodeParser.rootElements
     compiledObjects = []
     for rootElement in parsedRootElements
@@ -446,11 +446,11 @@ class BracketupCompiler
       compiledObjects.push(correspondence)
     compiledObjects
   
-  compileDoms: (source, document, sourceFileName) ->
+  compileDoms: (source, document, sourceFileInfo) ->
     compiledDoms = []
     documentWrapper = new Document(document)
     try
-      compiledObjects = @compile(source, sourceFileName)
+      compiledObjects = @compile(source, sourceFileInfo)
       (compiledObject.createDom(documentWrapper) for compiledObject in compiledObjects)
     catch error
       if error instanceof CustomError
