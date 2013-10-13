@@ -86,12 +86,14 @@ class CustomError
       console.log @getMessageLine()
       console.log ""
       console.log @sourceLinePosition.logLineAndPosition().join("\n")
+  addSourceCodeErrorInfo: (dom) ->
+    if @sourceLinePosition
+      @sourceLinePosition.addErrorInfo(@document, dom, @message)
   errorInfoDom: ->
     dom = @document.createNode("div", {cssClassName: "bracketup-error"})
     messageDom = @document.createNode("div", {parent: dom, cssClassName: "message", text: "Compilation Error: "})
     messageTextDom = @document.createNode("span", {parent: messageDom, cssClassName: "message-text", text: @message});
-    if @sourceLinePosition
-      @sourceLinePosition.addErrorInfo(@document, dom, @message)
+    @addSourceCodeErrorInfo(dom)
     dom
 
 class CompileError extends CustomError

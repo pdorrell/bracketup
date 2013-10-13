@@ -209,6 +209,12 @@
       }
     };
 
+    CustomError.prototype.addSourceCodeErrorInfo = function(dom) {
+      if (this.sourceLinePosition) {
+        return this.sourceLinePosition.addErrorInfo(this.document, dom, this.message);
+      }
+    };
+
     CustomError.prototype.errorInfoDom = function() {
       var dom, messageDom, messageTextDom;
       dom = this.document.createNode("div", {
@@ -224,9 +230,7 @@
         cssClassName: "message-text",
         text: this.message
       });
-      if (this.sourceLinePosition) {
-        this.sourceLinePosition.addErrorInfo(this.document, dom, this.message);
-      }
+      this.addSourceCodeErrorInfo(dom);
       return dom;
     };
 
