@@ -184,11 +184,19 @@ $default_block_background: white;
 	}
 	.unbalanced {
 	    color: #005000;
-	    background-color: yellow;
+	    background-color: #f0f030;
+	    &:hover {
+		color: green;
+		background-color: yellow;
+	    }
 	}
 	.unexpected {
-	    color: red;
-	    background-color: #ffa0a0;
+	    color: #d00000;
+	    background-color: #ffc0c0;
+	    &:hover {
+		color: red;
+		background-color: ffa0a0;
+	    }
 	}
     }
 }

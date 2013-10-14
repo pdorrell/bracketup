@@ -383,9 +383,17 @@
     };
 
     RecordedToken.prototype.createDom = function(document) {
+      var attributes;
+      attributes = {};
+      if (this.unexpected) {
+        attributes.title = "Unexpected closing bracket";
+      } else if (!this.balanced) {
+        attributes.title = "Bracket is balanced by a bracket on a different line";
+      }
       return document.createNode("span", {
         cssClassName: this.cssClassName(),
-        text: this.text
+        text: this.text,
+        attributes: attributes
       });
     };
 

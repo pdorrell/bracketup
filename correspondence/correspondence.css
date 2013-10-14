@@ -139,7 +139,13 @@
   margin: 0.2em 0.2em; }
 .parsed-tokens .line .unbalanced {
   color: #005000;
-  background-color: yellow; }
+  background-color: #f0f030; }
+  .parsed-tokens .line .unbalanced:hover {
+    color: green;
+    background-color: yellow; }
 .parsed-tokens .line .unexpected {
-  color: red;
-  background-color: #ffa0a0; }
+  color: #d00000;
+  background-color: #ffc0c0; }
+  .parsed-tokens .line .unexpected:hover {
+    color: red;
+    background-color: ffa0a0; }

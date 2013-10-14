@@ -200,7 +200,12 @@ class RecordedToken
     else
       @type + " unbalanced"
   createDom: (document) ->
-    document.createNode("span", {cssClassName: @cssClassName(), text: @text})
+    attributes = {}
+    if @unexpected
+      attributes.title = "Unexpected closing bracket"
+    else if !@balanced
+      attributes.title = "Bracket is balanced by a bracket on a different line"
+    document.createNode("span", {cssClassName: @cssClassName(), text: @text, attributes: attributes})
   toString: ->
     "{" + @type + " " + @text + " # " + @balanced + "}"
 
@@ -589,7 +594,8 @@ class BracketupCompiler
     nodeParser = new NodeParser()
     bracketupScanner.scanSource(nodeParser, source, sourceFileInfo,
       (depth, sourceFileInfo) ->
-        throw new BracketParseException(depth + " unbalanced '['" + (if depth == 1 then "" else "s"),
+        throw new BracketParseException(depth + " unbalanced '['" +
+                                        (if depth == 1 then "" else "s"),
                                         sourceFileInfo.endOfFilePosition()))
         
     parsedRootElements = nodeParser.rootElements
