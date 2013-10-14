@@ -384,9 +384,17 @@
     };
 
     RecordedToken.prototype.createDom = function(document) {
+      var attributes;
+      attributes = {};
+      if (this.unexpected) {
+        attributes.title = "Unexpected closing bracket";
+      } else if (!this.balanced) {
+        attributes.title = "Bracket is balanced by a bracket on a different line";
+      }
       return document.createNode("span", {
         cssClassName: this.cssClassName(),
-        text: this.text
+        text: this.text,
+        attributes: attributes
       });
     };
 
@@ -1055,7 +1063,7 @@
       bracketupScanner = new BracketupScanner();
       nodeParser = new NodeParser();
       bracketupScanner.scanSource(nodeParser, source, sourceFileInfo, function(depth, sourceFileInfo) {
-        throw new BracketParseException(depth + " unbalanced '['s at end of file", sourceFileInfo.endOfFilePosition());
+        throw new BracketParseException(depth + " unbalanced '['" + (depth === 1 ? "" : "s"), sourceFileInfo.endOfFilePosition());
       });
       parsedRootElements = nodeParser.rootElements;
       compiledObjects = [];
