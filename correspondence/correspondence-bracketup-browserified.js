@@ -374,12 +374,14 @@
     }
 
     RecordedToken.prototype.cssClassName = function() {
+      var tokenCssClassName;
+      tokenCssClassName = this.type + "-token";
       if (this.unexpected) {
-        return this.type + " unexpected";
+        return tokenCssClassName + " unexpected";
       } else if (this.balanced) {
-        return this.type;
+        return tokenCssClassName;
       } else {
-        return this.type + " unbalanced";
+        return tokenCssClassName + " unbalanced";
       }
     };
 
@@ -521,13 +523,13 @@
     };
 
     RecordedTokens.prototype.endOfLine = function(sourceLinePosition) {
-      this.depth = this.currentLine.depthAtEnd;
+      this.depth = Math.max(0, this.currentLine.depthAtEnd);
       this.lines.push(this.currentLine);
       return this.currentLine = new RecordedLineOfTokens(this.depth);
     };
 
     RecordedTokens.prototype.endOfSource = function() {
-      this.depth = this.currentLine.depthAtEnd;
+      this.depth = Math.max(0, this.currentLine.depthAtEnd);
       if (!this.currentLine.isEmpty) {
         return this.lines.push(this.currentLine);
       }
@@ -686,18 +688,20 @@
         if (match[1]) {
           tokenReceiver.recordStart(matchedSubstring);
           this.sendAnyTexts(tokenReceiver);
+          this.depth++;
           itemArguments = match[2].split(",");
           whitespace = match[3];
           tokenReceiver.startItem(itemArguments, whitespace, sourceLinePosition);
-          this.depth++;
         } else if (match[4]) {
           tokenReceiver.recordEnd(matchedSubstring);
           this.sendAnyTexts(tokenReceiver);
-          if (this.depth <= 0 && tokenReceiver.checkDepth) {
-            throw new BracketParseException("One or more unexpected ']'s", sourceLinePosition);
+          this.depth--;
+          if (this.depth < 0) {
+            if (tokenReceiver.checkDepth) {
+              throw new BracketParseException("One or more unexpected ']'s", sourceLinePosition);
+            }
           }
           tokenReceiver.endItem(sourceLinePosition);
-          this.depth--;
         } else if (match[5]) {
           tokenReceiver.recordQuotedCharacter(matchedSubstring);
           this.saveTextPortion(match[6], sourceLinePosition);

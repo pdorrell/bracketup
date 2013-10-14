@@ -193,12 +193,13 @@ class RecordedToken
     @balanced = @numOpens == 0
     @unexpected = false
   cssClassName: ->
+    tokenCssClassName = @type + "-token"
     if @unexpected
-      @type + " unexpected"
+      tokenCssClassName + " unexpected"
     else if @balanced
-      @type
+      tokenCssClassName
     else
-      @type + " unbalanced"
+      tokenCssClassName + " unbalanced"
   createDom: (document) ->
     attributes = {}
     if @unexpected
@@ -278,12 +279,12 @@ class RecordedTokens
   text: (string, sourceLinePosition) -> {}
   
   endOfLine: (sourceLinePosition) ->
-    @depth = @currentLine.depthAtEnd
+    @depth = Math.max(0, @currentLine.depthAtEnd)
     @lines.push(@currentLine)
     @currentLine = new RecordedLineOfTokens(@depth)
 
   endOfSource: ->
-    @depth = @currentLine.depthAtEnd
+    @depth = Math.max(0, @currentLine.depthAtEnd)
     if !@currentLine.isEmpty
       @lines.push(@currentLine)
 
@@ -386,17 +387,18 @@ class BracketupScanner
       if match[1]
         tokenReceiver.recordStart(matchedSubstring)
         @sendAnyTexts(tokenReceiver)
+        @depth++
         itemArguments = match[2].split(",")
         whitespace = match[3]
         tokenReceiver.startItem(itemArguments, whitespace, sourceLinePosition)
-        @depth++
       else if match[4]
         tokenReceiver.recordEnd(matchedSubstring)
         @sendAnyTexts(tokenReceiver)
-        if @depth <= 0 && tokenReceiver.checkDepth
-          throw new BracketParseException("One or more unexpected ']'s", sourceLinePosition)
-        tokenReceiver.endItem(sourceLinePosition)
         @depth--
+        if @depth < 0
+          if tokenReceiver.checkDepth
+            throw new BracketParseException("One or more unexpected ']'s", sourceLinePosition)
+        tokenReceiver.endItem(sourceLinePosition)
       else if match[5]
         tokenReceiver.recordQuotedCharacter(matchedSubstring)
         @saveTextPortion(match[6], sourceLinePosition)
