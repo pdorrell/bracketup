@@ -81,7 +81,7 @@ var correspondenceTests = {
                    function(err) {
                      assert.equal(err.sourceLinePosition.toString(), "test/data/unfinished.bracketup:11:1");
                      assert.equal(err.message, 
-                                  "2 unbalanced '['s at end of file");
+                                  "2 unbalanced '['s");
                      return true;
                    });
   }

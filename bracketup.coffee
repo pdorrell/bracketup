@@ -589,7 +589,7 @@ class BracketupCompiler
     nodeParser = new NodeParser()
     bracketupScanner.scanSource(nodeParser, source, sourceFileInfo,
       (depth, sourceFileInfo) ->
-        throw new BracketParseException(depth + " unbalanced '['s at end of file",
+        throw new BracketParseException(depth + " unbalanced '['" + (if depth == 1 then "" else "s"),
                                         sourceFileInfo.endOfFilePosition()))
         
     parsedRootElements = nodeParser.rootElements

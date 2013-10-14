@@ -1054,7 +1054,7 @@
       bracketupScanner = new BracketupScanner();
       nodeParser = new NodeParser();
       bracketupScanner.scanSource(nodeParser, source, sourceFileInfo, function(depth, sourceFileInfo) {
-        throw new BracketParseException(depth + " unbalanced '['s at end of file", sourceFileInfo.endOfFilePosition());
+        throw new BracketParseException(depth + " unbalanced '['" + (depth === 1 ? "" : "s"), sourceFileInfo.endOfFilePosition());
       });
       parsedRootElements = nodeParser.rootElements;
       compiledObjects = [];
